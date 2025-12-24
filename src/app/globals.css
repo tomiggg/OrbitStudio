@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+/* Orbit Design System — CSS Variables */
+:root {
+  /* Light mode (principal) */
+  --bg: #fdfefe;
+  --section: #f4f9f9;
+  --card: #ffffff;
+
+  --title: #0f2f2d;
+  --text: #334b49;
+  --muted: #6f8f8c;
+
+  --link: #338b85;
+  --linkHover: #005954;
+
+  --cta: #005954;
+  --ctaHover: #338b85;
+
+  --borderSoft: rgba(0, 0, 0, 0.04);
+  --ringSoft: rgba(51, 139, 133, 0.35);
+}
+
+.dark {
+  /* Dark mode (premium) */
+  --bg: #0e1f1e;
+  --section: #132c2a;
+  --card: #1a3a38;
+
+  --title: #e8fdfb;
+  --text: #b8dedd;
+  --muted: #7fbdb8;
+
+  --link: #5dc1b9;
+  --linkHover: #9ce0db;
+
+  --cta: #5dc1b9;
+  --ctaHover: #9ce0db;
+
+  --borderSoft: rgba(255, 255, 255, 0.06);
+  --ringSoft: rgba(93, 193, 185, 0.35);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Links: usar clase, NO global */
+.orbit-link {
+  color: var(--link);
+  text-decoration: none;
+}
+.orbit-link:hover {
+  color: var(--linkHover);
+  text-decoration: underline;
+}
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a[role="button"],
+a.buttonlike {
+  text-decoration: none !important;
+}
+
+
+/* Layout helpers */
+.orbit-container {
+  width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+
+@media (min-width: 768px) {
+  .orbit-container {
+    padding-inline: 28px;
+  }
+}
+
+.orbit-section {
+  padding-block: 64px;
+}
+
+@media (min-width: 768px) {
+  .orbit-section {
+    padding-block: 88px;
+  }
+}
+
+.orbit-card {
+  border: 1px solid var(--borderSoft);
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
