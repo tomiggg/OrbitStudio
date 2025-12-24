@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { ReactNode, ButtonHTMLAttributes } from "react";
 
 type Variant = "primary" | "secondary";
 type Size = "md" | "lg";
@@ -19,38 +19,45 @@ const variants: Record<Variant, string> = {
     "border border-[color:var(--link)] bg-transparent text-[color:var(--link)] hover:bg-[color:rgba(93,193,185,0.10)]",
 };
 
+type CommonProps = {
+  children: ReactNode;
+  variant?: Variant;
+  size?: Size;
+  className?: string;
+};
+
+export function Button({
+  children,
+  variant = "primary",
+  size = "md",
+  className = "",
+  ...props
+}: CommonProps & ButtonHTMLAttributes<HTMLButtonElement>) {
+  const cls = `${base} ${sizes[size]} ${variants[variant]} ${className}`;
+
+  const style = variant === "primary" ? ({ color: "#fff" } as const) : undefined;
+
+  return (
+    <button type="button" className={cls} style={style} {...props}>
+      {children}
+    </button>
+  );
+}
+
 export function ButtonLink({
   href,
   children,
   variant = "primary",
   size = "md",
   className = "",
-}: {
-  href: string;
-  children: ReactNode;
-  variant?: Variant;
-  size?: Size;
-  className?: string;
-}) {
+}: CommonProps & { href: string }) {
   const isExternal = /^https?:\/\//.test(href);
-
   const cls = `${base} ${sizes[size]} ${variants[variant]} ${className}`;
-
-  // 🔒 Blindado: el primary siempre blanco pase lo que pase
-  const style =
-    variant === "primary"
-      ? ({ color: "#fff" } as const)
-      : undefined;
+  const style = variant === "primary" ? ({ color: "#fff" } as const) : undefined;
 
   if (isExternal) {
     return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noreferrer"
-        className={cls}
-        style={style}
-      >
+      <a href={href} target="_blank" rel="noreferrer" className={cls} style={style}>
         {children}
       </a>
     );

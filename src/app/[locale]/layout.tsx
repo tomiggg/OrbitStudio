@@ -4,9 +4,6 @@ import { notFound } from "next/navigation";
 import { isLocale } from "@/i18n/routing";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { Services } from "@/components/home/Services";
-import { Process } from "@/components/home/Process";
-import { FinalCta } from "@/components/home/FinalCta";
 
 export default async function LocaleLayout({
   children,
@@ -24,9 +21,6 @@ export default async function LocaleLayout({
     <NextIntlClientProvider locale={locale} messages={messages}>
       <Header />
       {children}
-      <Services />
-      <Process />
-      <FinalCta />
       <Footer />
     </NextIntlClientProvider>
   );

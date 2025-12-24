@@ -107,3 +107,18 @@ a.buttonlike {
   border-radius: 16px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
+
+:root {
+  --linkTiffany: #0a3246;
+  --linkTiffanyHover: #0d405a;
+}
+
+.orbit-nav-link {
+  color: var(--linkTiffany);
+  font-weight: 550; /* 👈 sutil, premium */
+  transition: color 0.2s ease;
+}
+
+.orbit-nav-link:hover {
+  color: var(--linkTiffanyHover);
+}

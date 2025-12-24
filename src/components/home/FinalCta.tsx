@@ -1,10 +1,10 @@
 import { Container } from "@/components/ui/Container";
 
 type FinalCtaProps = {
-  onPrimaryClick?: () => void;
+  onOpenContact?: () => void;
 };
 
-export function FinalCta({ onPrimaryClick }: FinalCtaProps) {
+export function FinalCta({ onOpenContact }: FinalCtaProps) {
   return (
     <section id="contact" className="relative overflow-hidden py-18 md:py-24">
       {/* Fondo suave (respeta tu design system) */}
@@ -30,19 +30,19 @@ export function FinalCta({ onPrimaryClick }: FinalCtaProps) {
             </h2>
 
             <p className="mx-auto mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-[color:var(--muted)] md:text-base">
-              Te decimos qué conviene construir primero para vender, ordenar y escalar.
-              Claro, rápido y sin compromiso.
+              Te decimos qué conviene construir primero para vender, ordenar y
+              escalar. Claro, rápido y sin compromiso.
             </p>
 
             <div className="mt-10 flex justify-center">
               <button
                 type="button"
-                onClick={onPrimaryClick}
+                onClick={() => onOpenContact?.()}
                 className="
                   inline-flex items-center justify-center
                   rounded-xl bg-[color:var(--cta)]
                   px-8 py-4 text-base font-semibold
-                  text-[color:#fff] hover:text-[color:#fff]
+                  text-white
                   shadow-[0_10px_30px_rgba(0,89,84,0.18)]
                   transition hover:bg-[color:var(--ctaHover)]
                   focus:outline-none focus:ring-2 focus:ring-[color:var(--ringSoft)]

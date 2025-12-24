@@ -2,7 +2,6 @@
 
 import { useMemo, useRef, useState } from "react";
 import { Container } from "@/components/ui/Container";
-import { ButtonLink } from "@/components/ui/Button";
 
 type Extra = { name: string; price: string };
 
@@ -15,6 +14,10 @@ type Service = {
   mockupSrc: string; // ruta en /public
   includes: string[];
   extras: Extra[];
+};
+
+type ServicesProps = {
+  onOpenContact: (serviceTitle?: string) => void;
 };
 
 const SERVICES: Service[] = [
@@ -101,7 +104,7 @@ const SERVICES: Service[] = [
   },
 ];
 
-export function Services() {
+export function Services({ onOpenContact }: ServicesProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const selected = useMemo(
@@ -115,8 +118,10 @@ export function Services() {
     const el = railRef.current;
     if (!el) return;
 
-    // Scroll “por una card” aprox (responsive)
-    const amount = Math.min(420, Math.max(280, Math.floor(el.clientWidth * 0.85)));
+    const amount = Math.min(
+      420,
+      Math.max(280, Math.floor(el.clientWidth * 0.85))
+    );
     el.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
   }
 
@@ -135,7 +140,7 @@ export function Services() {
 
         {/* Carrusel */}
         <div className="relative mt-12">
-          {/* Fade edges (sugiere scroll) */}
+          {/* Fade edges */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-[color:var(--section)] to-transparent"
@@ -304,8 +309,6 @@ export function Services() {
                       />
                     </div>
                   </div>
-
-
                 </div>
               </div>
             </div>
@@ -320,9 +323,13 @@ export function Services() {
                 Cerrar
               </button>
 
-              <ButtonLink href="#contact" size="md" className="!text-white">
+              <button
+                type="button"
+                onClick={() => onOpenContact(selected.title)}
+                className="inline-flex items-center justify-center rounded-xl bg-[color:var(--cta)] px-5 py-3 text-sm font-semibold text-white hover:bg-[color:var(--ctaHover)]"
+              >
                 Elegir este servicio
-              </ButtonLink>
+              </button>
             </div>
           </div>
         )}
