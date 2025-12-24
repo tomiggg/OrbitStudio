@@ -1,107 +1,150 @@
+"use client";
+
+import Link from "next/link";
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 
 export function Footer() {
   return (
-    <footer className="relative border-t border-[color:var(--borderSoft)] bg-[color:var(--bg)]">
-      {/* glow sutil */}
+    <footer
+      className="relative overflow-hidden"
+      style={{ backgroundColor: "#0ABAB5" }}
+    >
+      {/* top fade */}
       <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 -top-24 mx-auto h-40 max-w-5xl
-                   rounded-full bg-[color:var(--link)]/10 blur-3xl"
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-14"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0))",
+        }}
       />
 
-      <Container>
-        <div className="py-12">
-          <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
-            {/* Brand */}
-            <div className="max-w-md">
-              <div className="text-sm font-semibold tracking-tight text-[color:var(--title)]">
-                Orbit Digital
-              </div>
+      {/* noise */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 footer-noise" />
 
-              <p className="mt-3 text-sm leading-relaxed text-[color:var(--text)]">
+      <Container>
+        <div className="relative py-8">
+          {/* MAIN GRID */}
+          <div className="grid gap-10 md:grid-cols-4 md:items-start">
+            {/* BRAND */}
+            <div className="max-w-sm">
+              <Link href="/es" className="inline-flex items-center">
+                <Image
+                  src="/logo/orbit-logo-header.png"
+                  alt="Orbit Digital"
+                  width={150}
+                  height={36}
+                  className="h-8 w-auto object-contain"
+                />
+              </Link>
+
+              <p className="mt-3 text-sm text-[#072b2a]/80">
                 Soluciones digitales pensadas para negocios que quieren crecer.
               </p>
 
-              <p className="mt-4 text-xs leading-relaxed text-[color:var(--muted)]">
+              <p className="mt-2 text-sm text-[#072b2a]/65">
                 Transformamos negocios tradicionales en soluciones digitales competitivas.
               </p>
             </div>
 
-            {/* Columns */}
-            <div className="grid w-full grid-cols-2 gap-8 text-sm md:w-auto md:grid-cols-3">
-              {/* Links */}
-              <div className="space-y-3">
-                <div className="text-sm font-semibold text-[color:var(--title)]">
-                  Secciones
-                </div>
-
-                <a href="#services" className="orbit-link block">
-                  Servicios
-                </a>
-                <a href="#portfolio" className="orbit-link block">
-                  Proyectos
-                </a>
-                <a href="#process" className="orbit-link block">
-                  Proceso
-                </a>
-                <a href="#contact" className="orbit-link block">
-                  Contacto
-                </a>
+            {/* SECCIONES */}
+            <div>
+              <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#072b2a]/60">
+                Secciones
               </div>
+              <ul className="space-y-2">
+                <li><a href="#services" className="footer-link">Servicios</a></li>
+                <li><a href="#portfolio" className="footer-link">Proyectos</a></li>
+                <li><a href="#process" className="footer-link">Proceso</a></li>
+                <li><a href="#contact" className="footer-link">Contacto</a></li>
+              </ul>
+            </div>
 
-              {/* Contact */}
-              <div className="space-y-3">
-                <div className="text-sm font-semibold text-[color:var(--title)]">
-                  Contacto
-                </div>
-
-                <a
-                  href="https://wa.me/5493510000000?text=Hola%20Orbit%20Digital%2C%20quiero%20consultar%20por%20un%20proyecto."
-                  target="_blank"
-                  rel="noreferrer"
-                  className="orbit-link block"
-                >
-                  WhatsApp
-                </a>
-
-                <a href="mailto:hola@orbitdigital.com" className="orbit-link block">
-                  hola@orbitdigital.com
-                </a>
-
-                <span className="block text-sm text-[color:var(--muted)]">
-                  Córdoba, AR
-                </span>
+            {/* CONTACTO */}
+            <div>
+              <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#072b2a]/60">
+                Contacto
               </div>
+              <ul className="space-y-2">
+                <li>
+                  <a
+                    href="https://wa.me/5493510000000"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="footer-link"
+                  >
+                    WhatsApp
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="mailto:hola@orbitdigital.com"
+                    className="footer-link break-all"
+                  >
+                    hola@orbitdigital.com
+                  </a>
+                </li>
+                <li className="text-sm text-[#072b2a]/60">Córdoba, AR</li>
+              </ul>
+            </div>
 
-              {/* Legal */}
-              <div className="space-y-3">
-                <div className="text-sm font-semibold text-[color:var(--title)]">
-                  Legal
-                </div>
-
-                <div className="text-sm text-[color:var(--text)]">
-                  © {new Date().getFullYear()} Orbit Digital
-                </div>
-
-                <div className="text-sm text-[color:var(--muted)]">
-                  Todos los derechos reservados.
-                </div>
+            {/* LEGAL */}
+            <div>
+              <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#072b2a]/60">
+                Legal
               </div>
+              <p className="text-sm text-[#072b2a]/75">
+                © {new Date().getFullYear()} Orbit Digital
+              </p>
+              <p className="mt-1 text-sm text-[#072b2a]/55">
+                Todos los derechos reservados.
+              </p>
             </div>
           </div>
 
-          {/* Bottom bar */}
-          <div className="mt-10 border-t border-[color:var(--borderSoft)] pt-6">
-            <div className="flex flex-col gap-2 text-xs text-[color:var(--muted)] md:flex-row md:items-center md:justify-between">
+          {/* BOTTOM BAR */}
+          <div className="mt-6 border-t border-white/20 pt-4">
+            <div className="flex flex-col gap-2 text-xs text-[#072b2a]/60 md:flex-row md:justify-between">
               <span>Hecho en Córdoba · Enfoque en resultados</span>
-              <span className="text-[color:var(--muted)]">
-                Diseño & desarrollo web · Landing pages · Web apps
-              </span>
+              <span>Diseño & desarrollo web · Landing pages · Web apps</span>
             </div>
           </div>
         </div>
       </Container>
+
+      <style jsx>{`
+        .footer-noise {
+          opacity: 0.04;
+          mix-blend-mode: overlay;
+          background-image: repeating-linear-gradient(
+              0deg,
+              rgba(255, 255, 255, 0.08) 0px,
+              rgba(255, 255, 255, 0.08) 1px,
+              transparent 1px,
+              transparent 3px
+            ),
+            repeating-linear-gradient(
+              90deg,
+              rgba(0, 0, 0, 0.05) 0px,
+              rgba(0, 0, 0, 0.05) 1px,
+              transparent 1px,
+              transparent 4px
+            );
+        }
+
+        .footer-link {
+          font-size: 14px;
+          font-weight: 600;
+          color: rgba(7, 43, 42, 0.75);
+          transition: color 160ms ease, transform 160ms ease;
+        }
+
+        .footer-link:hover {
+          color: rgba(7, 43, 42, 1);
+          transform: translateY(-1px);
+        }
+      `}</style>
     </footer>
   );
 }
