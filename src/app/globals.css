@@ -122,3 +122,102 @@ a.buttonlike {
 .orbit-nav-link:hover {
   color: var(--linkTiffanyHover);
 }
+
+
+/* HERO helpers */
+.hero-noise {
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.08) 0px,
+      rgba(255, 255, 255, 0.08) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.05) 0px,
+      rgba(0, 0, 0, 0.05) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+}
+
+.hero-right-abs {
+  position: absolute;
+  right: 0px;
+  bottom: 140px;
+}
+
+.caret-solid {
+  opacity: 1;
+}
+
+.caret-blink {
+  animation: hero-blink 900ms step-end infinite;
+}
+
+@keyframes hero-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-right-abs {
+    display: none;
+  }
+}
+
+@keyframes heroFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-hero-fade {
+  animation: heroFade 700ms ease-out forwards;
+}
+
+@keyframes heroFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-fade-slide {
+  animation: heroFadeSlide 700ms ease-out both;
+}
+
+
+@keyframes orbit-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.services-marquee-track {
+  animation: orbit-marquee var(--marquee-duration, 60s) linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .services-marquee-track {
+    animation: none !important;
+    transform: none !important;
+  }
+}

@@ -4,9 +4,9 @@ import { useMemo, useState } from "react";
 import { Container } from "@/components/ui/Container";
 import { SERVICES } from "@/lib/services";
 import type { Service } from "@/lib/services";
-
 import { ServicesCarousel } from "@/components/home/services/ServicesCarousel";
 import { ServiceDetails } from "@/components/home/services/ServiceDetails";
+import { motion } from "framer-motion";
 
 type ServicesProps = {
   onOpenContact: (serviceTitle?: string) => void;
@@ -23,10 +23,9 @@ export function Services({ onOpenContact }: ServicesProps) {
   return (
     <section
       id="services"
-      className="relative overflow-hidden py-16 md:py-20"
+      className="relative overflow-hidden min-h-[100svh] py-20 md:py-24"
       style={{ backgroundColor: "#a7e9e7ff" }}
     >
-      {/* Separación suave desde hero */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-24"
@@ -39,30 +38,49 @@ export function Services({ onOpenContact }: ServicesProps) {
       <div aria-hidden className="pointer-events-none absolute inset-0 services-noise" />
 
       <Container>
-        {/* Header */}
-        <div className="mx-auto max-w-3xl text-center">
-          <h2
-            className="font-extrabold tracking-[-0.06em] text-[#072b2a]"
-            style={{ fontSize: "clamp(44px, 4.4vw, 72px)", lineHeight: "0.95" }}
+        <div className="flex min-h-[calc(100svh-140px)] flex-col justify-center">
+          {/* Header */}
+          <motion.div
+            className="mx-auto max-w-3xl text-center"
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.35 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            Servicios diseñados para negocio
-          </h2>
+            <h2
+              className="font-extrabold tracking-[-0.06em] text-[#072b2a]"
+              style={{ fontSize: "clamp(44px, 4.4vw, 72px)", lineHeight: "0.95" }}
+            >
+              Servicios diseñados para negocio
+            </h2>
 
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-[#072b2a]/70 md:text-base">
-            Elegí un punto de partida. Después lo iteramos según tus objetivos.
-          </p>
+            <motion.p
+              className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-[#072b2a]/70 md:text-base"
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+            >
+              Elegí un punto de partida. Después lo iteramos según tus objetivos.
+            </motion.p>
+          </motion.div>
+
+          {/* Grid */}
+          <motion.div
+            className="mt-12"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <ServicesCarousel
+              services={SERVICES}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+            />
+          </motion.div>
         </div>
 
-        {/* Carrusel */}
-        <div className="mt-12">
-          <ServicesCarousel
-            services={SERVICES}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-          />
-        </div>
-
-        {/* Detalle modular */}
         {selected && (
           <ServiceDetails
             service={selected}

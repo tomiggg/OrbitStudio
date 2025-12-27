@@ -1,97 +1,97 @@
 "use client";
 
-import { useRef } from "react";
 import type { Service } from "@/lib/services";
-import { ServiceCard } from "./ServiceCard";
+import { motion } from "framer-motion";
 
 type Props = {
   services: Service[];
   selectedId: string | null;
   onSelect: (id: string) => void;
-
-  /** color base del fondo (para los fades laterales) */
-  fadeBg?: string; // ej: "rgba(232, 232, 232, 1)"
 };
 
-export function ServicesCarousel({
-  services,
-  selectedId,
-  onSelect,
-  fadeBg = "rgba(167,233,231,1)",
-}: Props) {
-  const railRef = useRef<HTMLDivElement | null>(null);
-
-  function scrollByCards(dir: "left" | "right") {
-    const el = railRef.current;
-    if (!el) return;
-
-    const amount = Math.min(420, Math.max(280, Math.floor(el.clientWidth * 0.85)));
-    el.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
-  }
-
-  const arrowBtnClass =
-    "absolute top-1/2 z-20 -translate-y-1/2 rounded-xl px-3 py-2 text-sm font-semibold text-[#072b2a] bg-white/10 backdrop-blur border border-white/20 shadow-[0_8px_22px_rgba(0,0,0,0.10)] hover:bg-white/14";
-
+export function ServicesCarousel({ services, selectedId, onSelect }: Props) {
   return (
-    <div className="relative mt-12">
-      {/* Fade edges */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10"
-        style={{
-          background: `linear-gradient(to right, ${fadeBg}, rgba(167,233,231,0))`,
-        }}
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10"
-        style={{
-          background: `linear-gradient(to left, ${fadeBg}, rgba(167,233,231,0))`,
-        }}
-      />
+    <div className="mx-auto w-full max-w-[1280px]">
+      <div className="flex flex-col gap-6 md:flex-row md:gap-8">
+        {services.map((s, i) => {
+          const active = s.id === selectedId;
 
-      {/* Flechas (desktop) */}
-      <div className="hidden md:block">
-        <button
-          type="button"
-          onClick={() => scrollByCards("left")}
-          className={`${arrowBtnClass} left-0`}
-          aria-label="Anterior"
-        >
-          <span aria-hidden="true">&larr;</span>
-        </button>
+          const highlights = Array.isArray((s as any).highlights)
+            ? ((s as any).highlights as string[]).slice(0, 3)
+            : [];
 
-        <button
-          type="button"
-          onClick={() => scrollByCards("right")}
-          className={`${arrowBtnClass} right-0`}
-          aria-label="Siguiente"
-        >
-          <span aria-hidden="true">&rarr;</span>
-        </button>
-      </div>
+          return (
+            <motion.button
+              key={s.id}
+              type="button"
+              onClick={() => onSelect(s.id)}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{
+                duration: 0.55,
+                delay: 0.08 * i,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              whileHover={{ y: -6, scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              className={[
+                "group",
+                "w-full md:flex-1 min-w-0",
+                "text-left rounded-xl",
+                "h-[360px] md:h-[380px]",
+                "p-10 flex flex-col",
+                "border border-white/25",
+                "bg-white/30 backdrop-blur-2xl",
+                "shadow-[0_18px_50px_rgba(0,0,0,0.12)]",
+                "transition-shadow",
+                active
+                  ? "bg-white/55 border-black/15 shadow-[0_22px_60px_rgba(0,0,0,0.16)]"
+                  : "hover:bg-white/42 hover:shadow-[0_22px_60px_rgba(0,0,0,0.14)]",
+              ].join(" ")}
+            >
+              <div>
+                <p className="text-xl font-extrabold tracking-[-0.02em] text-[#072b2a]">
+                  {s.title}
+                </p>
 
-      {/* Rail */}
-<div
-  ref={railRef}
-  className="
-    flex items-stretch gap-6 overflow-x-auto py-2 pb-4
-    px-1 sm:px-2 md:px-0
-    snap-x snap-mandatory
-    scroll-smooth
-    [-ms-overflow-style:none]
-    [scrollbar-width:none]
-    [&::-webkit-scrollbar]:hidden
-  "
->
-        {services.map((s) => (
-          <ServiceCard
-            key={s.id}
-            service={s}
-            isActive={s.id === selectedId}
-            onSelect={onSelect}
-          />
-        ))}
+                {"priceFrom" in s && (
+                  <div className="mt-3 text-sm font-semibold text-[#0ABAB5]">
+                    Desde {(s as any).priceFrom}
+                  </div>
+                )}
+
+                {"idealFor" in s && (
+                  <p className="mt-3 text-sm leading-relaxed text-[#072b2a]/70">
+                    <span className="font-semibold text-[#072b2a]">Ideal para:</span>{" "}
+                    {(s as any).idealFor}
+                  </p>
+                )}
+
+                <div className="mt-5 h-[84px]">
+                  {highlights.length > 0 && (
+                    <ul className="space-y-2 text-sm text-[#072b2a]/70">
+                      {highlights.map((h) => (
+                        <li key={h} className="flex items-start gap-2">
+                          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#0ABAB5]" />
+                          <span className="line-clamp-1">{h}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
+              {/* CTA minimal pro */}
+              <div className="mt-auto pt-8">
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#072b2a]/70 transition group-hover:text-[#072b2a]">
+                  Ver más
+                  <span className="h-[1px] w-6 bg-[#072b2a]/25 transition-all group-hover:w-10 group-hover:bg-[#0ABAB5]" />
+                </span>
+              </div>
+            </motion.button>
+          );
+        })}
       </div>
     </div>
   );

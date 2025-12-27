@@ -1,187 +1,155 @@
 "use client";
 
-type HeroProps = {
-  onOpenContact?: () => void;
-};
+import { useEffect, useMemo } from "react";
+import { useTypewriterLines } from "@/hooks/useTypewriterLines";
+
+type HeroProps = { onOpenContact?: () => void };
 
 export function Hero({ onOpenContact }: HeroProps) {
-  const primaryBtn =
-    "hero-cta hero-cta-1 inline-flex items-center justify-center rounded-full bg-[#072b2a] px-7 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 hover:bg-[#061f1e] focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-[#0ABAB5]";
+  const headlineLines = useMemo(() => ["Tu", "Marca", "Digital."], []);
 
-  const secondaryBtn =
-    "hero-cta hero-cta-2 inline-flex items-center justify-center rounded-full border border-white/25 bg-white/12 px-7 py-3 text-sm font-semibold text-[#072b2a] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/18 focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-[#0ABAB5]";
+  const { typedLines, done, cycle } = useTypewriterLines(headlineLines, {
+    startDelayMs: 520,
+    lineDelayMs: 240,
+    charMs: 26,
+    repeatDelayMs: 5000,
+  });
 
-  const scrollBtn =
-    "hero-cta hero-cta-3 flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[#072b2a]/80 backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/16";
+  // Evita llegar con hash y quedar scrolleado
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash) {
+      window.history.replaceState(null, "", window.location.pathname);
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }
+  }, []);
 
   return (
     <section
       id="top"
-      className="relative min-h-screen overflow-hidden"
-      style={{ backgroundColor: "#0ABAB5" }}
+      className="relative overflow-hidden"
+      style={{
+        minHeight: "100svh",
+        background:
+          "radial-gradient(circle at 20% 25%, rgba(255,255,255,0.18), rgba(255,255,255,0) 55%), radial-gradient(circle at 80% 70%, rgba(7,43,42,0.10), rgba(7,43,42,0) 55%), linear-gradient(180deg, #0ABAB5 0%, #09b2ad 55%, #0ABAB5 100%)",
+      }}
     >
+      {/* top fade */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-28"
         style={{
-          background:
-            "linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0))",
+          background: "linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0))",
         }}
       />
 
+      {/* noise */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 hero-noise" />
 
-      {/* NOTE: sin pt acá, para no duplicar */}
-      <div className="relative mx-auto flex min-h-screen w-full max-w-[1100px] flex-col px-5 pb-10 md:px-8 md:pb-12">
-        {/* ✅ Este pt es el ÚNICO control para bajar TODO el hero */}
-        <div className="flex flex-1 items-start pt-28 md:pt-36">
-          <div className="w-full">
-            {/* MAIN ROW */}
-            <div className="grid w-full gap-10 md:grid-cols-12 md:items-start">
-              {/* LEFT */}
-              <div className="md:col-span-8">
-                <div className="max-w-[780px]">
-                  <h1 className="font-extrabold tracking-[-0.06em] text-[#072b2a]">
-                    <span
-                      className="block hero-line hero-line-1"
-                      style={{ fontSize: "clamp(96px, 9.4vw, 176px)", lineHeight: "0.92" }}
-                    >
-                      Tu
-                    </span>
-                    <span
-                      className="block hero-line hero-line-2"
-                      style={{ fontSize: "clamp(92px, 8.9vw, 168px)", lineHeight: "0.92" }}
-                    >
-                      Marca
-                    </span>
-                    <span
-                      className="block hero-line hero-line-3"
-                      style={{ fontSize: "clamp(98px, 9.6vw, 178px)", lineHeight: "0.92" }}
-                    >
-                      Digital.
-                    </span>
-                  </h1>
-
-                  <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <button type="button" onClick={() => onOpenContact?.()} className={primaryBtn}>
-                      Hablá por WhatsApp
-                    </button>
-
-                    <a href="#process" className={secondaryBtn}>
-                      Ver cómo trabajamos
-                    </a>
-                  </div>
-
-                  {/* MOBILE SUPPORT */}
-                  <p className="mt-6 text-sm leading-relaxed text-[#072b2a]/80 md:hidden">
-                    Respuesta en el día · Sin compromiso · Presupuesto claro
-                    <span className="mt-2 block opacity-80">
-                      Diseño y desarrollo enfocado en conversión. Sin vueltas.
-                    </span>
-                  </p>
-                </div>
-              </div>
-
-              {/* Spacer col on desktop */}
-              <div className="hidden md:block md:col-span-4" />
-            </div>
-
-            {/* DESKTOP SUPPORT (bottom-right, no box) */}
-            <div className="hidden md:block hero-right-abs">
-              <div className="flex items-start gap-6">
-                <div className="mt-1 h-14 w-px bg-[#072b2a]/20" aria-hidden="true" />
-                <div className="max-w-[420px]">
-                  <p className="text-sm font-semibold text-[#072b2a]/85">
-                    Respuesta en el día <span className="opacity-40">·</span> Sin compromiso{" "}
-                    <span className="opacity-40">·</span> Presupuesto claro
-                  </p>
-                  <p className="mt-3 text-base leading-relaxed text-[#072b2a]/70">
-                    Diseño y desarrollo enfocado en conversión. Sin vueltas.
-                  </p>
-                </div>
-              </div>
+      {/* MOBILE microcopy */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-10 z-30 md:hidden">
+        <div className="px-5">
+          {/* key en el wrapper animado para que reinicie cada ciclo */}
+          <div key={cycle} className="pointer-events-auto hero-fade-slide flex items-start gap-4">
+            <div className="mt-1 h-12 w-px bg-[#072b2a]/20" />
+            <div className="max-w-[520px]">
+              <p className="text-xs font-extrabold tracking-wide text-[#072b2a]/70">
+                RESPUESTA EN EL DÍA <span className="opacity-40">·</span> SIN COMPROMISO{" "}
+                <span className="opacity-40">·</span> PRESUPUESTO CLARO
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-[#072b2a]/70">
+                Diseño y desarrollo enfocado en conversión. Sin vueltas.
+              </p>
             </div>
           </div>
         </div>
-
-        {/* Scroll hint */}
-        <div className="mt-10 flex items-center justify-center">
-          <a href="#services" className={scrollBtn} aria-label="Ir a servicios">
-            ↓
-          </a>
-        </div>
       </div>
 
-      <style jsx>{`
-        .hero-noise {
-          opacity: 0.07;
-          mix-blend-mode: overlay;
-          background-image: repeating-linear-gradient(
-              0deg,
-              rgba(255, 255, 255, 0.08) 0px,
-              rgba(255, 255, 255, 0.08) 1px,
-              transparent 1px,
-              transparent 3px
-            ),
-            repeating-linear-gradient(
-              90deg,
-              rgba(0, 0, 0, 0.05) 0px,
-              rgba(0, 0, 0, 0.05) 1px,
-              transparent 1px,
-              transparent 4px
-            );
-        }
+      {/* WRAPPER */}
+      <div className="relative mx-auto w-full max-w-[1100px] px-5 md:px-8">
+        <div className="flex items-start pt-24 pb-44 md:pt-32 md:pb-24" style={{ minHeight: "100svh" }}>
+          <div className="w-full">
+            <div className="grid w-full gap-10 md:grid-cols-12 md:items-end">
+              {/* LEFT – HEADLINE */}
+              <div className="md:col-span-7">
+                <div className="max-w-[820px]">
+                  {/* ⛔ NO TOCAR alturas: reservorio fijo */}
+                  <div className="flex flex-col justify-end [min-height:300px] sm:[min-height:360px] md:[min-height:460px] lg:[min-height:520px]">
+                    <h1
+                      key={cycle} // reinicia fade+slide cada 5s
+                      className="hero-fade-slide font-extrabold tracking-[-0.06em] text-[#072b2a]"
+                      style={{ lineHeight: "0.90" }}
+                    >
+                      {headlineLines.map((_, idx) => {
+                        const txt = typedLines[idx] ?? "";
+                        const isActiveLine =
+                          idx === Math.min(typedLines.length - 1, headlineLines.length - 1);
 
-        /* Bottom-right placement (desktop) */
-        .hero-right-abs {
-          position: absolute;
-          right: 0px;
-          bottom: 140px;
-        }
+                        return (
+                          <span
+                            key={idx}
+                            className="block"
+                            style={{
+                              fontSize:
+                                idx === 1
+                                  ? "clamp(106px, 10.2vw, 190px)"
+                                  : idx === 0
+                                  ? "clamp(112px, 10.8vw, 200px)"
+                                  : "clamp(114px, 11.0vw, 204px)",
+                            }}
+                          >
+                            <span className="align-top">
+  {txt && txt.length > 0 ? txt : "\u00A0"}
+</span>
 
-        .hero-line {
-          opacity: 0;
-          transform: translateY(10px);
-          animation: inUp 240ms ease-out forwards;
-        }
-        .hero-line-1 {
-          animation-delay: 60ms;
-        }
-        .hero-line-2 {
-          animation-delay: 120ms;
-        }
-        .hero-line-3 {
-          animation-delay: 180ms;
-        }
+                            {isActiveLine && (
+                              <span
+                                aria-hidden="true"
+                                className={[
+                                  "ml-[2px] inline-block w-[12px] translate-y-[0.06em] bg-[#072b2a]",
+                                  done ? "caret-blink" : "caret-solid",
+                                ].join(" ")}
+                                style={{ height: "0.9em" }}
+                              />
+                            )}
+                          </span>
+                        );
+                      })}
+                    </h1>
+                  </div>
+                </div>
+              </div>
 
-        .hero-cta {
-          opacity: 0;
-          transform: translateY(8px);
-          animation: inUp 220ms ease-out forwards;
-        }
-        .hero-cta-1 {
-          animation-delay: 220ms;
-        }
-        .hero-cta-2 {
-          animation-delay: 260ms;
-        }
-        .hero-cta-3 {
-          animation-delay: 320ms;
-        }
+              {/* RIGHT – DESKTOP MICROCOPY */}
+              <div className="hidden md:flex md:col-span-5 md:items-end">
+  {/* key en el wrapper animado + subir óptico para alinear con “Digital.” */}
+  <div
+    key={cycle}
+    className="hero-fade-slide ml-10 max-w-[420px] -translate-y-10 lg:-translate-y-12"
+  >
+    <div className="flex items-start gap-6">
+      <div className="h-14 w-px bg-[#072b2a]/20" />
 
-        @keyframes inUp {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
+      <div>
+        {/* FRASE PRINCIPAL */}
+        <p className="text-base font-semibold leading-snug text-[#072b2a]/80">
+          Adaptamos tu negocio al mundo digital.
+        </p>
 
-        @media (max-width: 768px) {
-          .hero-right-abs {
-            display: none;
-          }
-        }
-      `}</style>
+        {/* FRASE SECUNDARIA */}
+        <p className="mt-3 text-sm font-medium tracking-wide leading-snug text-[#072b2a]/55">
+  Estrategia <span className="opacity-40">·</span> Diseño{" "}
+  <span className="opacity-40">·</span> Desarrollo
+</p>
+      </div>
+    </div>
+  </div>
+</div>
+            </div>
+            {/* end grid */}
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
