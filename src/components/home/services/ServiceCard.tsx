@@ -1,78 +1,114 @@
 "use client";
 
 import type { Service } from "@/lib/services";
+import { motion } from "framer-motion";
 
 type Props = {
-  service: Service;
-  isActive: boolean;
+  services: Service[];
+  selectedId: string | null;
   onSelect: (id: string) => void;
 };
 
-export function ServiceCard({ service, isActive, onSelect }: Props) {
+export function ServicesCarousel({ services, selectedId, onSelect }: Props) {
+  const handleSelect = (id: string) => {
+    onSelect(id);
+
+    // ✅ scroll al details cuando ya exista en el DOM
+    requestAnimationFrame(() => {
+      const el = document.getElementById("service-details");
+      if (!el) return;
+
+      el.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  };
+
   return (
-    <button
-      type="button"
-      onClick={() => onSelect(service.id)}
-      className={[
-        // layout
-        "snap-start w-[86vw] sm:w-[360px] md:w-[360px] flex-none",
-        "rounded-xl px-6 py-6 text-left transition",
+    <div className="mx-auto w-full max-w-[1280px]">
+      <div className="flex flex-col gap-6 md:flex-row md:gap-8">
+        {services.map((s, i) => {
+          const active = s.id === selectedId;
 
-        // fondo blanco REAL
-        "bg-white",
+          const highlights = Array.isArray((s as any).highlights)
+            ? ((s as any).highlights as string[]).slice(0, 3)
+            : [];
 
-        // sin bordes ni outlines feos
-        "border-0 outline-none",
+          return (
+            <motion.button
+              key={s.id}
+              type="button"
+              onClick={() => handleSelect(s.id)}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{
+                duration: 0.55,
+                delay: 0.08 * i,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              whileHover={{ y: -6, scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              className={[
+                "group",
+                "w-full md:flex-1 min-w-0",
+                "text-left rounded-xl",
+                "h-[360px] md:h-[380px]",
+                "p-10 flex flex-col",
+                "border border-white/25",
+                "bg-white/30 backdrop-blur-2xl",
+                "shadow-[0_18px_50px_rgba(0,0,0,0.12)]",
+                "transition-shadow",
+                active
+                  ? "bg-white/55 border-black/15 shadow-[0_22px_60px_rgba(0,0,0,0.16)]"
+                  : "hover:bg-white/42 hover:shadow-[0_22px_60px_rgba(0,0,0,0.14)]",
+              ].join(" ")}
+            >
+              <div>
+                <p className="text-xl font-extrabold tracking-[-0.02em] text-[#072b2a]">
+                  {s.title}
+                </p>
 
-        // sombra premium
-        "shadow-[0_12px_28px_rgba(0,0,0,0.10)]",
-        "hover:-translate-y-1 hover:shadow-[0_22px_50px_rgba(0,0,0,0.16)]",
+                {"priceFrom" in s && (
+                  <div className="mt-3 text-sm font-semibold text-[#0ABAB5]">
+                    Desde {(s as any).priceFrom}
+                  </div>
+                )}
 
-        // focus ultra discreto
-        "focus-visible:ring-2 focus-visible:ring-[#0ABAB5]/30",
+                {"idealFor" in s && (
+                  <p className="mt-3 text-sm leading-relaxed text-[#072b2a]/70">
+                    <span className="font-semibold text-[#072b2a]">
+                      Ideal para:
+                    </span>{" "}
+                    {(s as any).idealFor}
+                  </p>
+                )}
 
-        // activo: glow suave, NO borde
-        isActive ? "ring-2 ring-[#0ABAB5]/20" : "",
-      ].join(" ")}
-    >
-      {/* Título */}
-      <h3 className="text-xl font-extrabold tracking-[-0.03em] text-[#072b2a]">
-        {service.title}
-      </h3>
+                <div className="mt-5 h-[84px]">
+                  {highlights.length > 0 && (
+                    <ul className="space-y-2 text-sm text-[#072b2a]/70">
+                      {highlights.map((h) => (
+                        <li key={h} className="flex items-start gap-2">
+                          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#0ABAB5]" />
+                          <span className="line-clamp-1">{h}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
 
-      {/* Precio (acento visual) */}
-      <div className="mt-2 text-sm font-semibold text-[#0ABAB5]">
-        Desde {service.priceFrom}
+              <div className="mt-auto pt-8">
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#072b2a]/70 transition group-hover:text-[#072b2a]">
+                  Ver más
+                  <span className="h-[1px] w-6 bg-[#072b2a]/25 transition-all group-hover:w-10 group-hover:bg-[#0ABAB5]" />
+                </span>
+              </div>
+            </motion.button>
+          );
+        })}
       </div>
-
-      {/* Ideal para */}
-      <p className="mt-3 text-sm leading-relaxed text-[#072b2a]/70">
-        <span className="font-semibold text-[#072b2a]">Ideal para:</span>{" "}
-        {service.idealFor}
-      </p>
-
-      {/* Highlights */}
-      <ul className="mt-4 space-y-2 text-sm text-[#072b2a]/70">
-        {service.highlights.map((h) => (
-          <li key={h} className="flex items-start gap-2">
-            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#0ABAB5]" />
-            <span>{h}</span>
-          </li>
-        ))}
-      </ul>
-
-      {/* CTA */}
-      <div className="mt-6">
-        <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#072b2a] group">
-          Ver detalles
-          <span
-            aria-hidden="true"
-            className="transition-transform group-hover:translate-x-1 text-[#0ABAB5]"
-          >
-            →
-          </span>
-        </span>
-      </div>
-    </button>
+    </div>
   );
 }
