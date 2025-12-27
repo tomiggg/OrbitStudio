@@ -6,6 +6,9 @@ export type Project = {
   hrefLabel?: string; // "Ver proyecto" | "Ver caso"
   serviceTag?: string; // ej: "Sitio Web Profesional"
   featured?: boolean; // destacados para Home
+
+  // ✅ opcional: preview visual
+  imageSrc?: string; // /projects/pb.png
 };
 
 export const PROJECTS: Project[] = [
@@ -18,6 +21,7 @@ export const PROJECTS: Project[] = [
     hrefLabel: "Ver proyecto",
     serviceTag: "Sitio Web Profesional",
     featured: true,
+    imageSrc: "/projects/pb.png",
   },
   {
     id: "tu-utn",
@@ -28,6 +32,7 @@ export const PROJECTS: Project[] = [
     hrefLabel: "Ver web app",
     serviceTag: "Web Apps / Sistemas",
     featured: true,
+    imageSrc: "/projects/tuutn.png",
   },
 ];
 
