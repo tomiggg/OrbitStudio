@@ -39,23 +39,31 @@ export function Hero({ onOpenContact }: HeroProps) {
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-28"
         style={{
-          background: "linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0))",
+          background:
+            "linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0))",
         }}
       />
 
       {/* noise */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 hero-noise" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 hero-noise"
+      />
 
       {/* MOBILE microcopy */}
       <div className="pointer-events-none absolute inset-x-0 bottom-10 z-30 md:hidden">
         <div className="px-5">
           {/* key en el wrapper animado para que reinicie cada ciclo */}
-          <div key={cycle} className="pointer-events-auto hero-fade-slide flex items-start gap-4">
+          <div
+            key={cycle}
+            className="pointer-events-auto hero-fade-slide flex items-start gap-4"
+          >
             <div className="mt-1 h-12 w-px bg-[#072b2a]/20" />
             <div className="max-w-[520px]">
               <p className="text-xs font-extrabold tracking-wide text-[#072b2a]/70">
-                RESPUESTA EN EL DÍA <span className="opacity-40">·</span> SIN COMPROMISO{" "}
-                <span className="opacity-40">·</span> PRESUPUESTO CLARO
+                RESPUESTA EN EL DÍA <span className="opacity-40">·</span> SIN
+                COMPROMISO <span className="opacity-40">·</span> PRESUPUESTO
+                CLARO
               </p>
               <p className="mt-2 text-sm leading-relaxed text-[#072b2a]/70">
                 Diseño y desarrollo enfocado en conversión. Sin vueltas.
@@ -67,23 +75,46 @@ export function Hero({ onOpenContact }: HeroProps) {
 
       {/* WRAPPER */}
       <div className="relative mx-auto w-full max-w-[1100px] px-5 md:px-8">
-        <div className="flex items-start pt-24 pb-44 md:pt-32 md:pb-24" style={{ minHeight: "100svh" }}>
+        {/* ✅ NO pelear con header fixed: dejamos el wrapper estable */}
+        <div
+          className="
+            flex items-start
+            pt-24 pb-44
+            md:pt-32 md:pb-24
+          "
+          style={{ minHeight: "100svh" }}
+        >
           <div className="w-full">
             <div className="grid w-full gap-10 md:grid-cols-12 md:items-end">
               {/* LEFT – HEADLINE */}
               <div className="md:col-span-7">
                 <div className="max-w-[820px]">
-                  {/* ⛔ NO TOCAR alturas: reservorio fijo */}
-                  <div className="flex flex-col justify-end [min-height:300px] sm:[min-height:360px] md:[min-height:460px] lg:[min-height:520px]">
+                  {/* ⛔ Reservorio fijo: NO tocar con mt/pt para mover el título */}
+                  <div
+                    className="
+                      flex flex-col justify-end
+                      [min-height:300px] sm:[min-height:360px] md:[min-height:460px] lg:[min-height:520px]
+                    "
+                  >
                     <h1
                       key={cycle} // reinicia fade+slide cada 5s
-                      className="hero-fade-slide font-extrabold tracking-[-0.06em] text-[#072b2a]"
+                      className="
+                        hero-fade-slide
+                        font-extrabold
+                        tracking-[-0.06em]
+                        text-[#072b2a]
+                        translate-y-16 sm:translate-y-20 md:translate-y-0
+                      "
                       style={{ lineHeight: "0.90" }}
                     >
                       {headlineLines.map((_, idx) => {
                         const txt = typedLines[idx] ?? "";
                         const isActiveLine =
-                          idx === Math.min(typedLines.length - 1, headlineLines.length - 1);
+                          idx ===
+                          Math.min(
+                            typedLines.length - 1,
+                            headlineLines.length - 1
+                          );
 
                         return (
                           <span
@@ -99,8 +130,8 @@ export function Hero({ onOpenContact }: HeroProps) {
                             }}
                           >
                             <span className="align-top">
-  {txt && txt.length > 0 ? txt : "\u00A0"}
-</span>
+                              {txt && txt.length > 0 ? txt : "\u00A0"}
+                            </span>
 
                             {isActiveLine && (
                               <span
@@ -122,29 +153,26 @@ export function Hero({ onOpenContact }: HeroProps) {
 
               {/* RIGHT – DESKTOP MICROCOPY */}
               <div className="hidden md:flex md:col-span-5 md:items-end">
-  {/* key en el wrapper animado + subir óptico para alinear con “Digital.” */}
-  <div
-    key={cycle}
-    className="hero-fade-slide ml-10 max-w-[420px] -translate-y-10 lg:-translate-y-12"
-  >
-    <div className="flex items-start gap-6">
-      <div className="h-14 w-px bg-[#072b2a]/20" />
+                <div
+                  key={cycle}
+                  className="hero-fade-slide ml-10 max-w-[420px] -translate-y-10 lg:-translate-y-12"
+                >
+                  <div className="flex items-start gap-6">
+                    <div className="h-14 w-px bg-[#072b2a]/20" />
 
-      <div>
-        {/* FRASE PRINCIPAL */}
-        <p className="text-base font-semibold leading-snug text-[#072b2a]/80">
-          Adaptamos tu negocio al mundo digital.
-        </p>
+                    <div>
+                      <p className="text-base font-semibold leading-snug text-[#072b2a]/80">
+                        Adaptamos tu negocio al mundo digital.
+                      </p>
 
-        {/* FRASE SECUNDARIA */}
-        <p className="mt-3 text-sm font-medium tracking-wide leading-snug text-[#072b2a]/55">
-  Estrategia <span className="opacity-40">·</span> Diseño{" "}
-  <span className="opacity-40">·</span> Desarrollo
-</p>
-      </div>
-    </div>
-  </div>
-</div>
+                      <p className="mt-3 text-sm font-medium tracking-wide leading-snug text-[#072b2a]/55">
+                        Estrategia <span className="opacity-40">·</span> Diseño{" "}
+                        <span className="opacity-40">·</span> Desarrollo
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             {/* end grid */}
           </div>

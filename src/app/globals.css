@@ -19,6 +19,10 @@
 
   --borderSoft: rgba(0, 0, 0, 0.04);
   --ringSoft: rgba(51, 139, 133, 0.35);
+
+  /* nav */
+  --linkTiffany: #0a3246;
+  --linkTiffanyHover: #0d405a;
 }
 
 .dark {
@@ -46,9 +50,24 @@ body {
   height: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--bg);
   color: var(--text);
+
+  /* ✅ FONT SYSTEM */
+  font-family: var(--font-body), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ✅ TITLES USE Archivo Black */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title), var(--font-body), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
 /* Links: usar clase, NO global */
@@ -61,21 +80,10 @@ body {
   text-decoration: underline;
 }
 
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 a[role="button"],
 a.buttonlike {
   text-decoration: none !important;
 }
-
 
 /* Layout helpers */
 .orbit-container {
@@ -108,21 +116,15 @@ a.buttonlike {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-:root {
-  --linkTiffany: #0a3246;
-  --linkTiffanyHover: #0d405a;
-}
-
 .orbit-nav-link {
   color: var(--linkTiffany);
-  font-weight: 550; /* 👈 sutil, premium */
+  font-weight: 550; /* sutil, premium */
   transition: color 0.2s ease;
 }
 
 .orbit-nav-link:hover {
   color: var(--linkTiffanyHover);
 }
-
 
 /* HERO helpers */
 .hero-noise {
@@ -199,7 +201,6 @@ a.buttonlike {
 .hero-fade-slide {
   animation: heroFadeSlide 700ms ease-out both;
 }
-
 
 @keyframes orbit-marquee {
   from {

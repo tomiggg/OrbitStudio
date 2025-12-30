@@ -76,6 +76,7 @@ export function Process() {
             shadow-[0_18px_55px_rgba(0,0,0,0.06)]
           "
         >
+          {/* ✅ Importante: esto define el stacking context */}
           <div ref={listWrapRef} className="relative">
             {/* Timeline Desktop */}
             <div className="hidden sm:block">
@@ -83,7 +84,7 @@ export function Process() {
                 nodeYs={nodeYsDesktop}
                 leftClassName="left-6"
                 topClassName="top-2"
-                durationSec={7.5}
+                durationSec={6}
               />
             </div>
 
@@ -93,11 +94,12 @@ export function Process() {
                 nodeYs={nodeYsMobile}
                 leftClassName="left-4"
                 topClassName="top-2"
-                durationSec={7.5}
+                durationSec={6}
               />
             </div>
 
-            <ul className="flex flex-col gap-6 sm:gap-7">
+            {/* ✅ clave: el UL queda abajo (para que el track no desaparezca) */}
+            <ul className="relative z-0 flex flex-col gap-6 sm:gap-7">
               {PROCESS_STEPS.map((step, i) => {
                 const num = String(i + 1).padStart(2, "0");
                 const isVisible = visible[i];
@@ -122,8 +124,8 @@ export function Process() {
                       transitionTimingFunction: "cubic-bezier(0.2,0.8,0.2,1)",
                     }}
                   >
-                    {/* Nodo */}
-                    <div className="absolute left-4 sm:left-6 top-3 -translate-x-1/2">
+                    {/* ✅ Nodo arriba de todo para “pisar” la línea */}
+                    <div className="absolute left-4 sm:left-6 top-3 -translate-x-1/2 z-20">
                       <div
                         className="
                           h-4 w-4 rounded-full

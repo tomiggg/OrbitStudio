@@ -138,8 +138,7 @@ export function FeaturedProjects() {
             {/* ✅ copy “real” + ✅ tipeo marcado */}
             <div className="mx-auto mt-4 max-w-2xl">
               <p className="text-sm leading-relaxed text-[#072b2a]/70 md:text-base">
-                Muestras cortas de lo que construimos para clientes (y del tipo de
-                resultados que buscamos):
+                Muestras cortas de lo que construimos para clientes reales.
               </p>
 
               <div className="mt-3 inline-flex items-center justify-center gap-2">

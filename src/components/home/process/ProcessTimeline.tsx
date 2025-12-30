@@ -4,17 +4,10 @@ import { motion } from "framer-motion";
 import { useMemo } from "react";
 
 type Props = {
-  /** posiciones Y (px) relativas al wrapper */
   nodeYs: number[];
-
-  /** Posición horizontal (tailwind) */
-  leftClassName?: string;
-
-  /** Ajuste superior/inferior del track */
-  topClassName?: string;
-  bottomClassName?: string;
-
-  /** duración total del recorrido */
+  leftClassName?: string;   // ej: "left-6"
+  topClassName?: string;    // ej: "top-2"
+  bottomClassName?: string; // ej: "bottom-2"
   durationSec?: number;
 };
 
@@ -27,63 +20,57 @@ export function ProcessTimeline({
 }: Props) {
   const { yValues, times } = useMemo(() => {
     const ys = (nodeYs ?? []).filter((n) => Number.isFinite(n));
-
-    // fallback si todavía no midió
-    if (ys.length < 2) {
-      return {
-        yValues: [0, 420],
-        times: [0, 1],
-      };
-    }
+    if (ys.length < 2) return { yValues: [0, 420], times: [0, 1] };
 
     const min = Math.min(...ys);
-    const max = Math.max(...ys);
-
-    // normalizamos para que el motion sea relativo al min
     const normalized = ys.map((y) => y - min);
 
-    // tiempos uniformes (misma “velocidad” en todo el recorrido)
-    const t = normalized.map((_, i) => (normalized.length === 1 ? 1 : i / (normalized.length - 1)));
+    const t = normalized.map((_, i) =>
+      normalized.length === 1 ? 1 : i / (normalized.length - 1)
+    );
 
     return { yValues: normalized, times: t };
   }, [nodeYs]);
 
   return (
     <>
-      {/* Track base */}
+      {/* TRACK base */}
       <div
         aria-hidden
         className={[
-          "pointer-events-none absolute",
+          "pointer-events-none absolute z-10", // arriba del contenido pero abajo de nodos
           leftClassName,
           topClassName,
           bottomClassName,
           "w-[3px] rounded-full",
+          "-translate-x-1/2", // centra respecto al left-x del nodo (que ya usa -translate-x-1/2)
           "bg-[color:var(--link)]/25",
         ].join(" ")}
       />
 
-      {/* Glow del track (suave) */}
+      {/* TRACK glow */}
       <div
         aria-hidden
         className={[
-          "pointer-events-none absolute",
+          "pointer-events-none absolute z-10",
           leftClassName,
           topClassName,
           bottomClassName,
-          "w-[11px] -translate-x-[4px] rounded-full",
+          "w-[11px] rounded-full",
+          "-translate-x-1/2",
           "bg-[color:var(--link)]/10 blur-[10px]",
         ].join(" ")}
       />
 
-      {/* Drop wrapper */}
+      {/* DROP */}
       <motion.div
         aria-hidden
         className={[
-          "pointer-events-none absolute",
+          "pointer-events-none absolute z-10",
           leftClassName,
           topClassName,
-          "w-[14px] -translate-x-[5.5px]",
+          "w-[14px]",
+          "-translate-x-1/2",
         ].join(" ")}
         animate={{ y: yValues }}
         transition={{
@@ -93,9 +80,7 @@ export function ProcessTimeline({
           times,
         }}
       >
-        {/* cuerpo de la gota */}
         <div className="relative h-[56px] w-[14px] rounded-full bg-[color:var(--link)] shadow-[0_14px_30px_rgba(10,186,181,0.28)]" />
-        {/* glow de la gota */}
         <div className="absolute inset-0 rounded-full bg-[color:var(--link)]/25 blur-[12px]" />
       </motion.div>
     </>

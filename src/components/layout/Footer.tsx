@@ -69,7 +69,7 @@ export function Footer() {
               <ul className="space-y-2">
                 <li>
                   <a
-                    href="https://wa.me/5493510000000"
+                    href="https://wa.me/5493512261334"
                     target="_blank"
                     rel="noreferrer"
                     className="footer-link"
@@ -79,10 +79,10 @@ export function Footer() {
                 </li>
                 <li>
                   <a
-                    href="mailto:hola@orbitdigital.com"
+                    href="mailto:tomasggggggg@gmail.com"
                     className="footer-link break-all"
                   >
-                    hola@orbitdigital.com
+                    tomasggggggg@gmail.com
                   </a>
                 </li>
                 <li className="text-sm text-[#072b2a]/60">Córdoba, AR</li>

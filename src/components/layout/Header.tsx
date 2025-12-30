@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { MobileMenuSheet } from "@/components/ui/MobileMenuSheet";
+import { useContact } from "@/components/contact/ContactProvider";
 
 const NAV_ITEMS = [
   { href: "#services", label: "Servicios" },
@@ -19,6 +21,7 @@ const ctaPill =
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const { openContact } = useContact();
 
   useEffect(() => {
     const onResize = () => {
@@ -30,117 +33,105 @@ export function Header() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
-      {/* Glass band (sin tinte, blur real, sin línea inferior) */}
+      {/* Glass band */}
       <div
         className="
           relative
-          bg-white/40
+          bg-white/10
           backdrop-blur-2xl
           shadow-[0_10px_30px_rgba(0,0,0,0.10)]
         "
       >
-        {/* highlight suave */}
         <div
           aria-hidden="true"
           className="
             pointer-events-none absolute inset-0
-            bg-[linear-gradient(180deg,rgba(255,255,255,0.55),rgba(255,255,255,0.08))]
-        "
-        />
-        {/* borde sutil (no “línea negra”) */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-white/35"
+            bg-[linear-gradient(180deg,rgba(255,255,255,0.35),rgba(255,255,255,0.06))]
+          "
         />
 
-        <div className="relative mx-auto flex h-14 w-full max-w-[1100px] items-center justify-between px-5 md:h-16 md:px-8">
-          <Link href="/" className="flex items-center no-underline" aria-label="Orbit Digital">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-white/25"
+        />
+
+        {/* ✅ Mobile igual / ✅ Desktop más bajo */}
+        <div className="relative mx-auto flex h-16 w-full max-w-[1100px] items-center justify-between px-5 py-3 md:h-20 md:px-8 md:py-3">
+          <Link
+            href="/"
+            className="flex items-center no-underline"
+            aria-label="Orbit Studio"
+          >
+            {/* ✅ Logo un toque más chico en desktop */}
             <img
               src="/logo/orbit-logo-header.png"
-              alt="Orbit Digital"
+              alt="Orbit Studio"
               loading="eager"
-              className="block h-auto w-auto max-h-8 md:max-h-10 max-w-[140px] md:max-w-[180px] object-contain"
+              className="block h-auto w-auto max-h-9 md:max-h-10 max-w-[140px] md:max-w-[180px] object-contain"
             />
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden items-center gap-10 md:flex">
+          <nav className="hidden items-center gap-10 md:flex md:gap-8">
             {NAV_ITEMS.map((item) => (
               <a key={item.href} href={item.href} className={linkBase}>
                 {item.label}
               </a>
             ))}
 
-            <a href={CTA.href} className={ctaPill}>
+            {/* ✅ CTA abre modal (no navega al hash) */}
+            <button
+              type="button"
+              onClick={openContact}
+              className={ctaPill}
+              aria-label="Abrir contacto"
+            >
               {CTA.label}
-            </a>
+            </button>
           </nav>
 
-          {/* Mobile hamburger */}
+          {/* Mobile toggle button */}
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
             className="
               md:hidden
               inline-flex items-center justify-center
-              rounded-xl
-              border border-black/10
-              bg-white/30
+              h-11 w-11
+              rounded-full
+              border border-white/25
+              bg-white/18
               backdrop-blur-xl
-              px-3 py-2
-              text-sm font-semibold
-              text-[color:var(--title)]/90
-              shadow-[0_10px_20px_rgba(0,0,0,0.08)]
+              text-[color:var(--title)]
+              shadow-[0_10px_24px_rgba(0,0,0,0.14)]
               transition
-              hover:bg-white/40
+              hover:bg-white/26
+              hover:scale-[1.03]
+              active:scale-[0.96]
             "
-            aria-label="Abrir menú"
+            aria-label={open ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={open}
           >
-            ☰
+            <span
+              aria-hidden
+              className={[
+                "leading-none",
+                "transition-transform duration-200",
+                open ? "text-[18px] -translate-y-[0.5px]" : "text-[20px]",
+              ].join(" ")}
+            >
+              {open ? "✕" : "☰"}
+            </span>
           </button>
         </div>
-
-        {/* Mobile dropdown */}
-        {open && (
-          <div className="md:hidden">
-            <div className="mx-auto w-full max-w-[1100px] px-5 pb-4 md:px-8">
-              <div
-                className="
-                  mt-3 rounded-2xl
-                  border border-black/10
-                  bg-white/30
-                  backdrop-blur-2xl
-                  p-2
-                  shadow-[0_14px_30px_rgba(0,0,0,0.12)]
-                "
-              >
-                {NAV_ITEMS.map((item) => (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    className="
-                      block rounded-xl px-3 py-2
-                      text-sm font-semibold
-                      text-[color:var(--title)]/90
-                      no-underline
-                      transition
-                      hover:bg-black/5
-                    "
-                    onClick={() => setOpen(false)}
-                  >
-                    {item.label}
-                  </a>
-                ))}
-
-                <a href={CTA.href} className={`mt-2 ${ctaPill} w-full`} onClick={() => setOpen(false)}>
-                  {CTA.label}
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
+
+      <MobileMenuSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        items={NAV_ITEMS}
+        cta={CTA}
+      />
     </header>
   );
 }
