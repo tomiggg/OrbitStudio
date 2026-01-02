@@ -95,7 +95,7 @@ export function Footer() {
                 Legal
               </div>
               <p className="text-sm text-[#072b2a]/75">
-                © {new Date().getFullYear()} Orbit Digital
+                © {new Date().getFullYear()} Shift Digital
               </p>
               <p className="mt-1 text-sm text-[#072b2a]/55">
                 Todos los derechos reservados.

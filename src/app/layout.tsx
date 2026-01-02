@@ -7,7 +7,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Orbit Digital",
+  title: "Shift Studio",
   description: "Agencia digital orientada a resultados.",
 };
 
