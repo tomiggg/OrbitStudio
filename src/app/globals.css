@@ -231,3 +231,36 @@ a.buttonlike {
     scroll-margin-top: 76px;
   }
 }
+
+/* Footer helpers (migrado desde styled-jsx) */
+.footer-noise {
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.08) 0px,
+      rgba(255, 255, 255, 0.08) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.05) 0px,
+      rgba(0, 0, 0, 0.05) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+}
+
+.footer-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(7, 43, 42, 0.75);
+  transition: color 160ms ease, transform 160ms ease;
+  display: inline-block;
+}
+
+.footer-link:hover {
+  color: rgba(7, 43, 42, 1);
+  transform: translateY(-1px);
+}
