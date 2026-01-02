@@ -222,3 +222,12 @@ a.buttonlike {
     transform: none !important;
   }
 }
+
+#detalle {
+  scroll-margin-top: 92px;
+}
+@media (max-width: 767px) {
+  #detalle {
+    scroll-margin-top: 76px;
+  }
+}

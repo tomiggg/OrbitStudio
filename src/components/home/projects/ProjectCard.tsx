@@ -1,13 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 type Project = {
   id: string;
   title: string;
   description: string;
-  href: string;
-  hrefLabel?: string;
+  href: string; // ahora: ruta interna (/proyectos/slug)
+  hrefLabel?: string; // ej: "Ver caso"
   serviceTag?: string;
   imageSrc?: string;
 };
@@ -33,16 +34,11 @@ export function ProjectCard({ project: p, index = 0 }: Props) {
       className={[
         "group relative flex flex-col justify-between",
         "rounded-2xl",
-
-        // ✅ FIX: sin borde, solo glass + sombra
         "bg-white/55 sm:bg-white/28",
         "backdrop-blur-xl sm:backdrop-blur-2xl",
-
         "shadow-[0_16px_45px_rgba(0,0,0,0.10)]",
         "transition-shadow",
         "hover:shadow-[0_28px_78px_rgba(0,0,0,0.16)]",
-
-        // sizing
         "px-6 py-6",
         "md:px-7 md:py-7",
         "min-h-[280px] md:min-h-[340px]",
@@ -63,7 +59,6 @@ export function ProjectCard({ project: p, index = 0 }: Props) {
         <div
           className={[
             "relative overflow-hidden rounded-xl",
-            // ✅ FIX: sin borde ni ring
             "bg-white/[0.08]",
             "h-[88px] md:h-[96px]",
           ].join(" ")}
@@ -112,23 +107,22 @@ export function ProjectCard({ project: p, index = 0 }: Props) {
         </p>
       </div>
 
-      {/* CTA */}
-      <div className="mt-7 relative">
-        <a
-          href={p.href}
-          target="_blank"
-          rel="noreferrer"
-          className={[
-            "inline-flex items-center gap-2",
-            "text-sm font-semibold",
-            "text-[#072b2a]/70 transition",
-            "group-hover:text-[#072b2a]",
-          ].join(" ")}
-        >
-          {p.hrefLabel ?? "Ver proyecto"}
-          <span className="h-[1px] w-6 bg-[#072b2a]/25 transition-all group-hover:w-10 group-hover:bg-[#0ABAB5]" />
-        </a>
-      </div>
+
+{/* CTA */}
+<div className="mt-7 relative">
+  <Link
+    href={p.href} // ahora p.href es "/proyectos/..."
+    className={[
+      "inline-flex items-center gap-2",
+      "text-sm font-semibold",
+      "text-[#072b2a]/70 transition",
+      "group-hover:text-[#072b2a]",
+    ].join(" ")}
+  >
+    {p.hrefLabel ?? "Ver caso"}
+    <span className="h-[1px] w-6 bg-[#072b2a]/25 transition-all group-hover:w-10 group-hover:bg-[#0ABAB5]" />
+  </Link>
+</div>
     </motion.article>
   );
 }
