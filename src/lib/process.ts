@@ -1,23 +1,18 @@
-export type ProcessStep = {
-  title: string;
-  desc: string;
-};
-
-export const PROCESS_STEPS: ProcessStep[] = [
+export const PROCESS_STEPS = [
   {
-    title: "Diagnóstico",
-    desc: "Entendemos tu negocio, tu público y el objetivo real del sitio.",
+    title: "Auditoría & Validación",
+    desc: "Analizamos tu modelo actual para detectar fugas de eficiencia. Validamos tu propuesta para asegurar que la solución digital ataque el problema real y no solo la estética.",
   },
   {
-    title: "Estrategia",
-    desc: "Definimos estructura, mensajes y CTA para convertir con claridad.",
+    title: "Lógica de Identidad",
+    desc: "Definimos el núcleo visual y la estructura de tu marca. Creamos una estética de autoridad y la lógica de negocio que servirá de base para el desarrollo técnico.",
   },
   {
-    title: "Construcción",
-    desc: "Diseño + desarrollo por iteraciones cortas, con feedback y orden.",
+    title: "Ingeniería Adaptativa",
+    desc: "Construimos tu motor operativo seleccionando el stack tecnológico óptimo para tus requerimientos. Desarrollo de alto rendimiento enfocado en escalabilidad y código limpio.",
   },
   {
-    title: "Entrega & escalado",
-    desc: "Publicación + base lista para crecer: mejoras, automatizaciones y nuevas secciones.",
+    title: "Autonomía de Escala",
+    desc: "Despliegue final y transferencia de mando. Te entregamos un activo digital soberano, diseñado para que tu marca opere y crezca sin fricciones técnicas.",
   },
 ];

@@ -4,162 +4,107 @@ import { useEffect, useRef, useState } from "react";
 import { Container } from "@/components/ui/Container";
 import { PROCESS_STEPS } from "@/lib/process";
 import { useInViewList } from "@/hooks/useInViewList";
-import { ProcessTimeline } from "@/components/home/process/ProcessTimeline";
+import { ProcessTimeline } from "./process/ProcessTimeline";
+import { Anton } from "next/font/google";
+
+const anton = Anton({ subsets: ["latin"], weight: "400" });
 
 export function Process() {
   const { refs, visible } = useInViewList(PROCESS_STEPS.length);
-
-  // wrapper relativo del panel/lista
   const listWrapRef = useRef<HTMLDivElement | null>(null);
-
-  // posiciones reales en px donde pasa la gota (relativas al wrapper)
-  const [nodeYsDesktop, setNodeYsDesktop] = useState<number[]>([]);
-  const [nodeYsMobile, setNodeYsMobile] = useState<number[]>([]);
+  const [nodeYs, setNodeYs] = useState<number[]>([]);
 
   useEffect(() => {
-    const wrap = listWrapRef.current;
-    if (!wrap) return;
-
     const measure = () => {
+      const wrap = listWrapRef.current;
+      if (!wrap) return;
       const wrapRect = wrap.getBoundingClientRect();
-
-      const TOP_3_PX = 12; // top-3
-      const NODE_CENTER_ADJUST = 8; // círculo 16px => centro
-
       const ys = refs.current
         .filter(Boolean)
         .map((li) => {
           const r = (li as HTMLLIElement).getBoundingClientRect();
-          return r.top - wrapRect.top + TOP_3_PX + NODE_CENTER_ADJUST;
+          // Alineado al centro del título del paso
+          return r.top - wrapRect.top + 16; 
         });
-
-      setNodeYsDesktop(ys);
-      setNodeYsMobile(ys);
+      setNodeYs(ys);
     };
 
-    measure();
-
-    const ro = new ResizeObserver(measure);
-    ro.observe(wrap);
-
+    const timer = setTimeout(measure, 150);
     window.addEventListener("resize", measure);
     return () => {
-      ro.disconnect();
+      clearTimeout(timer);
       window.removeEventListener("resize", measure);
     };
   }, [refs]);
 
   return (
-    <section id="process" className="bg-[color:var(--section)] py-16 md:py-20">
+    <section 
+      id="process" 
+      className="py-16 md:py-32"
+      style={{ backgroundColor: "#a7e9e75f" }}
+    >
       <Container>
-        {/* Header */}
-        <div className="mx-auto max-w-3xl text-center">
+        {/* Header Estilo Brutalista */}
+        <div className="mx-auto max-w-4xl text-center mb-20 md:mb-28">
           <h2
-            className="font-extrabold tracking-[-0.06em] text-[color:var(--title)]"
-            style={{ fontSize: "clamp(44px, 4.4vw, 72px)", lineHeight: "0.95" }}
+            className={`${anton.className} text-black uppercase`}
+            style={{ 
+              fontSize: "clamp(48px, 6vw, 84px)", 
+              lineHeight: "0.9",
+              letterSpacing: "-0.03em"
+            }}
           >
             Cómo trabajamos
           </h2>
-
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-[color:var(--muted)] md:text-base">
-            Un proceso simple, predecible y enfocado en resultados.
+          <p className="mx-auto mt-6 max-w-xl font-mono text-[10px] md:text-[11px] font-bold tracking-[0.2em] text-[#0abab5] uppercase">
+            [ Proceso simple · Predecible · Orientado a resultados ]
           </p>
         </div>
 
-        {/* Panel */}
-        <div
-          className="
-            mx-auto mt-10 max-w-5xl
-            rounded-3xl border border-[color:var(--borderSoft)]
-            bg-[color:var(--card)]
-            px-5 py-6 sm:px-7 sm:py-8 md:px-8
-            shadow-[0_18px_55px_rgba(0,0,0,0.06)]
-          "
-        >
-          {/* ✅ Importante: esto define el stacking context */}
+        {/* El Contenedor ahora es una estructura limpia sin bordes redondeados exagerados */}
+        <div className="mx-auto max-w-4xl relative">
           <div ref={listWrapRef} className="relative">
-            {/* Timeline Desktop */}
-            <div className="hidden sm:block">
-              <ProcessTimeline
-                nodeYs={nodeYsDesktop}
-                leftClassName="left-6"
-                topClassName="top-2"
-                durationSec={6}
-              />
-            </div>
+            
+            {/* Timeline Pro */}
+            <ProcessTimeline nodeYs={nodeYs} leftClassName="left-4 sm:left-8" durationSec={5} />
 
-            {/* Timeline Mobile */}
-            <div className="sm:hidden">
-              <ProcessTimeline
-                nodeYs={nodeYsMobile}
-                leftClassName="left-4"
-                topClassName="top-2"
-                durationSec={6}
-              />
-            </div>
-
-            {/* ✅ clave: el UL queda abajo (para que el track no desaparezca) */}
-            <ul className="relative z-0 flex flex-col gap-6 sm:gap-7">
+            <ul className="relative z-20 flex flex-col gap-12 md:gap-16">
               {PROCESS_STEPS.map((step, i) => {
                 const num = String(i + 1).padStart(2, "0");
-                const isVisible = visible[i];
 
                 return (
                   <li
                     key={step.title}
-                    ref={(el) => {
-                      refs.current[i] = el;
-                    }}
-                    data-idx={i}
-                    className={[
-                      "group relative",
-                      "pl-14 sm:pl-16",
-                      "transition",
-                      isVisible
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 translate-y-3",
-                    ].join(" ")}
-                    style={{
-                      transitionDuration: "600ms",
-                      transitionTimingFunction: "cubic-bezier(0.2,0.8,0.2,1)",
-                    }}
+                    ref={(el) => { if(el) refs.current[i] = el; }}
+                    className="group relative pl-12 sm:pl-24"
                   >
-                    {/* ✅ Nodo arriba de todo para “pisar” la línea */}
-                    <div className="absolute left-4 sm:left-6 top-3 -translate-x-1/2 z-20">
-                      <div
-                        className="
-                          h-4 w-4 rounded-full
-                          bg-[color:var(--link)]
-                          ring-8 ring-[color:var(--link)]/15
-                          transition-transform
-                          group-hover:scale-[1.06]
-                        "
-                      />
+                    {/* Punto de anclaje (Nodo) */}
+                    <div className="absolute left-4 sm:left-8 top-4 -translate-x-1/2 z-30">
+                      <div className="h-4 w-4 bg-black border-2 border-[#0abab5] transition-transform group-hover:rotate-45 duration-500" />
                     </div>
 
-                    {/* Contenido */}
-                    <div className="rounded-2xl px-4 py-3 sm:px-5 sm:py-4 transition hover:bg-black/[0.02]">
-                      <div className="flex items-start justify-between gap-3">
-                        <h3 className="text-[15px] sm:text-base font-extrabold tracking-[-0.02em] text-[color:var(--title)]">
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-baseline gap-4">
+                        <span className="font-mono text-[14px] font-black text-[#0abab5] opacity-40">
+                          {num}
+                        </span>
+                        <h3 
+                          className={`${anton.className} text-black uppercase leading-none`}
+                          style={{ fontSize: "clamp(26px, 3vw, 40px)", letterSpacing: "-0.02em" }}
+                        >
                           {step.title}
                         </h3>
-
-                        <span className="hidden sm:inline-flex items-center rounded-full border border-[color:var(--borderSoft)] px-3 py-1 text-[11px] font-semibold text-[color:var(--muted)] transition group-hover:text-[color:var(--title)] group-hover:border-[color:var(--link)]/35">
-                          Paso {num}
-                        </span>
                       </div>
 
-                      <p className="mt-2 text-sm leading-relaxed text-[color:var(--muted)]">
-                        {step.desc}
-                      </p>
+                      <div className="max-w-2xl">
+                        <p className="text-[14px] md:text-[16px] leading-relaxed text-[#072b2a]/70 font-medium">
+                          {step.desc}
+                        </p>
+                      </div>
+                      
+                      {/* Línea decorativa técnica */}
+                      <div className="mt-4 h-[1px] w-full bg-black/5" />
                     </div>
-
-                    {i !== PROCESS_STEPS.length - 1 && (
-                      <div
-                        aria-hidden
-                        className="ml-0 mt-4 h-px w-full bg-[color:var(--borderSoft)] opacity-70"
-                      />
-                    )}
                   </li>
                 );
               })}

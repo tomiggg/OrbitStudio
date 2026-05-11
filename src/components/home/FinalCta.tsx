@@ -7,6 +7,7 @@ type FinalCtaProps = {
 };
 
 export function FinalCta({ onOpenContact }: FinalCtaProps) {
+  // Mantenemos tu clase original de botón para consistencia total
   const primaryBtn =
     "inline-flex items-center justify-center rounded-full bg-[#072b2a] px-7 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 hover:bg-[#061f1e] focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-[#0ABAB5]";
 
@@ -16,7 +17,7 @@ export function FinalCta({ onOpenContact }: FinalCtaProps) {
       className="relative overflow-hidden py-16 md:py-20"
       style={{ backgroundColor: "#0ABAB5" }}
     >
-      {/* separador superior suave como el hero */}
+      {/* Separador superior suave */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-28"
@@ -26,39 +27,45 @@ export function FinalCta({ onOpenContact }: FinalCtaProps) {
         }}
       />
 
-      {/* glow suave */}
+      {/* Glow suave */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[760px] -translate-x-1/2 rounded-full bg-white/10 blur-3xl"
       />
 
-      {/* noise igual espíritu del hero */}
+      {/* Noise igual espíritu del hero */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 cta-noise" />
 
       <Container>
         <div className="relative mx-auto max-w-5xl">
-<div className="px-6 py-10 md:px-12 md:py-12">
+          <div className="px-6 py-10 md:px-12 md:py-12">
             <div className="mx-auto max-w-3xl text-center">
+              {/* Título: Opción 1 con tu escala y tracking original */}
               <h2
-                className="font-extrabold tracking-[-0.06em] text-[#072b2a]"
+                className="font-extrabold tracking-[-0.06em] text-[#072b2a] uppercase"
                 style={{ fontSize: "clamp(44px, 4.4vw, 72px)", lineHeight: "0.95" }}
               >
-                ¿Hablamos de tu proyecto?
+                Llevá tu negocio al próximo nivel
               </h2>
 
+              {/* Subtítulo: Enfocado en solución a medida y escala */}
               <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-[#072b2a]/75 md:text-base">
-                Te decimos qué conviene construir primero para vender, ordenar y escalar.
-                Claro, rápido y sin compromiso.
+                Basta de soluciones genéricas que no encajan. Desarrollamos el <b>producto digital exacto</b> que tu negocio necesita para resolver sus trabas operativas y empezar a operar a escala real.
               </p>
 
               <div className="mt-8 flex justify-center">
-                <button type="button" onClick={() => onOpenContact?.()} className={primaryBtn}>
-                  Hablá por WhatsApp
+                <button 
+                  type="button" 
+                  onClick={() => onOpenContact?.()} 
+                  className={primaryBtn}
+                >
+                  Quiero mi diagnóstico gratuito
                 </button>
               </div>
 
+              {/* Microcopy de cierre */}
               <p className="mt-5 text-xs text-[#072b2a]/65">
-                Respuesta en el día · Sin compromiso
+                Respuesta en el día · Sin vueltas
               </p>
             </div>
           </div>

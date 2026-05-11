@@ -5,73 +5,44 @@ import { useMemo } from "react";
 
 type Props = {
   nodeYs: number[];
-  leftClassName?: string;   // ej: "left-6"
-  topClassName?: string;    // ej: "top-2"
-  bottomClassName?: string; // ej: "bottom-2"
+  leftClassName?: string;
   durationSec?: number;
 };
 
 export function ProcessTimeline({
   nodeYs,
-  leftClassName = "left-6",
-  topClassName = "top-2",
-  bottomClassName = "bottom-2",
-  durationSec = 7.5,
+  leftClassName = "left-8",
+  durationSec = 5,
 }: Props) {
   const { yValues, times } = useMemo(() => {
     const ys = (nodeYs ?? []).filter((n) => Number.isFinite(n));
-    if (ys.length < 2) return { yValues: [0, 420], times: [0, 1] };
+    if (ys.length < 2) return { yValues: [0, 0], times: [0, 1] };
 
     const min = Math.min(...ys);
     const normalized = ys.map((y) => y - min);
-
-    const t = normalized.map((_, i) =>
-      normalized.length === 1 ? 1 : i / (normalized.length - 1)
-    );
+    const t = normalized.map((_, i) => i / (normalized.length - 1));
 
     return { yValues: normalized, times: t };
   }, [nodeYs]);
 
+  const topPos = nodeYs.length > 0 ? Math.min(...nodeYs) : 0;
+  const bottomPos = nodeYs.length > 0 ? Math.max(...nodeYs) : 0;
+  const height = bottomPos - topPos;
+
   return (
-    <>
-      {/* TRACK base */}
-      <div
-        aria-hidden
-        className={[
-          "pointer-events-none absolute z-10", // arriba del contenido pero abajo de nodos
-          leftClassName,
-          topClassName,
-          bottomClassName,
-          "w-[3px] rounded-full",
-          "-translate-x-1/2", // centra respecto al left-x del nodo (que ya usa -translate-x-1/2)
-          "bg-[color:var(--link)]/25",
-        ].join(" ")}
-      />
+    <div 
+      className={`absolute ${leftClassName} -translate-x-1/2 pointer-events-none z-10`}
+      style={{ top: topPos, height: height }}
+    >
+      {/* Track Base: Negro con baja opacidad para un look industrial */}
+      <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[1px] bg-black/10" />
 
-      {/* TRACK glow */}
-      <div
-        aria-hidden
-        className={[
-          "pointer-events-none absolute z-10",
-          leftClassName,
-          topClassName,
-          bottomClassName,
-          "w-[11px] rounded-full",
-          "-translate-x-1/2",
-          "bg-[color:var(--link)]/10 blur-[10px]",
-        ].join(" ")}
-      />
+      {/* Track Animado (Glow opcional) */}
+      <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[1px] bg-[#0abab5]/20 blur-[2px]" />
 
-      {/* DROP */}
+      {/* Gota Técnica (El Pulso) */}
       <motion.div
-        aria-hidden
-        className={[
-          "pointer-events-none absolute z-10",
-          leftClassName,
-          topClassName,
-          "w-[14px]",
-          "-translate-x-1/2",
-        ].join(" ")}
+        className="absolute left-1/2 -translate-x-1/2 w-[2px] z-20"
         animate={{ y: yValues }}
         transition={{
           duration: durationSec,
@@ -80,9 +51,11 @@ export function ProcessTimeline({
           times,
         }}
       >
-        <div className="relative h-[56px] w-[14px] rounded-full bg-[color:var(--link)] shadow-[0_14px_30px_rgba(10,186,181,0.28)]" />
-        <div className="absolute inset-0 rounded-full bg-[color:var(--link)]/25 blur-[12px]" />
+        {/* La "Gota" ahora es una línea de luz brillante */}
+        <div className="relative h-20 w-full bg-gradient-to-b from-transparent via-[#0abab5] to-transparent">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-[#0abab5] shadow-[0_0_15px_#0abab5]" />
+        </div>
       </motion.div>
-    </>
+    </div>
   );
 }

@@ -1,114 +1,91 @@
 "use client";
 
-import type { Service } from "@/lib/services";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import type { Service } from "@/lib/services";
+import { Anton } from "next/font/google";
 
-type Props = {
-  services: Service[];
-  selectedId: string | null;
-  onSelect: (id: string) => void;
-};
+const font = Anton({ subsets: ["latin"], weight: "400" });
 
-export function ServicesCarousel({ services, selectedId, onSelect }: Props) {
-  const handleSelect = (id: string) => {
-    onSelect(id);
-
-    // ✅ scroll al details cuando ya exista en el DOM
-    requestAnimationFrame(() => {
-      const el = document.getElementById("service-details");
-      if (!el) return;
-
-      el.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    });
-  };
+function TypingTag({ text, index }: { text: string; index: number }) {
+  const [displayedText, setDisplayedText] = useState("");
+  
+  useEffect(() => {
+    const startDelay = 1500 + (index * 2000); 
+    const timeout = setTimeout(() => {
+      let i = 0;
+      const interval = setInterval(() => {
+        setDisplayedText(text.slice(0, i + 1));
+        i++;
+        if (i === text.length) clearInterval(interval);
+      }, 40);
+      return () => clearInterval(interval);
+    }, startDelay);
+    return () => clearTimeout(timeout);
+  }, [text, index]);
 
   return (
-    <div className="mx-auto w-full max-w-[1280px]">
-      <div className="flex flex-col gap-6 md:flex-row md:gap-8">
-        {services.map((s, i) => {
-          const active = s.id === selectedId;
+    <span>
+      {displayedText}
+      {displayedText.length < text.length && displayedText.length > 0 && (
+        <span className="animate-pulse">_</span>
+      )}
+    </span>
+  );
+}
 
-          const highlights = Array.isArray((s as any).highlights)
-            ? ((s as any).highlights as string[]).slice(0, 3)
-            : [];
+type Props = {
+  service: Service;
+  index?: number;
+};
 
-          return (
-            <motion.button
-              key={s.id}
-              type="button"
-              onClick={() => handleSelect(s.id)}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{
-                duration: 0.55,
-                delay: 0.08 * i,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              whileHover={{ y: -6, scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              className={[
-                "group",
-                "w-full md:flex-1 min-w-0",
-                "text-left rounded-xl",
-                "h-[360px] md:h-[380px]",
-                "p-10 flex flex-col",
-                "border border-white/25",
-                "bg-white/30 backdrop-blur-2xl",
-                "shadow-[0_18px_50px_rgba(0,0,0,0.12)]",
-                "transition-shadow",
-                active
-                  ? "bg-white/55 border-black/15 shadow-[0_22px_60px_rgba(0,0,0,0.16)]"
-                  : "hover:bg-white/42 hover:shadow-[0_22px_60px_rgba(0,0,0,0.14)]",
-              ].join(" ")}
-            >
-              <div>
-                <p className="text-xl font-extrabold tracking-[-0.02em] text-[#072b2a]">
-                  {s.title}
-                </p>
-
-                {"priceFrom" in s && (
-                  <div className="mt-3 text-sm font-semibold text-[#0ABAB5]">
-                    Desde {(s as any).priceFrom}
-                  </div>
-                )}
-
-                {"idealFor" in s && (
-                  <p className="mt-3 text-sm leading-relaxed text-[#072b2a]/70">
-                    <span className="font-semibold text-[#072b2a]">
-                      Ideal para:
-                    </span>{" "}
-                    {(s as any).idealFor}
-                  </p>
-                )}
-
-                <div className="mt-5 h-[84px]">
-                  {highlights.length > 0 && (
-                    <ul className="space-y-2 text-sm text-[#072b2a]/70">
-                      {highlights.map((h) => (
-                        <li key={h} className="flex items-start gap-2">
-                          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#0ABAB5]" />
-                          <span className="line-clamp-1">{h}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-auto pt-8">
-                <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#072b2a]/70 transition group-hover:text-[#072b2a]">
-                  Ver más
-                  <span className="h-[1px] w-6 bg-[#072b2a]/25 transition-all group-hover:w-10 group-hover:bg-[#0ABAB5]" />
-                </span>
-              </div>
-            </motion.button>
-          );
-        })}
+export function ServiceCard({ service, index = 0 }: Props) {
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1, duration: 0.6 }}
+      viewport={{ once: true }}
+      // Se eliminó 'border' y 'border-black/5'
+      className="group flex h-full w-full max-w-[320px] md:max-w-none mx-auto flex-col bg-white p-2 md:p-2.5 shadow-xl"
+    >
+      {/* SECCIÓN SUPERIOR */}
+      <div className="relative h-[100px] md:h-[110px] w-full shrink-0 overflow-hidden bg-[#fafcfc]">
+        <span
+          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none text-[#0abab5] transition-transform duration-700 group-hover:scale-105 ${font.className}`}
+          style={{ 
+            fontSize: "clamp(150px, 14vw, 180px)", 
+            lineHeight: "1", 
+            opacity: 0.15 
+          }}
+        >
+          {service.number}
+        </span>
       </div>
-    </div>
+
+      {/* SECCIÓN INFERIOR */}
+      <div 
+        className="flex flex-grow flex-col p-4 md:p-5"
+        style={{ 
+          backgroundColor: "rgba(7, 43, 42, 0.95)", 
+        }}
+      >
+        <h3 className="mb-2.5 text-[18px] md:text-[22px] font-black uppercase leading-[0.95] tracking-tighter text-white">
+          {service.title}
+        </h3>
+
+        <div className="mb-3 h-px w-full bg-white/20" />
+
+        <p className="text-[12px] font-mono font-medium leading-relaxed text-white/80">
+          {service.description}
+        </p>
+
+        <div className="mt-auto pt-4 min-h-[24px]">
+          <span className="font-mono text-[9px] md:text-[10px] font-bold tracking-[0.12em] text-[#0abab5] uppercase">
+            [ <TypingTag text={service.model} index={index} /> ]
+          </span>
+        </div>
+      </div>
+    </motion.article>
   );
 }

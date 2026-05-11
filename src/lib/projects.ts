@@ -64,34 +64,34 @@ export const PROJECTS: Project[] = [
 
   {
     id: "tu-utn",
-    title: "Tu UTN (Gestion Estudiantil)",
+    title: "Tu UTN",
     description:
-      "La web oficial de UTN no muestra desbloqueos ni métricas. Creamos una app que previsualiza materias habilitadas y un dashboard para planificar la carrera.",
+      "Convertimos el caos de datos en control total. Rediseñamos un sistema complejo y antiguo para transformarlo en una herramienta simple que hoy ayuda a muchos de usuarios a tomar mejores decisiones.",
     href: "/proyectos/tu-utn",
-    hrefLabel: "Ver caso",
-    serviceTag: "Web App",
+    hrefLabel: "Ver caso de estudio",
+    serviceTag: "Optimización de Procesos",
     featured: true,
     imageSrc: "/projects/tuutn.png",
     case: {
-      client: "Estudiantes (UTN)",
+      client: "Comunidad Académica",
       context:
-        "Alumnos necesitan herramientas modernas para planificar su carrera; la web oficial no ofrece visualización de progreso, desbloqueos ni métricas.",
+        "Los sistemas antiguos suelen ser difíciles de usar y no muestran la información que realmente importa para el día a día del usuario.",
       problem:
-        "No se puede previsualizar qué materias se habilitan según lo aprobado, ni tener un dashboard con datos clave (progreso, estimaciones, decisiones). Esto existe en privadas/exterior, pero no en la UTN.",
+        "Información desordenada y falta de claridad. El usuario perdía tiempo intentando entender su situación actual y no podía planificar sus próximos pasos con seguridad.",
       approach: [
-        "Modelar reglas de correlatividad y estados de materia",
-        "Diseñar una UI que muestre desbloqueos de forma visual e inmediata",
-        "Crear un dashboard con métricas útiles para decisiones de cursado",
+        "Analizar las reglas del sistema para simplificarlas al máximo.",
+        "Diseñar una interfaz moderna donde lo importante resalte a primera vista.",
+        "Crear un panel de control automático que elimine las dudas del usuario."
       ],
       solution: [
-        "Tabla/visor de materias con estados (Libre/Regular/Aprobada) y resaltado de habilitadas",
-        "Cálculo dinámico de desbloqueos (qué podés cursar/rendir según tu avance)",
-        "Dashboard con métricas: progreso, proyección/estimación y insights para planificación",
+        "Panel de Control Inteligente: Un tablero que muestra el estado real y los logros alcanzados de forma visual.",
+        "Mapa de Ruta Automático: El sistema calcula solo qué caminos están habilitados, eliminando el error humano.",
+        "Acceso Rápido a Datos Críticos: Todo lo que el usuario necesita en un solo lugar, optimizado para celulares y computadoras."
       ],
       results: [
-        "Planificación más rápida (ver desbloqueos sin adivinar)",
-        "Mejor toma de decisiones (métricas y visualización clara)",
-        "Experiencia más “universidad moderna” sin depender del sistema oficial",
+        "Ahorro de tiempo real: Planificación de meses reducida a segundos.",
+        "Validación Masiva: Probado y aprobado por una comunidad activa que impulsó el crecimiento del proyecto.",
+        "Impacto Visual: Transformamos una experiencia frustrante en una herramienta que da gusto usar."
       ],
       stack: ["React", "Node.js", "PostgreSQL"],
       externalUrl: "https://tu-utn.vercel.app/",

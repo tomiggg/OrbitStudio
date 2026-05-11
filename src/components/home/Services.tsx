@@ -1,33 +1,21 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import { Container } from "@/components/ui/Container";
 import { SERVICES } from "@/lib/services";
-import type { Service } from "@/lib/services";
-import { ServicesCarousel } from "@/components/home/services/ServicesCarousel";
-import { ServiceDetails } from "@/components/home/services/ServiceDetails";
-import { motion } from "framer-motion";
+import { ServiceCard } from "./services/ServiceCard";
+import { Anton } from "next/font/google"; // Importamos la fuente
 
-type ServicesProps = {
-  onOpenContact: (serviceTitle?: string) => void;
-};
+const font = Anton({ subsets: ["latin"], weight: "400" });
 
-export function Services({ onOpenContact }: ServicesProps) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  const selected = useMemo<Service | null>(
-    () => SERVICES.find((s) => s.id === selectedId) ?? null,
-    [selectedId]
-  );
-
+export function Services() {
   return (
     <section
       id="services"
-      className="relative overflow-hidden min-h-[100svh] py-20 md:py-24"
-      style={{ backgroundColor: "#a7e9e7ff" }}
+      className="relative overflow-hidden py-16 md:py-24"
+      style={{ backgroundColor: "#a7e9e75f" }}
     >
       <div
-        aria-hidden
+        aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-24"
         style={{
           background:
@@ -35,81 +23,37 @@ export function Services({ onOpenContact }: ServicesProps) {
         }}
       />
 
-      <div aria-hidden className="pointer-events-none absolute inset-0 services-noise" />
-
       <Container>
-        <div className="flex min-h-[calc(100svh-140px)] flex-col justify-center">
-          {/* Header */}
-          <motion.div
-            className="mx-auto max-w-3xl text-center"
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.35 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          >
+        <div className="flex flex-col justify-center">
+          
+          {/* Header Centrado */}
+          <div className="mx-auto max-w-3xl text-center mb-16">
+            {/* Título: Usando Anton, negro full y tracking apretado */}
             <h2
-              className="font-extrabold tracking-[-0.06em] text-[#072b2a]"
-              style={{ fontSize: "clamp(44px, 4.4vw, 72px)", lineHeight: "0.95" }}
+              className={`${font.className} inline-block text-black uppercase`}
+              style={{
+                fontSize: "clamp(48px, 6vw, 84px)", // Un poco más grande para lucir la Anton
+                lineHeight: "0.9",
+                letterSpacing: "-0.04em", // Tracking-tighter para ese look brutalista
+              }}
             >
-              Servicios diseñados para negocio
+              NUESTROS SERVICIOS
             </h2>
+            
+            <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-[#072b2a] md:text-base font-medium">
+              Infraestructura digital diseñada para resolver problemas reales de negocio.
+            </p>
+          </div>
 
-            <motion.p
-              className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-[#072b2a]/70 md:text-base"
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.35 }}
-              transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-            >
-              Elegí un punto de partida. Después lo iteramos según tus objetivos.
-            </motion.p>
-          </motion.div>
+          {/* GRID */}
+          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-6 md:grid-cols-3 md:gap-8 items-stretch">
+            {SERVICES.map((s, i) => (
+              <ServiceCard key={s.id} service={s} index={i} />
+            ))}
+          </div>
 
-          {/* Grid */}
-          <motion.div
-            className="mt-12"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.7, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <ServicesCarousel
-              services={SERVICES}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-            />
-          </motion.div>
         </div>
-
-        {selected && (
-          <ServiceDetails
-            service={selected}
-            onClose={() => setSelectedId(null)}
-            onChoose={(title) => onOpenContact(title)}
-          />
-        )}
       </Container>
-
-      <style jsx>{`
-        .services-noise {
-          opacity: 0.06;
-          mix-blend-mode: overlay;
-          background-image: repeating-linear-gradient(
-              0deg,
-              rgba(255, 255, 255, 0.07) 0px,
-              rgba(255, 255, 255, 0.07) 1px,
-              transparent 1px,
-              transparent 3px
-            ),
-            repeating-linear-gradient(
-              90deg,
-              rgba(0, 0, 0, 0.04) 0px,
-              rgba(0, 0, 0, 0.04) 1px,
-              transparent 1px,
-              transparent 4px
-            );
-        }
-      `}</style>
     </section>
   );
 }
