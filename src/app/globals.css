@@ -1,48 +1,17 @@
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
 @import "tailwindcss";
 
-/* Orbit Design System — CSS Variables */
+/* Shift Studio Design System — CSS Variables */
 :root {
-  /* Light mode (principal) */
-  --bg: #fdfefe;
-  --section: #f4f9f9;
-  --card: #ffffff;
+  --teal: #0ABAB5;
+  --dark: #072B2A;
+  --black: #000000;
+  --bg-light: #FAFCFC;
+  --bg-teal: rgba(167, 233, 231, 0.37);
+  --white: #FFFFFF;
+  --mono-muted: rgba(7, 43, 42, 0.5);
 
-  --title: #0f2f2d;
-  --text: #334b49;
-  --muted: #6f8f8c;
-
-  --link: #338b85;
-  --linkHover: #005954;
-
-  --cta: #005954;
-  --ctaHover: #338b85;
-
-  --borderSoft: rgba(0, 0, 0, 0.04);
-  --ringSoft: rgba(51, 139, 133, 0.35);
-
-  /* nav */
-  --linkTiffany: #0a3246;
-  --linkTiffanyHover: #0d405a;
-}
-
-.dark {
-  /* Dark mode (premium) */
-  --bg: #0e1f1e;
-  --section: #132c2a;
-  --card: #1a3a38;
-
-  --title: #e8fdfb;
-  --text: #b8dedd;
-  --muted: #7fbdb8;
-
-  --link: #5dc1b9;
-  --linkHover: #9ce0db;
-
-  --cta: #5dc1b9;
-  --ctaHover: #9ce0db;
-
-  --borderSoft: rgba(255, 255, 255, 0.06);
-  --ringSoft: rgba(93, 193, 185, 0.35);
+  /* --font-title and --font-body are injected by next/font as CSS variables */
 }
 
 html,
@@ -55,28 +24,24 @@ html {
 }
 
 body {
-  background: var(--bg);
-  color: var(--text);
-
-  /* ✅ FONT SYSTEM */
-  font-family: var(--font-body), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-
+  background: var(--bg-light);
+  color: var(--dark);
+  font-family: var(--font-body), monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ✅ TITLES USE Archivo Black */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-title), var(--font-body), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-family: var(--font-title), sans-serif;
+  text-transform: uppercase;
 }
 
-/* Links: usar clase, NO global */
 .orbit-link {
-  color: var(--link);
+  color: var(--teal);
   text-decoration: none;
 }
 .orbit-link:hover {
-  color: var(--linkHover);
+  color: var(--dark);
   text-decoration: underline;
 }
 
@@ -110,20 +75,19 @@ a.buttonlike {
 }
 
 .orbit-card {
-  border: 1px solid var(--borderSoft);
-  background: var(--card);
-  border-radius: 16px;
+  border: 1px solid var(--dark);
+  background: var(--white);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .orbit-nav-link {
-  color: var(--linkTiffany);
-  font-weight: 550; /* sutil, premium */
+  color: var(--dark);
+  font-weight: 550;
   transition: color 0.2s ease;
 }
 
 .orbit-nav-link:hover {
-  color: var(--linkTiffanyHover);
+  color: var(--teal);
 }
 
 /* HERO helpers */
@@ -232,7 +196,7 @@ a.buttonlike {
   }
 }
 
-/* Footer helpers (migrado desde styled-jsx) */
+/* Footer helpers */
 .footer-noise {
   opacity: 0.04;
   mix-blend-mode: overlay;
@@ -255,12 +219,12 @@ a.buttonlike {
 .footer-link {
   font-size: 14px;
   font-weight: 600;
-  color: rgba(7, 43, 42, 0.75);
+  color: var(--mono-muted);
   transition: color 160ms ease, transform 160ms ease;
   display: inline-block;
 }
 
 .footer-link:hover {
-  color: rgba(7, 43, 42, 1);
+  color: var(--dark);
   transform: translateY(-1px);
 }

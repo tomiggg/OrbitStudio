@@ -1,58 +1,120 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { Container } from "@/components/ui/Container";
 import { SERVICES } from "@/lib/services";
 import { ServiceCard } from "./services/ServiceCard";
-import { Anton } from "next/font/google"; // Importamos la fuente
 
-const font = Anton({ subsets: ["latin"], weight: "400" });
+const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 
-export function Services() {
+function TypeLine({ text, delayMs = 0 }: { text: string; delayMs?: number }) {
+  const [displayed, setDisplayed] = useState("");
+  const ref = useRef<HTMLSpanElement>(null);
+  const started = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started.current) {
+          started.current = true;
+          let i = 0;
+          const timeout = setTimeout(() => {
+            const interval = setInterval(() => {
+              setDisplayed(text.slice(0, i + 1));
+              i++;
+              if (i === text.length) clearInterval(interval);
+            }, 38);
+            return () => clearInterval(interval);
+          }, delayMs);
+          return () => clearTimeout(timeout);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [text, delayMs]);
+
+  return <span ref={ref}>{displayed}</span>;
+}
+
+type ServicesProps = { onOpenContact?: (serviceTitle?: string) => void };
+
+export function Services({ onOpenContact: _ }: ServicesProps = {}) {
   return (
-    <section
-      id="services"
-      className="relative overflow-hidden py-16 md:py-24"
-      style={{ backgroundColor: "#a7e9e75f" }}
-    >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-24"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(7,43,42,0.08), rgba(7,43,42,0))",
-        }}
-      />
-
+    <section id="services" className="relative py-20 md:py-28" style={{ background: "var(--bg-teal)" }}>
       <Container>
-        <div className="flex flex-col justify-center">
-          
-          {/* Header Centrado */}
-          <div className="mx-auto max-w-3xl text-center mb-16">
-            {/* Título: Usando Anton, negro full y tracking apretado */}
-            <h2
-              className={`${font.className} inline-block text-black uppercase`}
+
+        {/* HEADER BLOCK */}
+        <div className="relative w-full mb-12">
+
+          {/* Section label */}
+          <div className="flex items-center gap-2 mb-6">
+            <div
+              className="flex items-center justify-center"
               style={{
-                fontSize: "clamp(48px, 6vw, 84px)", // Un poco más grande para lucir la Anton
-                lineHeight: "0.9",
-                letterSpacing: "-0.04em", // Tracking-tighter para ese look brutalista
+                width: "20px",
+                height: "20px",
+                border: "1px solid rgba(0,0,0,0.2)",
+                borderRadius: "50%",
+                fontSize: "12px",
+                color: "rgba(0,0,0,0.35)",
               }}
             >
-              NUESTROS SERVICIOS
-            </h2>
-            
-            <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-[#072b2a] md:text-base font-medium">
-              Infraestructura digital diseñada para resolver problemas reales de negocio.
-            </p>
+              +
+            </div>
+            <span
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "12px",
+                color: "rgba(0,0,0,0.35)",
+              }}
+            >
+              Lo que ofrecemos
+            </span>
           </div>
 
-          {/* GRID */}
-          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-6 md:grid-cols-3 md:gap-8 items-stretch">
-            {SERVICES.map((s, i) => (
-              <ServiceCard key={s.id} service={s} index={i} />
-            ))}
-          </div>
+          <h2
+            className={plusJakarta.className}
+            style={{
+              fontSize: "clamp(56px, 8vw, 120px)",
+              color: "#000",
+              lineHeight: "0.85",
+            }}
+          >
+            servicios.
+          </h2>
 
+          <p
+            className="hidden md:block absolute right-0 text-right"
+            style={{
+              top: "50%",
+              transform: "translateY(-50%)",
+              fontFamily: "var(--font-body)",
+              fontSize: "13px",
+              color: "rgba(0,0,0,0.4)",
+              lineHeight: "1.6",
+              minWidth: "200px",
+            }}
+          >
+            <TypeLine text="Lo que tu idea necesita" delayMs={200} />
+            <br />
+            <TypeLine text="para ser realidad." delayMs={1000} />
+          </p>
         </div>
+
+        {/* ACCORDION LIST */}
+        <div style={{ borderTop: "1px solid rgba(0,0,0,0.1)" }}>
+          {SERVICES.map((service, i) => (
+            <ServiceCard key={service.id} service={service} index={i} />
+          ))}
+        </div>
+
       </Container>
     </section>
   );

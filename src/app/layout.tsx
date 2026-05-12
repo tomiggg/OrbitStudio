@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { Inter } from "next/font/google";
+import { Anton, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-
-const inter = Inter({ subsets: ["latin"], display: "swap" });
+const anton = Anton({ subsets: ["latin"], weight: "400", variable: "--font-title" });
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["400", "500", "600", "700"],
+});
 
 export const metadata: Metadata = {
   title: "Shift Studio",
@@ -20,7 +24,7 @@ export default async function RootLayout({
   const locale = h.get("x-next-intl-locale") ?? "es";
 
   return (
-    <html lang={locale} className={inter.className}>
+    <html lang={locale} className={`${anton.variable} ${jetbrainsMono.variable}`}>
       <body>
         <main>{children}</main>
       </body>

@@ -1,91 +1,144 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import type { Service } from "@/lib/services";
-import { Anton } from "next/font/google";
 
-const font = Anton({ subsets: ["latin"], weight: "400" });
+const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 
-function TypingTag({ text, index }: { text: string; index: number }) {
-  const [displayedText, setDisplayedText] = useState("");
-  
-  useEffect(() => {
-    const startDelay = 1500 + (index * 2000); 
-    const timeout = setTimeout(() => {
-      let i = 0;
-      const interval = setInterval(() => {
-        setDisplayedText(text.slice(0, i + 1));
-        i++;
-        if (i === text.length) clearInterval(interval);
-      }, 40);
-      return () => clearInterval(interval);
-    }, startDelay);
-    return () => clearTimeout(timeout);
-  }, [text, index]);
+const BOX_PALETTE = [
+  { bg: "rgba(167,233,231,0.25)", border: "rgba(10,186,181,0.2)",  text: "rgba(10,186,181,0.65)" },
+  { bg: "rgba(167,233,231,0.45)", border: "rgba(10,186,181,0.35)", text: "rgba(10,186,181,0.82)" },
+  { bg: "rgba(10,186,181,0.15)",  border: "rgba(10,186,181,0.55)", text: "#0ABAB5"               },
+];
+
+type Props = { service: Service; index: number };
+
+export function ServiceCard({ service, index }: Props) {
+  const [open, setOpen] = useState(index === 0);
+  const palette = BOX_PALETTE[index % BOX_PALETTE.length];
 
   return (
-    <span>
-      {displayedText}
-      {displayedText.length < text.length && displayedText.length > 0 && (
-        <span className="animate-pulse">_</span>
-      )}
-    </span>
-  );
-}
-
-type Props = {
-  service: Service;
-  index?: number;
-};
-
-export function ServiceCard({ service, index = 0 }: Props) {
-  return (
-    <motion.article
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.6 }}
-      viewport={{ once: true }}
-      // Se eliminó 'border' y 'border-black/5'
-      className="group flex h-full w-full max-w-[320px] md:max-w-none mx-auto flex-col bg-white p-2 md:p-2.5 shadow-xl"
+    <div
+      style={{
+        borderBottom: open
+          ? "1px solid rgba(10,186,181,0.2)"
+          : "1px solid rgba(0,0,0,0.1)",
+        position: "relative",
+        transition: "border-color 0.3s ease",
+      }}
     >
-      {/* SECCIÓN SUPERIOR */}
-      <div className="relative h-[100px] md:h-[110px] w-full shrink-0 overflow-hidden bg-[#fafcfc]">
-        <span
-          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none text-[#0abab5] transition-transform duration-700 group-hover:scale-105 ${font.className}`}
-          style={{ 
-            fontSize: "clamp(150px, 14vw, 180px)", 
-            lineHeight: "1", 
-            opacity: 0.15 
-          }}
-        >
-          {service.number}
-        </span>
-      </div>
-
-      {/* SECCIÓN INFERIOR */}
-      <div 
-        className="flex flex-grow flex-col p-4 md:p-5"
-        style={{ 
-          backgroundColor: "rgba(7, 43, 42, 0.95)", 
+      {/* ROW */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => setOpen((v) => !v)}
+        onKeyDown={(e) => e.key === "Enter" && setOpen((v) => !v)}
+        className="flex items-center cursor-pointer"
+        style={{
+          padding: "24px 0",
+          gap: "20px",
+          background: open ? "rgba(0,0,0,0.03)" : "transparent",
+          transition: "background 0.2s",
         }}
       >
-        <h3 className="mb-2.5 text-[18px] md:text-[22px] font-black uppercase leading-[0.95] tracking-tighter text-white">
-          {service.title}
-        </h3>
-
-        <div className="mb-3 h-px w-full bg-white/20" />
-
-        <p className="text-[12px] font-mono font-medium leading-relaxed text-white/80">
-          {service.description}
-        </p>
-
-        <div className="mt-auto pt-4 min-h-[24px]">
-          <span className="font-mono text-[9px] md:text-[10px] font-bold tracking-[0.12em] text-[#0abab5] uppercase">
-            [ <TypingTag text={service.model} index={index} /> ]
+        {/* Number box */}
+        <div
+          className="flex items-center justify-center flex-shrink-0"
+          style={{
+            width: "56px",
+            height: "56px",
+            background: palette.bg,
+            border: `1px solid ${palette.border}`,
+            borderRadius: "12px",
+            transition: "background 0.2s, border-color 0.2s",
+          }}
+        >
+          <span
+            className={plusJakarta.className}
+            style={{
+              fontSize: "16px",
+              color: palette.text,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            {service.number}
           </span>
         </div>
+
+        {/* Service name */}
+        <span
+          className={`${plusJakarta.className} flex-1`}
+          style={{
+            fontSize: "clamp(18px, 2.5vw, 24px)",
+            color: open ? "#000" : "rgba(0,0,0,0.7)",
+            transition: "color 0.2s",
+          }}
+        >
+          {service.title}
+        </span>
+
+        {/* Toggle */}
+        <div
+          className="flex items-center justify-center flex-shrink-0"
+          style={{
+            width: "32px",
+            height: "32px",
+            borderRadius: "50%",
+            border: open ? "1px solid #0ABAB5" : "1px solid rgba(0,0,0,0.15)",
+            background: open ? "rgba(10,186,181,0.08)" : "transparent",
+            transition: "all 0.25s ease",
+          }}
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            stroke={open ? "#0ABAB5" : "rgba(0,0,0,0.35)"}
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+              transform: open ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.3s ease, stroke 0.25s ease",
+            }}
+          >
+            <polyline points="2 5 7 10 12 5" />
+          </svg>
+        </div>
       </div>
-    </motion.article>
+
+      {/* ACCORDION BODY */}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="body"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            style={{ overflow: "hidden" }}
+          >
+            <div style={{ padding: "16px 0 24px 76px" }}>
+              <p
+                className={plusJakarta.className}
+                style={{
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  color: "rgba(0,0,0,0.55)",
+                  lineHeight: "1.7",
+                  maxWidth: "520px",
+                  margin: 0,
+                }}
+              >
+                {service.description}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
