@@ -16,7 +16,6 @@ function TypeLine({ text, delayMs = 0 }: { text: string; delayMs?: number }) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !started.current) {
@@ -35,7 +34,6 @@ function TypeLine({ text, delayMs = 0 }: { text: string; delayMs?: number }) {
       },
       { threshold: 0.1 }
     );
-
     observer.observe(el);
     return () => observer.disconnect();
   }, [text, delayMs]);
@@ -47,37 +45,24 @@ type ServicesProps = { onOpenContact?: (serviceTitle?: string) => void };
 
 export function Services({ onOpenContact: _ }: ServicesProps = {}) {
   return (
-    <section id="services" className="relative py-20 md:py-28" style={{ background: "var(--bg-teal)" }}>
+    <section id="services" className="relative py-20 md:py-28" style={{ background: "#0ABAB5" }}>
       <Container>
 
         {/* HEADER BLOCK */}
-        <div className="relative w-full mb-12">
+        <div className="relative w-full mb-32">
 
           {/* Section label */}
-          <div className="flex items-center gap-2 mb-6">
-            <div
-              className="flex items-center justify-center"
-              style={{
-                width: "20px",
-                height: "20px",
-                border: "1px solid rgba(0,0,0,0.2)",
-                borderRadius: "50%",
-                fontSize: "12px",
-                color: "rgba(0,0,0,0.35)",
-              }}
-            >
-              +
-            </div>
-            <span
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: "12px",
-                color: "rgba(0,0,0,0.35)",
-              }}
-            >
-              Lo que ofrecemos
-            </span>
-          </div>
+          <p
+            className="mb-5 uppercase"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "9px",
+              color: "rgba(0,0,0,0.5)",
+              letterSpacing: "0.18em",
+            }}
+          >
+            // LO QUE OFRECEMOS
+          </p>
 
           <h2
             className={plusJakarta.className}
@@ -85,6 +70,9 @@ export function Services({ onOpenContact: _ }: ServicesProps = {}) {
               fontSize: "clamp(56px, 8vw, 120px)",
               color: "#000",
               lineHeight: "0.85",
+              textTransform: "none",
+              letterSpacing: "-0.03em",
+              paddingBottom: "24px",
             }}
           >
             servicios.
@@ -96,9 +84,9 @@ export function Services({ onOpenContact: _ }: ServicesProps = {}) {
               top: "50%",
               transform: "translateY(-50%)",
               fontFamily: "var(--font-body)",
-              fontSize: "13px",
+              fontSize: "12px",
               color: "rgba(0,0,0,0.4)",
-              lineHeight: "1.6",
+              lineHeight: "1.7",
               minWidth: "200px",
             }}
           >
@@ -109,7 +97,7 @@ export function Services({ onOpenContact: _ }: ServicesProps = {}) {
         </div>
 
         {/* ACCORDION LIST */}
-        <div style={{ borderTop: "1px solid rgba(0,0,0,0.1)" }}>
+        <div style={{ borderTop: "1px solid rgba(0,0,0,0.15)" }}>
           {SERVICES.map((service, i) => (
             <ServiceCard key={service.id} service={service} index={i} />
           ))}
