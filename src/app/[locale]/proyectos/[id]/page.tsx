@@ -29,10 +29,10 @@ export default async function ProjectCasePage({ params }: PageProps) {
         {
           label: "Enfoque",
           content: (
-            <ul className="grid gap-2">
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: "10px" }}>
               {c.approach.map((x) => (
-                <li key={x} className="flex gap-2">
-                  <span className="mt-[6px] h-[5px] w-[5px] rounded-full bg-[color:var(--link)]" />
+                <li key={x} style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+                  <span style={{ color: "#0ABAB5", flexShrink: 0, lineHeight: 1.8 }}>—</span>
                   <span>{x}</span>
                 </li>
               ))}
@@ -42,10 +42,10 @@ export default async function ProjectCasePage({ params }: PageProps) {
         {
           label: "Solución",
           content: (
-            <ul className="grid gap-2">
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: "10px" }}>
               {c.solution.map((x) => (
-                <li key={x} className="flex gap-2">
-                  <span className="mt-[6px] h-[5px] w-[5px] rounded-full bg-[color:var(--link)]" />
+                <li key={x} style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+                  <span style={{ color: "#0ABAB5", flexShrink: 0, lineHeight: 1.8 }}>—</span>
                   <span>{x}</span>
                 </li>
               ))}

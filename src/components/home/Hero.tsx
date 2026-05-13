@@ -24,15 +24,14 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
     >
       {/* Video background */}
       <video
+        src="/hero-video-web.mp4"
         autoPlay
         muted
         loop
         playsInline
         className="absolute inset-0 w-full h-full object-cover opacity-40"
         style={{ zIndex: 0 }}
-      >
-        <source src="/hero-video.mp4" type="video/mp4" />
-      </video>
+      />
 
       {/* Dark overlay */}
       <div
@@ -55,7 +54,7 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
           margin: 0,
         }}
       >
-        // URBAN_ENGINEERING_CORE
+        // SHIFT_STUDIO · CÓRDOBA_AR
       </p>
 
       {/* TITLE BLOCK — left side, vertically centered */}
@@ -83,7 +82,7 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
               display: "inline-block",
             }}
           >
-            shift
+            shif<span style={{ color: "#0ABAB5" }}>t</span>
           </span>
         </span>
         <span

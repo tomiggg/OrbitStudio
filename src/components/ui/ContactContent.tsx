@@ -1,5 +1,10 @@
 "use client";
 
+import { useState } from "react";
+import { Plus_Jakarta_Sans } from "next/font/google";
+
+const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
+
 export type BudgetRange =
   | "No lo sé"
   | "USD 150–350"
@@ -26,223 +31,254 @@ type Props = {
   onChange: (patch: Partial<ContactFormState>) => void;
   onClose: () => void;
   onSend: () => void;
+  onSendEmail: () => void;
   canSend: boolean;
 };
 
-export function ContactContent({ value, onChange, onClose, onSend, canSend }: Props) {
+const inputClass =
+  "w-full rounded-lg text-[13px] text-black outline-none transition-[border-color,background] duration-200 placeholder:text-[rgba(7,43,42,0.35)] focus:border-[rgba(10,186,181,0.4)] focus:bg-[rgba(10,186,181,0.04)]";
+
+const inputStyle = {
+  padding: "12px 14px",
+  background: "rgba(7,43,42,0.05)",
+  border: "1px solid transparent",
+  fontFamily: "var(--font-body)",
+};
+
+type SendMethod = "whatsapp" | "email";
+
+export function ContactContent({ value, onChange, onClose: _, onSend, onSendEmail, canSend }: Props) {
+  const [sendMethod, setSendMethod] = useState<SendMethod>("whatsapp");
+
+  function handleSend() {
+    if (sendMethod === "email") {
+      onSendEmail();
+    } else {
+      onSend();
+    }
+  }
+
   return (
-    <div className="mx-auto w-full max-w-[520px]">
-      {/* ✅ mantenemos el H3 grande, el TopBar ya no repite */}
-      <h3 className="text-3xl font-extrabold tracking-[-0.04em] text-[#072b2a]">
-        Contanos tu proyecto.
-      </h3>
+    <div style={{ width: "100%" }}>
 
-      <p className="mt-3 text-sm leading-relaxed text-[#072b2a]/70">
-        Te respondemos en el día con un plan claro y un presupuesto sin humo.
-      </p>
+      {/* Title */}
+      <h2
+        className={plusJakarta.className}
+        style={{
+          fontSize: "clamp(32px, 5vw, 44px)",
+          color: "#000",
+          lineHeight: 0.85,
+          letterSpacing: "-0.03em",
+          textTransform: "none",
+          marginBottom: "32px",
+        }}
+      >
+        ¿Tenés un proyecto
+        <br />
+        en mente?
+      </h2>
 
-      <div className="mt-7 grid gap-5">
-        <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Nombre" required>
-            <input
-              value={value.name}
-              onChange={(e) => onChange({ name: e.target.value })}
-              className={inputBase}
-              placeholder="Tu nombre"
-            />
-          </Field>
+      {/* Fields */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
 
-          <Field label="WhatsApp (opcional)">
-            <input
-              value={value.whatsApp}
-              onChange={(e) => onChange({ whatsApp: e.target.value })}
-              className={inputBase}
-              placeholder="+54 9 ..."
-            />
-          </Field>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Negocio (opcional)">
-            <input
-              value={value.business}
-              onChange={(e) => onChange({ business: e.target.value })}
-              className={inputBase}
-              placeholder="Ej: Estudio, local, e-commerce..."
-            />
-          </Field>
-
-          <Field label="Servicio">
-            <SelectField>
-              <select
-                value={value.service}
-                onChange={(e) => onChange({ service: e.target.value })}
-                className={selectBase}
-              >
-                <option value="">No estoy seguro</option>
-                <option value="Landing Page Profesional">Landing Page Profesional</option>
-                <option value="Sitio Web Profesional">Sitio Web Profesional</option>
-                <option value="E-commerce">E-commerce</option>
-                <option value="Web App / Sistema a medida">Web App / Sistema a medida</option>
-              </select>
-            </SelectField>
-          </Field>
-        </div>
-
-        <Field label="Objetivo" required>
+        <Field label="Tu nombre *">
           <input
+            type="text"
+            value={value.name}
+            onChange={(e) => onChange({ name: e.target.value })}
+            className={inputClass}
+            style={inputStyle}
+            placeholder="Nombre"
+          />
+        </Field>
+
+        <Field label="¿Cuál es tu negocio?">
+          <input
+            type="text"
+            value={value.business}
+            onChange={(e) => onChange({ business: e.target.value })}
+            className={inputClass}
+            style={inputStyle}
+            placeholder="Ej: inmobiliaria, ecommerce, estudio..."
+          />
+        </Field>
+
+        <Field label="¿Qué necesitás?">
+          <input
+            type="text"
+            value={value.service}
+            onChange={(e) => onChange({ service: e.target.value })}
+            className={inputClass}
+            style={inputStyle}
+            placeholder="Ej: web, branding, sistema a medida..."
+          />
+        </Field>
+
+        <Field label="Objetivo principal *">
+          <textarea
             value={value.goal}
             onChange={(e) => onChange({ goal: e.target.value })}
-            className={inputBase}
-            placeholder="Ej: conseguir consultas por WhatsApp, vender online…"
+            className={inputClass}
+            style={{ ...inputStyle, resize: "none" }}
+            placeholder="Contanos qué problema querés resolver..."
+            rows={3}
           />
         </Field>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Plazo">
-            <SelectField>
-              <select
-                value={value.timeline}
-                onChange={(e) => onChange({ timeline: e.target.value as Timeline })}
-                className={selectBase}
-              >
-                <option>Esta semana</option>
-                <option>2–3 semanas</option>
-                <option>1 mes</option>
-                <option>Flexible</option>
-              </select>
-            </SelectField>
-          </Field>
+      </div>
 
-          <Field label="Presupuesto">
-            <SelectField>
-              <select
-                value={value.budget}
-                onChange={(e) => onChange({ budget: e.target.value as BudgetRange })}
-                className={selectBase}
-              >
-                <option>No lo sé</option>
-                <option>USD 150–350</option>
-                <option>USD 350–800</option>
-                <option>USD 800–1500</option>
-                <option>USD 1500+</option>
-              </select>
-            </SelectField>
-          </Field>
+      {/* Divider */}
+      <div style={{ margin: "24px 0 0", height: "1px", background: "rgba(7,43,42,0.07)" }} />
+
+      {/* Send method switch */}
+      <div
+        style={{
+          marginTop: "20px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "12px",
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "var(--font-body)",
+            fontSize: "11px",
+            color: "rgba(7,43,42,0.45)",
+            letterSpacing: "0.05em",
+            textTransform: "uppercase",
+            flexShrink: 0,
+          }}
+        >
+          Enviar por
+        </span>
+
+        <div
+          style={{
+            display: "flex",
+            border: "1px solid rgba(7,43,42,0.12)",
+            borderRadius: "8px",
+            overflow: "hidden",
+          }}
+        >
+          {(["whatsapp", "email"] as SendMethod[]).map((method, i) => (
+            <button
+              key={method}
+              type="button"
+              onClick={() => setSendMethod(method)}
+              style={{
+                padding: "8px 18px",
+                background: sendMethod === method ? "#000" : "transparent",
+                color: sendMethod === method ? "#fff" : "rgba(7,43,42,0.45)",
+                border: "none",
+                borderLeft: i === 1 ? "1px solid rgba(7,43,42,0.12)" : "none",
+                cursor: "pointer",
+                fontFamily: "var(--font-body)",
+                fontSize: "11px",
+                letterSpacing: "0.05em",
+                textTransform: "uppercase",
+                transition: "background 0.2s, color 0.2s",
+              }}
+            >
+              {method === "whatsapp" ? "WhatsApp" : "Email"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Buttons */}
+      <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "10px" }}>
+
+        <button
+          type="button"
+          onClick={handleSend}
+          disabled={!canSend}
+          className={plusJakarta.className}
+          style={{
+            width: "100%",
+            padding: "16px",
+            background: "#000",
+            color: "#fff",
+            fontSize: "15px",
+            borderRadius: "10px",
+            border: "none",
+            cursor: canSend ? "pointer" : "not-allowed",
+            opacity: canSend ? 1 : 0.4,
+            transition: "opacity 0.2s",
+            textTransform: "none",
+          }}
+        >
+          {sendMethod === "whatsapp" ? "Enviar por WhatsApp" : "Enviar por Email"}
+        </button>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ flex: 1, height: "1px", background: "rgba(7,43,42,0.08)" }} />
+          <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "rgba(7,43,42,0.3)" }}>o</span>
+          <div style={{ flex: 1, height: "1px", background: "rgba(7,43,42,0.08)" }} />
         </div>
 
-        <Field label="Referencias (opcional)">
-          <input
-            value={value.refs}
-            onChange={(e) => onChange({ refs: e.target.value })}
-            className={inputBase}
-            placeholder="Links de webs que te gustan (si tenés)"
-          />
-        </Field>
+        <button
+          type="button"
+          onClick={() =>
+            window.open(
+              "https://wa.me/5493512261334?text=" +
+                encodeURIComponent("Hola Shift Studio, quiero agendar una llamada"),
+              "_blank",
+              "noreferrer"
+            )
+          }
+          className={plusJakarta.className}
+          style={{
+            width: "100%",
+            padding: "14px",
+            background: "transparent",
+            color: "rgba(7,43,42,0.7)",
+            fontSize: "14px",
+            borderRadius: "10px",
+            border: "1px solid rgba(7,43,42,0.2)",
+            cursor: "pointer",
+            transition: "border-color 0.2s",
+            textTransform: "none",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(7,43,42,0.4)")}
+          onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(7,43,42,0.2)")}
+        >
+          Agenda una llamada
+        </button>
 
-        <Field label="Detalles (opcional)">
-          <textarea
-            value={value.details}
-            onChange={(e) => onChange({ details: e.target.value })}
-            className={`${inputBase} min-h-[120px] resize-none`}
-            placeholder="Qué ofrecés, qué problema querés resolver, secciones que necesitás, etc."
-          />
-        </Field>
-
-        <p className="text-xs text-[#072b2a]/60">
-          * Campos obligatorios. Respuesta en el día · Presupuesto claro · Sin compromiso
+        <p
+          style={{
+            fontFamily: "var(--font-body)",
+            fontSize: "10px",
+            color: "rgba(7,43,42,0.3)",
+            textAlign: "center",
+            marginTop: "8px",
+          }}
+        >
+          Al enviar aceptás nuestros Términos y Política de Privacidad
         </p>
 
-        {/* Acciones */}
-        <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:justify-end">
-          <button
-            type="button"
-            onClick={onClose}
-            className="
-              inline-flex items-center justify-center
-              rounded-full
-              border border-[#072b2a]/15
-              bg-white/18 backdrop-blur
-              px-6 py-3
-              text-sm font-semibold text-[#072b2a]
-              transition hover:bg-white/26
-            "
-          >
-            Cancelar
-          </button>
-
-          <button
-            type="button"
-            onClick={onSend}
-            disabled={!canSend}
-            className="
-              inline-flex items-center justify-center
-              rounded-full bg-[#072b2a]
-              px-6 py-3
-              text-sm font-semibold text-white
-              shadow-[0_18px_45px_rgba(0,0,0,0.28)]
-              transition hover:opacity-95
-              disabled:cursor-not-allowed disabled:opacity-50
-              active:scale-[0.99]
-            "
-          >
-            Enviar por WhatsApp
-          </button>
-        </div>
       </div>
     </div>
   );
 }
 
-function Field({
-  label,
-  children,
-  required,
-}: {
-  label: string;
-  children: React.ReactNode;
-  required?: boolean;
-}) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="grid gap-1 text-sm">
-      <span className="font-semibold text-[#072b2a]/85">
-        {label} {required ? <span className="text-[#072b2a]/60">*</span> : null}
-      </span>
-      {children}
-    </label>
-  );
-}
-
-/** ✅ Wrapper para select con caret custom */
-function SelectField({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="relative">
-      {children}
-      {/* caret */}
-      <div
-        aria-hidden
-        className="
-          pointer-events-none
-          absolute right-4 top-1/2 -translate-y-1/2
-          text-[#072b2a]/70
-        "
+    <div>
+      <label
+        style={{
+          fontFamily: "var(--font-body)",
+          fontSize: "12px",
+          color: "rgba(7,43,42,0.6)",
+          fontWeight: 600,
+          marginBottom: "4px",
+          display: "block",
+        }}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M7 10l5 5 5-5"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
+        {label}
+      </label>
+      {children}
     </div>
   );
 }
-
-const inputBase =
-  "w-full rounded-2xl border border-[#072b2a]/15 bg-white/18 backdrop-blur px-4 py-3 text-[#072b2a] placeholder:text-[#072b2a]/45 outline-none transition focus:border-[#072b2a]/25 focus:bg-white/22";
-
-const selectBase =
-  `${inputBase} pr-12 appearance-none cursor-pointer`;

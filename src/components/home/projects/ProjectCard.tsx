@@ -1,82 +1,119 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { Anton } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
+import type { Project } from "@/lib/projects";
 
-const anton = Anton({ subsets: ["latin"], weight: "400" });
+const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 
-type Project = {
-  id: string;
-  title: string;
-  description: string;
-  href: string;
-  serviceTag?: string;
-  imageSrc?: string;
-};
+type Props = { project: Project; index: number };
 
-type Props = {
-  project: Project;
-  index?: number;
-};
+export function ProjectCard({ project: p, index }: Props) {
+  const num = String(index + 1).padStart(2, "0");
 
-export function ProjectCard({ project: p, index = 0 }: Props) {
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 18 }}
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.6, delay: 0.08 * index, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -6 }}
-      whileTap={{ scale: 0.99 }}
-      className="group relative flex flex-col bg-white shadow-xl overflow-hidden"
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+      style={{ borderBottom: "1px solid rgba(0,0,0,0.12)" }}
     >
-      {/* Imagen — más baja */}
-      <div className="relative h-[140px] md:h-[160px] overflow-hidden bg-[#f5fafa]">
-        {p.imageSrc ? (
-          <img
-            src={p.imageSrc}
-            alt={`Preview ${p.title}`}
-            className="h-full w-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105"
-            loading="lazy"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(10,186,181,0.12),transparent_60%)]" />
-        )}
-      </div>
-
-      {/* Contenido */}
-      <div
-        className="flex flex-grow flex-col pb-4 px-4 md:pb-5 md:px-5"
-        style={{ backgroundColor: "rgba(7,43,42,0.95)" }}
-      >
-        <h3
-          className={`${anton.className} mb-4 uppercase text-white leading-[0.95]`}
-          style={{
-            fontSize: "clamp(22px, 2.2vw, 26px)",
-            letterSpacing: "-0.02em",
-            paddingTop: "1.25rem",
-          }}
+      <div className="group block">
+        <div
+          className="flex items-center transition-colors duration-200 group-hover:bg-black/5"
+          style={{ padding: "28px 0", gap: "24px" }}
         >
-          {p.title}
-        </h3>
 
-        <div className="mb-4 h-px w-full bg-white/15" />
-
-        <p className="flex-1 font-mono text-[11px] font-medium leading-relaxed text-white">
-          {p.description}
-        </p>
-
-        <div className="mt-5">
-          <Link
-            href={p.href}
-            className="group/link inline-flex items-center gap-3 font-mono text-[10px] font-bold tracking-[0.15em] text-[#0abab5] uppercase transition hover:text-white"
+          {/* Number */}
+          <span
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "11px",
+              color: "#0ABAB5",
+              letterSpacing: "0.08em",
+              minWidth: "28px",
+              flexShrink: 0,
+            }}
           >
-            [ VER CASO ]
-            <span className="h-[1px] w-5 bg-[#0abab5]/40 transition-all group-hover/link:w-8 group-hover/link:bg-[#0abab5]" />
-          </Link>
+            {num}
+          </span>
+
+          {/* Image */}
+          <div
+            style={{
+              width: "200px",
+              height: "130px",
+              flexShrink: 0,
+              overflow: "hidden",
+              background: "rgba(0,0,0,0.08)",
+            }}
+          >
+            {p.imageSrc ? (
+              <img
+                src={p.imageSrc}
+                alt={`Preview ${p.title}`}
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                style={{ opacity: 0.9 }}
+                loading="lazy"
+              />
+            ) : (
+              <div style={{ width: "100%", height: "100%", background: "rgba(10,186,181,0.12)" }} />
+            )}
+          </div>
+
+          {/* Content */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="flex items-center" style={{ gap: "12px", marginBottom: "8px" }}>
+              <h3
+                className={plusJakarta.className}
+                style={{
+                  fontSize: "clamp(18px, 2vw, 22px)",
+                  color: "#000",
+                  lineHeight: 1,
+                  margin: 0,
+                  textTransform: "none",
+                }}
+              >
+                {p.title}
+              </h3>
+              {p.serviceTag && (
+                <span
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: "9px",
+                    color: "rgba(0,0,0,0.35)",
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  [ {p.serviceTag} ]
+                </span>
+              )}
+            </div>
+            <p
+              className={plusJakarta.className}
+              style={{
+                fontSize: "14px",
+                fontWeight: 600,
+                color: "rgba(0,0,0,0.55)",
+                lineHeight: 1.8,
+                maxWidth: "480px",
+                margin: 0,
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+              } as React.CSSProperties}
+            >
+              {p.description}
+            </p>
+          </div>
+
+
         </div>
       </div>
-    </motion.article>
+    </motion.div>
   );
 }

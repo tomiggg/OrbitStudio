@@ -99,7 +99,13 @@ export function Header() {
         </div>
       </div>
 
-      <MobileMenuSheet open={open} onClose={() => setOpen(false)} items={NAV_ITEMS} cta={CTA} />
+      <MobileMenuSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        items={NAV_ITEMS}
+        cta={CTA}
+        onCta={() => { setOpen(false); openContact(); }}
+      />
     </header>
   );
 }

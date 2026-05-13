@@ -1,97 +1,131 @@
 "use client";
 
+import { useState } from "react";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { Container } from "@/components/ui/Container";
+
+const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 
 type FinalCtaProps = {
   onOpenContact?: () => void;
 };
 
 export function FinalCta({ onOpenContact }: FinalCtaProps) {
-  // Mantenemos tu clase original de botón para consistencia total
-  const primaryBtn =
-    "inline-flex items-center justify-center rounded-full bg-[#072b2a] px-7 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 hover:bg-[#061f1e] focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-[#0ABAB5]";
+  const [hovered, setHovered] = useState(false);
 
   return (
     <section
       id="contact"
-      className="relative overflow-hidden py-16 md:py-20"
-      style={{ backgroundColor: "#0ABAB5" }}
+      className="py-20 md:py-28"
+      style={{
+        background: "#000",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+      }}
     >
-      {/* Separador superior suave */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-28"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0))",
-        }}
-      />
-
-      {/* Glow suave */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[760px] -translate-x-1/2 rounded-full bg-white/10 blur-3xl"
-      />
-
-      {/* Noise igual espíritu del hero */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 cta-noise" />
-
       <Container>
-        <div className="relative mx-auto max-w-5xl">
-          <div className="px-6 py-10 md:px-12 md:py-12">
-            <div className="mx-auto max-w-3xl text-center">
-              {/* Título: Opción 1 con tu escala y tracking original */}
-              <h2
-                className="font-extrabold tracking-[-0.06em] text-[#072b2a] uppercase"
-                style={{ fontSize: "clamp(44px, 4.4vw, 72px)", lineHeight: "0.95" }}
-              >
-                Llevá tu negocio al próximo nivel
-              </h2>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            gap: "32px",
+            flexWrap: "wrap",
+          }}
+        >
 
-              {/* Subtítulo: Enfocado en solución a medida y escala */}
-              <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-[#072b2a]/75 md:text-base">
-                Basta de soluciones genéricas que no encajan. Desarrollamos el <b>producto digital exacto</b> que tu negocio necesita para resolver sus trabas operativas y empezar a operar a escala real.
-              </p>
-
-              <div className="mt-8 flex justify-center">
-                <button 
-                  type="button" 
-                  onClick={() => onOpenContact?.()} 
-                  className={primaryBtn}
-                >
-                  Quiero mi diagnóstico gratuito
-                </button>
-              </div>
-
-              {/* Microcopy de cierre */}
-              <p className="mt-5 text-xs text-[#072b2a]/65">
-                Respuesta en el día · Sin vueltas
-              </p>
-            </div>
+          {/* LEFT — Title */}
+          <div>
+            <span
+              className={plusJakarta.className}
+              style={{
+                display: "block",
+                fontSize: "clamp(40px, 6vw, 80px)",
+                color: "#fff",
+                lineHeight: "0.85",
+                letterSpacing: "-0.03em",
+                margin: 0,
+              }}
+            >
+              ¿Listo para
+            </span>
+            <span
+              className={plusJakarta.className}
+              style={{
+                display: "block",
+                fontSize: "clamp(40px, 6vw, 80px)",
+                color: "#0ABAB5",
+                lineHeight: "0.85",
+                letterSpacing: "-0.03em",
+                margin: 0,
+              }}
+            >
+              construir?
+            </span>
           </div>
+
+          {/* RIGHT — Meta + Button */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: "20px",
+            }}
+          >
+            <p
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "10px",
+                color: "rgba(255,255,255,0.3)",
+                letterSpacing: "0.1em",
+                textAlign: "right",
+                textTransform: "uppercase",
+                lineHeight: 1.8,
+                margin: 0,
+              }}
+            >
+              Respuesta en el día
+              <br />
+              Córdoba, AR · WhatsApp
+            </p>
+
+            <button
+              type="button"
+              onClick={onOpenContact}
+              onMouseEnter={() => setHovered(true)}
+              onMouseLeave={() => setHovered(false)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+              }}
+            >
+              <span
+                className={plusJakarta.className}
+                style={{
+                  fontSize: "16px",
+                  color: "#0ABAB5",
+                }}
+              >
+                Hablemos
+              </span>
+              <div
+                style={{
+                  width: hovered ? "56px" : "32px",
+                  height: "1px",
+                  background: "#0ABAB5",
+                  transition: "width 0.3s ease",
+                }}
+              />
+            </button>
+          </div>
+
         </div>
       </Container>
-
-      <style jsx>{`
-        .cta-noise {
-          opacity: 0.07;
-          mix-blend-mode: overlay;
-          background-image: repeating-linear-gradient(
-              0deg,
-              rgba(255, 255, 255, 0.08) 0px,
-              rgba(255, 255, 255, 0.08) 1px,
-              transparent 1px,
-              transparent 3px
-            ),
-            repeating-linear-gradient(
-              90deg,
-              rgba(0, 0, 0, 0.05) 0px,
-              rgba(0, 0, 0, 0.05) 1px,
-              transparent 1px,
-              transparent 4px
-            );
-        }
-      `}</style>
     </section>
   );
 }

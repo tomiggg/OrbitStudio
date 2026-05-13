@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Plus_Jakarta_Sans } from "next/font/google";
+
+const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 
 export type MobileNavItem = { href: string; label: string };
 
@@ -8,128 +12,167 @@ type Props = {
   open: boolean;
   onClose: () => void;
   items: MobileNavItem[];
-  cta: { href: string; label: string };
+  cta: { label: string };
+  onCta: () => void;
 };
 
-export function MobileMenuSheet({ open, onClose, items, cta }: Props) {
-  // Lock body scroll
+const ease = [0.22, 1, 0.36, 1] as const;
+
+export function MobileMenuSheet({ open, onClose, items, cta, onCta }: Props) {
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
+    return () => { document.body.style.overflow = prev; };
   }, [open]);
 
-  // ESC close
   useEffect(() => {
     if (!open) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
+    const onKeyDown = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open, onClose]);
 
   return (
-    <div
-      className={[
-        "md:hidden",
-        "fixed inset-0 z-[9999]",
-        open ? "pointer-events-auto" : "pointer-events-none",
-      ].join(" ")}
-      aria-hidden={!open}
-    >
-      {/* Overlay */}
-      <div
-        onClick={onClose}
-        className={[
-          "absolute inset-0 transition-opacity duration-200",
-          open ? "opacity-100 bg-black/55" : "opacity-0 bg-black/0",
-        ].join(" ")}
-      />
+    <AnimatePresence>
+      {open && (
+        <div className="md:hidden" style={{ position: "fixed", inset: 0, zIndex: 9999 }}>
 
-      {/* Panel full (bg liso) */}
-      <div
-        className={[
-          "absolute inset-0",
-          "transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-          open ? "translate-x-0" : "translate-x-full",
-          "bg-[#8ED9D7]",
-        ].join(" ")}
-      >
-        {/* Top bar */}
-        <div className="flex items-center justify-between px-5 pt-5">
-          <div className="text-sm font-semibold text-[#072b2a]/80">Menú</div>
-
-          {/* Close button (MISMO estilo que el header toggle) */}
-          <button
-            type="button"
+          {/* Backdrop */}
+          <motion.div
             onClick={onClose}
-            className="
-              inline-flex items-center justify-center
-              h-10 w-10
-              rounded-full
-              border border-white/25
-              bg-white/25
-              backdrop-blur-xl
-              text-[#072b2a]
-              shadow-[0_8px_20px_rgba(0,0,0,0.12)]
-              transition
-              hover:bg-white/35
-              hover:scale-[1.03]
-              active:scale-[0.96]
-            "
-            aria-label="Cerrar menú"
-          >
-            <span aria-hidden style={{ fontSize: 18, lineHeight: 1 }}>
-              ✕
-            </span>
-          </button>
-        </div>
+            style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.55)" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          />
 
-        {/* Centered nav */}
-        <div className="flex h-[calc(100dvh-88px)] flex-col items-center justify-center px-8 text-center">
-          <nav className="flex flex-col items-center gap-8">
-            {items.map((it) => (
-              <a
-                key={it.href}
-                href={it.href}
-                onClick={onClose}
-                className="
-                  text-3xl font-semibold
-                  tracking-[-0.02em]
-                  text-[#072b2a]
-                  no-underline
-                  transition
-                  active:scale-[0.98]
-                "
+          {/* Bottom sheet */}
+          <motion.div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              background: "#FAFCFC",
+              borderRadius: "20px 20px 0 0",
+              display: "flex",
+              flexDirection: "column",
+            }}
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ duration: 0.35, ease }}
+          >
+            {/* Drag handle */}
+            <div style={{ display: "flex", justifyContent: "center", padding: "12px 0 4px" }}>
+              <div
+                style={{
+                  width: "36px",
+                  height: "4px",
+                  borderRadius: "2px",
+                  background: "rgba(7,43,42,0.15)",
+                }}
+              />
+            </div>
+
+            {/* Header */}
+            <div
+              style={{
+                height: "52px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "0 20px",
+                borderBottom: "1px solid rgba(7,43,42,0.07)",
+              }}
+            >
+              <span
+                className={plusJakarta.className}
+                style={{ fontSize: "13px", color: "#000" }}
               >
-                {it.label}
-              </a>
-            ))}
-          </nav>
+                SHIFT_STUDIO
+              </span>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Cerrar menú"
+                style={{
+                  width: "30px",
+                  height: "30px",
+                  borderRadius: "50%",
+                  border: "1px solid rgba(7,43,42,0.15)",
+                  background: "transparent",
+                  color: "rgba(7,43,42,0.6)",
+                  fontSize: "13px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                }}
+              >
+                ✕
+              </button>
+            </div>
 
-          <a
-            href={cta.href}
-            onClick={onClose}
-            className="
-              mt-14 inline-flex items-center justify-center
-              rounded-full
-              bg-[#072b2a]
-              px-10 py-4
-              text-lg font-semibold
-              text-white
-              no-underline
-              shadow-[0_18px_45px_rgba(0,0,0,0.30)]
-              active:scale-[0.99]
-            "
-          >
-            {cta.label}
-          </a>
+            {/* Nav links */}
+            <nav style={{ padding: "8px 0" }}>
+              {items.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  onClick={onClose}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "18px 20px",
+                    borderBottom: "1px solid rgba(7,43,42,0.06)",
+                    textDecoration: "none",
+                  }}
+                >
+                  <span
+                    className={plusJakarta.className}
+                    style={{
+                      fontSize: "22px",
+                      color: "#000",
+                      letterSpacing: "-0.02em",
+                      textTransform: "none",
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                  <span style={{ color: "rgba(7,43,42,0.25)", fontSize: "16px" }}>→</span>
+                </a>
+              ))}
+            </nav>
+
+            {/* CTA */}
+            <div style={{ padding: "16px 20px 40px" }}>
+              <button
+                type="button"
+                onClick={() => { onClose(); onCta(); }}
+                className={plusJakarta.className}
+                style={{
+                  width: "100%",
+                  padding: "16px",
+                  background: "#000",
+                  color: "#fff",
+                  fontSize: "15px",
+                  border: "none",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  textTransform: "none",
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {cta.label}
+              </button>
+            </div>
+
+          </motion.div>
         </div>
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 }

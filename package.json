@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "NEXT_TURBOPACK=0 next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
     "framer-motion": "^12.23.26",
-    "next": "16.1.1",
+    "next": "^15.3.9",
     "next-intl": "^4.6.1",
     "react": "19.2.3",
     "react-dom": "19.2.3"

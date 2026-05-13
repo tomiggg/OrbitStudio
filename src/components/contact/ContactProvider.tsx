@@ -42,13 +42,38 @@ export function ContactProvider({ children }: { children: React.ReactNode }) {
   }
 
   function onSend() {
-    // TODO: tu lógica real (WhatsApp / submit)
-    // Por ahora solo cierra:
-    setOpen(false);
+    const lines = [
+      "Hola Shift Studio 👋",
+      "",
+      `Nombre: ${form.name || "-"}`,
+      `Negocio: ${form.business || "-"}`,
+      `¿Qué necesitás?: ${form.service || "-"}`,
+      `Objetivo: ${form.goal || "-"}`,
+    ];
+    const text = encodeURIComponent(lines.join("\n"));
+    window.open(`https://wa.me/5493512261334?text=${text}`, "_blank", "noreferrer");
+  }
+
+  function onSendEmail() {
+    const subject = encodeURIComponent("Consulta desde Shift Studio");
+    const body = encodeURIComponent(
+      [
+        `Nombre: ${form.name || "-"}`,
+        `Negocio: ${form.business || "-"}`,
+        `¿Qué necesitás?: ${form.service || "-"}`,
+        `Objetivo: ${form.goal || "-"}`,
+      ].join("\n")
+    );
+    window.open(
+      `mailto:shiftstudio.work@gmail.com?subject=${subject}&body=${body}`,
+      "_blank",
+      "noreferrer"
+    );
   }
 
   const value = useMemo(
     () => ({ openContact, closeContact }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
@@ -56,18 +81,13 @@ export function ContactProvider({ children }: { children: React.ReactNode }) {
     <ContactContext.Provider value={value}>
       {children}
 
-      {/* Overlay se monta UNA vez (global) */}
-      <ContactOverlay
-        open={open}
-        onClose={closeContact}
-        title="Contacto"
-        subtitle="Te respondemos en el día. Sin compromiso."
-      >
+      <ContactOverlay open={open} onClose={closeContact}>
         <ContactContent
           value={form}
           onChange={(patch) => setForm((p) => ({ ...p, ...patch }))}
           onClose={closeContact}
           onSend={onSend}
+          onSendEmail={onSendEmail}
           canSend={canSend}
         />
       </ContactOverlay>

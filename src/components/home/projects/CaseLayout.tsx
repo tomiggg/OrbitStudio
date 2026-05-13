@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { Container } from "@/components/ui/Container";
 import { useContact } from "@/components/contact/ContactProvider";
-import { Anton } from "next/font/google";
 
-const anton = Anton({ subsets: ["latin"], weight: "400" });
+const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 
 type Props = {
   eyebrow?: string;
@@ -14,14 +13,8 @@ type Props = {
   subtitle?: string;
   heroTag?: string;
   externalUrl?: string;
-  blocks: {
-    label: string;
-    content: React.ReactNode;
-  }[];
-  highlights?: {
-    title: string;
-    items: string[];
-  };
+  blocks: { label: string; content: React.ReactNode }[];
+  highlights?: { title: string; items: string[] };
 };
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -38,113 +31,300 @@ export function CaseLayout({
   const { openContact } = useContact();
 
   return (
-    <section
-      className="relative overflow-hidden py-16 md:py-24"
-      style={{ backgroundColor: "#a7e9e75f" }} // Fondo menta suave
-    >
+    <div style={{ background: "#a7e9e7", minHeight: "100svh", paddingTop: "80px" }}>
       <Container>
-        {/* Hero Compacto y Alto */}
-        <div className="mx-auto max-w-4xl text-center mb-12 md:mb-16">
-          <div className="font-mono text-[9px] font-bold tracking-[0.2em] text-[#0abab5] uppercase mb-4 opacity-80">
-            {eyebrow} {heroTag && <span className="mx-1 opacity-30">·</span>} {heroTag}
-          </div>
+        <div
+          style={{
+            display: "flex",
+            height: "calc(100svh - 80px)",
+          }}
+        >
 
-          <h1
-            className={`${anton.className} block uppercase text-black mb-6`}
+          {/* LEFT COL */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease }}
             style={{
-              fontSize: "clamp(48px, 9vw, 92px)", // Título masivo como en la imagen
-              lineHeight: "0.85",
-              letterSpacing: "-0.04em",
+              width: "38%",
+              flexShrink: 0,
+              borderRight: "1px solid rgba(0,0,0,0.1)",
+              padding: "32px 32px 32px 0",
+              display: "flex",
+              flexDirection: "column",
+              position: "sticky",
+              top: "80px",
+              height: "calc(100svh - 80px)",
             }}
           >
-            {title}
-          </h1>
-
-          {subtitle && (
-            <p className="mx-auto max-w-xl text-[14px] md:text-[16px] leading-relaxed text-[#072b2a] opacity-60 mb-10 font-medium">
-              {subtitle}
+            <p
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "9px",
+                color: "#0ABAB5",
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                marginBottom: "48px",
+              }}
+            >
+              // {eyebrow}{heroTag && ` · ${heroTag}`}
             </p>
-          )}
 
-          {/* Botones Estilo Foto */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            {externalUrl && (
-              <a
-                href={externalUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="bg-black px-8 py-3.5 font-mono text-[10px] font-bold tracking-[0.15em] text-white uppercase transition hover:bg-[#072b2a]"
-              >
-                [ VER PROYECTO LIVE ]
-              </a>
-            )}
-            <button
-              className="border border-black/20 bg-white/50 px-8 py-3.5 font-mono text-[10px] font-bold tracking-[0.15em] text-black uppercase transition hover:border-black/40"
+            <h1
+              className={plusJakarta.className}
+              style={{
+                fontSize: "clamp(36px, 4vw, 64px)",
+                color: "#000",
+                lineHeight: "0.85",
+                letterSpacing: "-0.03em",
+                textTransform: "none",
+                paddingBottom: "12px",
+              }}
             >
-              [ VER DETALLE ]
-            </button>
-          </div>
-        </div>
+              {title.toLowerCase()}.
+            </h1>
 
-        {/* GRID 50/50 - Bloques Apilados y Altos */}
-        <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-2 md:gap-6 items-stretch">
-          
-          {/* Columna Izquierda: Contexto y Problema */}
-          <div className="flex flex-col gap-4">
-            {blocks.slice(0, 2).map((b, i) => (
-              <article
-                key={b.label}
-                className="bg-white p-10 md:p-14 shadow-sm flex flex-col justify-start min-h-[280px]"
+            {subtitle && (
+              <p
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "13px",
+                  color: "rgba(0,0,0,0.5)",
+                  lineHeight: 1.7,
+                  marginTop: "16px",
+                  maxWidth: "280px",
+                }}
               >
-                <h4 className="mb-6 font-mono text-[10px] font-bold tracking-[0.2em] text-[#0abab5] uppercase">
-                  {b.label}
-                </h4>
-                <div className="text-[15px] md:text-[17px] leading-relaxed text-[#072b2a]/90 font-medium">
-                  {b.content}
-                </div>
-              </article>
-            ))}
-          </div>
-
-          {/* Columna Derecha: Resultados y CTA */}
-          <div className="flex flex-col gap-4">
-            {highlights && (
-              <aside className="bg-white p-10 md:p-14 shadow-sm min-h-[280px]">
-                <h4 className="mb-6 font-mono text-[10px] font-bold tracking-[0.2em] text-[#0abab5] uppercase">
-                  {highlights.title}
-                </h4>
-                <ul className="flex flex-col gap-4">
-                  {highlights.items.map((it) => (
-                    <li key={it} className="flex gap-4 text-[14px] md:text-[16px] leading-relaxed text-[#072b2a]/80">
-                      <span className="text-[#0abab5] font-bold text-[18px]">✓</span>
-                      <span>{it}</span>
-                    </li>
-                  ))}
-                </ul>
-              </aside>
-            )}
-
-            {/* Caja de Contacto Oscura Matcheando Altura */}
-            <div 
-              className="p-10 md:p-14 shadow-sm flex flex-col justify-center bg-[#072b2a] flex-grow min-h-[280px]"
-              style={{ backgroundColor: "rgba(7, 43, 42, 0.95)" }} // Color oscuro Shift Studio
-            >
-              <h4 className="mb-4 font-mono text-[10px] font-bold tracking-[0.2em] text-[#0abab5] uppercase">
-                ¿Problema parecido?
-              </h4>
-              <p className="mb-8 text-[14px] md:text-[15px] leading-relaxed text-white/70">
-                Analizamos tu caso y damos un rango estimado, sin compromiso.
+                {subtitle}
               </p>
+            )}
+
+            <div style={{ borderTop: "1px solid rgba(0,0,0,0.1)", margin: "24px 0" }} />
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px",
+                marginTop: "auto",
+              }}
+            >
+              {externalUrl && (
+                <a
+                  href={externalUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: "10px",
+                    color: "#000",
+                    background: "#0ABAB5",
+                    padding: "12px 20px",
+                    letterSpacing: "0.15em",
+                    textTransform: "uppercase",
+                    textDecoration: "none",
+                    display: "inline-block",
+                    alignSelf: "flex-start",
+                  }}
+                >
+                  [ VER PROYECTO LIVE ]
+                </a>
+              )}
               <button
                 onClick={openContact}
-                className="w-full bg-[#0abab5] py-4 font-mono text-[11px] font-bold tracking-[0.15em] text-white uppercase transition hover:brightness-110"
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "10px",
+                  color: "rgba(0,0,0,0.5)",
+                  background: "transparent",
+                  border: "1px solid rgba(0,0,0,0.2)",
+                  padding: "12px 20px",
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                  alignSelf: "flex-start",
+                }}
               >
                 [ HABLEMOS ]
               </button>
             </div>
+          </motion.div>
+
+          {/* RIGHT COL */}
+          <div
+            style={{
+              flex: 1,
+              overflowY: "auto",
+              maxHeight: "calc(100svh - 80px)",
+              padding: "32px 0 32px 32px",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+
+            {/* Blocks grid 2 cols */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+              {blocks.map((b, i) => (
+                <motion.div
+                  key={b.label}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.07, ease }}
+                  style={{
+                    borderTop: "1px solid rgba(0,0,0,0.1)",
+                    borderLeft: i % 2 === 1 ? "1px solid rgba(0,0,0,0.1)" : "none",
+                    padding: "16px",
+                    paddingLeft: i % 2 === 1 ? "16px" : "0",
+                  }}
+                >
+                  <p
+                    className={plusJakarta.className}
+                    style={{
+                      fontSize: "11px",
+                      color: "rgba(0,0,0,0.4)",
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    {b.label}
+                  </p>
+                  <div
+                    className={plusJakarta.className}
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      color: "rgba(0,0,0,0.55)",
+                      lineHeight: 1.8,
+                    }}
+                  >
+                    {b.content}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Highlights */}
+            {highlights && (
+              <div style={{ borderTop: "1px solid rgba(0,0,0,0.1)", paddingTop: "16px" }}>
+                <p
+                  className={plusJakarta.className}
+                  style={{
+                    fontSize: "11px",
+                    color: "rgba(0,0,0,0.4)",
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    marginBottom: "8px",
+                  }}
+                >
+                  {highlights.title}
+                </p>
+                <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                  {highlights.items.map((item, i) => (
+                    <motion.li
+                      key={item}
+                      initial={{ opacity: 0, x: -8 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.35, delay: i * 0.08, ease }}
+                      style={{
+                        display: "flex",
+                        gap: "12px",
+                        alignItems: "flex-start",
+                        borderTop: "1px solid rgba(0,0,0,0.08)",
+                        padding: "10px 0",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontFamily: "var(--font-body)",
+                          fontSize: "10px",
+                          color: "#0ABAB5",
+                          minWidth: "24px",
+                          flexShrink: 0,
+                          letterSpacing: "0.08em",
+                        }}
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span
+                        className={plusJakarta.className}
+                        style={{
+                          fontSize: "14px",
+                          fontWeight: 600,
+                          color: "rgba(0,0,0,0.55)",
+                          lineHeight: 1.7,
+                        }}
+                      >
+                        {item}
+                      </span>
+                    </motion.li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Bottom CTA */}
+            <div
+              style={{
+                borderTop: "1px solid rgba(0,0,0,0.1)",
+                paddingTop: "16px",
+                marginTop: "auto",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "20px",
+                flexWrap: "wrap",
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: "9px",
+                    color: "#0ABAB5",
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                    marginBottom: "4px",
+                  }}
+                >
+                  // ¿PROBLEMA PARECIDO?
+                </p>
+                <p
+                  className={plusJakarta.className}
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    color: "rgba(0,0,0,0.5)",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  Analizamos tu caso sin compromiso.
+                </p>
+              </div>
+              <button
+                onClick={openContact}
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "10px",
+                  color: "#000",
+                  background: "#0ABAB5",
+                  border: "none",
+                  padding: "12px 20px",
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                  flexShrink: 0,
+                }}
+              >
+                [ HABLEMOS ]
+              </button>
+            </div>
+
           </div>
         </div>
       </Container>
-    </section>
+    </div>
   );
 }

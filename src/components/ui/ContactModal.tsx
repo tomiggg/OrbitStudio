@@ -5,8 +5,6 @@ import { ContactOverlay } from "@/components/ui/ContactOverlay";
 import {
   ContactContent,
   ContactFormState,
-  BudgetRange,
-  Timeline,
 } from "@/components/ui/ContactContent";
 
 type ContactModalProps = {
@@ -54,7 +52,7 @@ export function ContactModal({
 
   function buildWhatsAppText() {
     const lines = [
-      "Hola Orbit Digital 👋",
+      "Hola Shift Studio 👋",
       "",
       `Nombre: ${form.name || "-"}`,
       `Negocio: ${form.business || "-"}`,
@@ -77,18 +75,34 @@ export function ContactModal({
     window.open(href, "_blank", "noreferrer");
   }
 
+  function onSendEmail() {
+    const subject = encodeURIComponent("Consulta desde Shift Studio");
+    const body = encodeURIComponent(
+      [
+        `Nombre: ${form.name || "-"}`,
+        `Negocio: ${form.business || "-"}`,
+        `¿Qué necesitás?: ${form.service || "-"}`,
+        `Objetivo: ${form.goal || "-"}`,
+      ].join("\n")
+    );
+    window.open(
+      `mailto:shiftstudio.work@gmail.com?subject=${subject}&body=${body}`,
+      "_blank",
+      "noreferrer"
+    );
+  }
+
   return (
     <ContactOverlay
       open={open}
       onClose={onClose}
-      title="Contanos tu proyecto"
-      subtitle={undefined}
     >
       <ContactContent
         value={form}
         onChange={(patch) => setForm((prev) => ({ ...prev, ...patch }))}
         onClose={onClose}
         onSend={onSend}
+        onSendEmail={onSendEmail}
         canSend={canSend}
       />
     </ContactOverlay>
