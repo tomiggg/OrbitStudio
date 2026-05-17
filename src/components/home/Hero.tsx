@@ -5,6 +5,8 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 
 const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 
+const GRAIN_OPACITY = 0.06; // ← subí/bajá este valor (0 = nada, 0.2 = fuerte)
+
 type HeroProps = { onOpenContact?: () => void };
 
 export function Hero({ onOpenContact: _ }: HeroProps) {
@@ -37,7 +39,22 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
       <div
         aria-hidden="true"
         className="absolute inset-0"
-        style={{ background: "rgba(0,0,0,0.6)", zIndex: 1 }}
+        style={{ background: "rgba(0, 0, 0, 0.3)", zIndex: 1 }}
+      />
+
+      {/* Grain */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{
+          zIndex: 2,
+          opacity: GRAIN_OPACITY,
+          backgroundImage: "url('/grain.png')",
+          backgroundRepeat: "repeat",
+          backgroundSize: "180px 180px",
+          mixBlendMode: "overlay",
+          animation: "grain 0.8s steps(1) infinite",
+        }}
       />
 
       {/* TAG — top left */}
@@ -82,7 +99,7 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
               display: "inline-block",
             }}
           >
-            shif<span style={{ color: "#0ABAB5" }}>t</span>
+            shift
           </span>
         </span>
         <span
