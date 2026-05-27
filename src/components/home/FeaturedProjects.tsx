@@ -48,7 +48,7 @@ export function FeaturedProjects() {
                 letterSpacing: "0.18em",
               }}
             >
-              // TRABAJO RECIENTE
+              {"// TRABAJO RECIENTE"}
             </p>
 
             <h2

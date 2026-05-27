@@ -16,8 +16,8 @@ export function ServicesCarousel({ services, selectedId, onSelect }: Props) {
         {services.map((s, i) => {
           const active = s.id === selectedId;
 
-          const highlights = Array.isArray((s as any).highlights)
-            ? ((s as any).highlights as string[]).slice(0, 3)
+          const highlights = Array.isArray(s.highlights)
+            ? s.highlights.slice(0, 3)
             : [];
 
           return (
@@ -55,16 +55,16 @@ export function ServicesCarousel({ services, selectedId, onSelect }: Props) {
                   {s.title}
                 </p>
 
-                {"priceFrom" in s && (
+                {s.priceFrom && (
                   <div className="mt-3 text-sm font-semibold text-[#0ABAB5]">
-                    Desde {(s as any).priceFrom}
+                    Desde {s.priceFrom}
                   </div>
                 )}
 
-                {"idealFor" in s && (
+                {s.idealFor && (
                   <p className="mt-3 text-sm leading-relaxed text-[#072b2a]/70">
                     <span className="font-semibold text-[#072b2a]">Ideal para:</span>{" "}
-                    {(s as any).idealFor}
+                    {s.idealFor}
                   </p>
                 )}
 

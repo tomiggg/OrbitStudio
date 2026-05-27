@@ -17,6 +17,7 @@ export function ServiceDetailsMobileFlip({
   const [flipped, setFlipped] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFlipped(false);
   }, [service.id]);
 
@@ -104,7 +105,7 @@ export function ServiceDetailsMobileFlip({
                   Incluye
                 </div>
                 <ul className="mt-3 space-y-2 text-sm text-[#072b2a]/70">
-                  {service.includes.map((x) => (
+                  {service.includes?.map((x) => (
                     <li key={x} className="flex gap-2">
                       <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0abab5]" />
                       <span>{x}</span>

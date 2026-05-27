@@ -37,12 +37,14 @@ export function ContactModal({
 
   // Sync preset service
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setForm((prev) => ({ ...prev, service: presetService ?? "" }));
   }, [presetService]);
 
   // Reset al cerrar
   useEffect(() => {
     if (open) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setForm({ ...DEFAULT_FORM, service: presetService ?? "" });
   }, [open, presetService]);
 

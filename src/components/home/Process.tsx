@@ -121,6 +121,7 @@ export function Process() {
   }, [activate]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     activate(0);
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -137,7 +138,7 @@ export function Process() {
         <Reveal>
           <div className="mb-12">
             <p style={{ fontFamily: "var(--font-body)", fontSize: "9px", color: "rgba(0,0,0,0.4)", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: "16px" }}>
-              // CÓMO TRABAJAMOS
+              {"// CÓMO TRABAJAMOS"}
             </p>
             <h2
               className={plusJakarta.className}
@@ -212,7 +213,7 @@ export function Process() {
                     transition={{ duration: 0.35, delay: 0.05, ease }}
                     style={{ fontFamily: "var(--font-body)", fontSize: "9px", color: "#0ABAB5", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "16px" }}
                   >
-                    // {PROCESS_STEPS[activeStep].title}
+                    {"// "}{PROCESS_STEPS[activeStep].title}
                   </motion.p>
                   <motion.h3
                     className={plusJakarta.className}

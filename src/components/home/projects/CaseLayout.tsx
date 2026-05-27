@@ -67,7 +67,7 @@ export function CaseLayout({
                 marginBottom: "48px",
               }}
             >
-              // {eyebrow}{heroTag && ` · ${heroTag}`}
+              {"// "}{eyebrow}{heroTag && ` · ${heroTag}`}
             </p>
 
             <h1
@@ -289,7 +289,7 @@ export function CaseLayout({
                     marginBottom: "4px",
                   }}
                 >
-                  // ¿PROBLEMA PARECIDO?
+                  {"// ¿PROBLEMA PARECIDO?"}
                 </p>
                 <p
                   className={plusJakarta.className}

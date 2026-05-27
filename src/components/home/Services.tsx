@@ -124,7 +124,7 @@ export function Services({ onOpenContact: _ }: ServicesProps = {}) {
                 letterSpacing: "0.18em",
               }}
             >
-              // LO QUE OFRECEMOS
+              {"// LO QUE OFRECEMOS"}
             </p>
             <h2
               className={plusJakarta.className}
@@ -211,7 +211,7 @@ export function Services({ onOpenContact: _ }: ServicesProps = {}) {
                               marginBottom: "12px",
                             }}
                           >
-                            // {service.category}
+                            {"// "}{service.category}
                           </p>
                           <p
                             className={plusJakartaBody.className}
@@ -372,7 +372,7 @@ export function Services({ onOpenContact: _ }: ServicesProps = {}) {
                       marginBottom: "16px",
                     }}
                   >
-                    // {SERVICES[active].category}
+                    {"// "}{SERVICES[active].category}
                   </motion.p>
 
                   {/* Title — character stagger with controlled line break */}
