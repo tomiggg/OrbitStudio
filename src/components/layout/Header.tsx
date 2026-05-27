@@ -37,9 +37,7 @@ export function Header() {
     <header className="fixed inset-x-0 top-0 z-50">
       <div
         style={{
-          background: scrolled ? "rgba(0,0,0,0.92)" : "transparent",
-          borderBottom: scrolled ? "1px solid rgba(255,255,255,0.08)" : "1px solid transparent",
-          transition: "background 0.3s ease, border-color 0.3s ease",
+          background: "#fff",
         }}
       >
         <div className="relative mx-auto flex h-12 w-full max-w-[1100px] items-center justify-between px-5 md:h-14 md:px-8">
@@ -48,7 +46,7 @@ export function Header() {
           <Link href="/" className="flex items-center no-underline" aria-label="Shift Studio">
             <span
               className={plusJakarta.className}
-              style={{ fontSize: "clamp(22px, 2.5vw, 28px)", color: "#fff", lineHeight: "1" }}
+              style={{ fontSize: "clamp(22px, 2.5vw, 28px)", color: "#000", lineHeight: "1" }}
             >
               shift
             </span>
@@ -60,10 +58,10 @@ export function Header() {
               <a
                 key={item.href}
                 href={item.href}
-                className={`${plusJakarta.className} no-underline transition hover:text-white`}
+                className={`${plusJakarta.className} no-underline transition hover:text-black`}
                 style={{
                   fontSize: "13px",
-                  color: scrolled ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.8)",
+                  color: scrolled ? "rgba(0,0,0,0.5)" : "rgba(0,0,0,0.65)",
                 }}
               >
                 {item.label}
@@ -73,7 +71,7 @@ export function Header() {
               type="button"
               onClick={openContact}
               className={`${plusJakarta.className} inline-flex items-center justify-center uppercase tracking-[0.1em] text-[11px] px-5 py-2 transition hover:bg-[#0ABAB5] hover:text-black`}
-              style={{ background: "#fff", color: "#000", borderRadius: 0, border: "none", cursor: "pointer" }}
+              style={{ background: "#000", color: "#fff", borderRadius: 0, border: "none", cursor: "pointer" }}
               aria-label="Abrir contacto"
             >
               {CTA.label}
@@ -85,7 +83,7 @@ export function Header() {
             type="button"
             onClick={() => setOpen((v) => !v)}
             className="md:hidden inline-flex items-center justify-center h-9 w-9 transition"
-            style={{ color: "#fff" }}
+            style={{ color: "#000" }}
             aria-label={open ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={open}
           >

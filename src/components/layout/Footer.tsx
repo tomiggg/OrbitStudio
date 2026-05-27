@@ -19,8 +19,8 @@ export function Footer() {
     <footer
       className="py-6"
       style={{
-        background: "#000",
-        borderTop: "1px solid rgba(255,255,255,0.07)",
+        background: "#fff",
+        borderTop: "1px solid rgba(0,0,0,0.08)",
       }}
     >
       <Container>
@@ -39,7 +39,7 @@ export function Footer() {
             className={plusJakarta.className}
             style={{
               fontSize: "14px",
-              color: "#fff",
+              color: "#000",
               letterSpacing: "-0.02em",
             }}
           >
@@ -47,10 +47,7 @@ export function Footer() {
           </span>
 
           {/* CENTER — Nav links (desktop only) */}
-          <div
-            className="hidden md:flex"
-            style={{ gap: "24px" }}
-          >
+          <div className="hidden md:flex" style={{ gap: "24px" }}>
             {[
               { href: "#services", label: "Servicios" },
               { href: "#portfolio", label: "Proyectos" },
@@ -63,14 +60,14 @@ export function Footer() {
                 style={{
                   fontFamily: "var(--font-body)",
                   fontSize: "11px",
-                  color: "rgba(255,255,255,0.3)",
+                  color: "rgba(0,0,0,0.35)",
                   textTransform: "uppercase",
                   letterSpacing: "0.1em",
                   textDecoration: "none",
                   transition: "color 0.2s",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#000")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(0,0,0,0.35)")}
               >
                 {label}
               </a>
@@ -78,21 +75,14 @@ export function Footer() {
           </div>
 
           {/* RIGHT — Email + copyright */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "16px",
-            }}
-          >
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "16px" }}>
             <button
               type="button"
               onClick={handleCopy}
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize: "10px",
-                color: copied ? "#0ABAB5" : "#fff",
+                color: copied ? "#0ABAB5" : "rgba(0,0,0,0.5)",
                 background: "none",
                 border: "none",
                 padding: 0,
@@ -105,11 +95,9 @@ export function Footer() {
               {copied ? "// COPIED" : "shiftstudio.work@gmail.com"}
             </button>
 
-            <span style={{ fontFamily: "var(--font-body)", fontSize: "10px", color: "rgba(255,255,255,0.1)" }}>
-              ·
-            </span>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: "10px", color: "rgba(0,0,0,0.15)" }}>·</span>
 
-            <span style={{ fontFamily: "var(--font-body)", fontSize: "10px", color: "rgba(255,255,255,0.2)" }}>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: "10px", color: "rgba(0,0,0,0.25)" }}>
               © 2025 Shift Studio
             </span>
           </div>

@@ -6,7 +6,7 @@
   --teal: #0ABAB5;
   --dark: #072B2A;
   --black: #000000;
-  --bg-light: #FAFCFC;
+  --bg-light: #ffffff;
   --bg-teal: rgba(167, 233, 231, 0.37);
   --white: #FFFFFF;
   --mono-muted: rgba(7, 43, 42, 0.5);
@@ -114,6 +114,11 @@ a.buttonlike {
   position: absolute;
   right: 0px;
   bottom: 140px;
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 .caret-solid {
@@ -241,3 +246,4 @@ a.buttonlike {
   80% { transform: translate(1%, -2%); }
   90% { transform: translate(3%, 4%); }
 }
+
