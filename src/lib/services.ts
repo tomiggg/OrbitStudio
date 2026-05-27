@@ -9,7 +9,12 @@ export type Service = {
   highlights: string[];
   model: string;
   emoji?: string;
-  image?: string; // ruta en /public, ej: "/services/identidad.png"
+  image?: string;
+  idealFor?: string;
+  priceFrom?: string;
+  includes?: string[];
+  extras?: { name: string; price: string }[];
+  mockupSrc?: string;
 };
 
 export const SERVICES: Service[] = [

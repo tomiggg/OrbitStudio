@@ -18,22 +18,26 @@ export function ServiceDetailsDesktop({ service, onClose, onChoose }: Props) {
             <h3 className="text-2xl font-extrabold tracking-[-0.04em] text-[#072b2a]">
               {service.title}
             </h3>
-            <p className="mt-1 text-sm text-[#072b2a]/60">
-              Ideal para:{" "}
-              <span className="font-semibold text-[#072b2a]/80">
-                {service.idealFor}
-              </span>
-            </p>
+            {service.idealFor && (
+              <p className="mt-1 text-sm text-[#072b2a]/60">
+                Ideal para:{" "}
+                <span className="font-semibold text-[#072b2a]/80">
+                  {service.idealFor}
+                </span>
+              </p>
+            )}
           </div>
 
-          <div className="shrink-0 text-right">
-            <div className="text-[11px] font-semibold uppercase tracking-wide text-[#072b2a]/45">
-              Desde
+          {service.priceFrom && (
+            <div className="shrink-0 text-right">
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-[#072b2a]/45">
+                Desde
+              </div>
+              <div className="mt-1 inline-flex items-center rounded-full border border-white/30 bg-white/35 px-3 py-1 text-sm font-extrabold text-[#072b2a]">
+                {service.priceFrom}
+              </div>
             </div>
-            <div className="mt-1 inline-flex items-center rounded-full border border-white/30 bg-white/35 px-3 py-1 text-sm font-extrabold text-[#072b2a]">
-              {service.priceFrom}
-            </div>
-          </div>
+          )}
         </div>
 
         <div className="mt-5">
@@ -51,33 +55,37 @@ export function ServiceDetailsDesktop({ service, onClose, onChoose }: Props) {
         </div>
 
         <div className="mt-7 grid gap-6 lg:grid-cols-2">
-          <div>
-            <div className="text-sm font-semibold text-[#072b2a]">Incluye</div>
-            <ul className="mt-3 space-y-2 text-sm text-[#072b2a]/70">
-              {service.includes.map((x) => (
-                <li key={x} className="flex gap-2">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0abab5]" />
-                  <span>{x}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <div className="text-sm font-semibold text-[#072b2a]">
-              Extras opcionales
+          {service.includes && service.includes.length > 0 && (
+            <div>
+              <div className="text-sm font-semibold text-[#072b2a]">Incluye</div>
+              <ul className="mt-3 space-y-2 text-sm text-[#072b2a]/70">
+                {service.includes.map((x) => (
+                  <li key={x} className="flex gap-2">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0abab5]" />
+                    <span>{x}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="mt-3 space-y-2 text-sm text-[#072b2a]/70">
-              {service.extras.map((e) => (
-                <li key={e.name} className="flex items-start justify-between gap-4">
-                  <span>{e.name}</span>
-                  <span className="shrink-0 font-extrabold text-[#072b2a]">
-                    {e.price}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          )}
+
+          {service.extras && service.extras.length > 0 && (
+            <div>
+              <div className="text-sm font-semibold text-[#072b2a]">
+                Extras opcionales
+              </div>
+              <ul className="mt-3 space-y-2 text-sm text-[#072b2a]/70">
+                {service.extras.map((e) => (
+                  <li key={e.name} className="flex items-start justify-between gap-4">
+                    <span>{e.name}</span>
+                    <span className="shrink-0 font-extrabold text-[#072b2a]">
+                      {e.price}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -107,12 +115,14 @@ export function ServiceDetailsDesktop({ service, onClose, onChoose }: Props) {
           <div className="w-full max-w-[300px]">
             <div className="overflow-hidden rounded-2xl border border-white/20 bg-white/35 backdrop-blur-xl shadow-[0_22px_60px_rgba(0,0,0,0.18)]">
               <div className="aspect-[10/16] w-full bg-[#f4fdfd]">
-                <img
-                  src={service.mockupSrc}
-                  alt={`Mockup ${service.title}`}
-                  className="h-full w-full object-contain"
-                  loading="lazy"
-                />
+                {service.mockupSrc && (
+                  <img
+                    src={service.mockupSrc}
+                    alt={`Mockup ${service.title}`}
+                    className="h-full w-full object-contain"
+                    loading="lazy"
+                  />
+                )}
               </div>
             </div>
 
