@@ -150,8 +150,10 @@ export function Process() {
 
         <Reveal delay={0.2}>
 
+          <div style={{ border: "1px solid rgba(0,0,0,0.08)", borderRadius: "20px", overflow: "hidden" }}>
+
           {/* TABS */}
-          <div style={{ display: "flex", borderTop: "1px solid rgba(0,0,0,0.1)", borderBottom: "1px solid rgba(0,0,0,0.1)" }}>
+          <div style={{ display: "flex", borderBottom: "1px solid rgba(0,0,0,0.1)" }}>
             {PROCESS_STEPS.map((step, i) => {
               const isActive = activeStep === i;
               return (
@@ -188,7 +190,7 @@ export function Process() {
           {/* CONTENT PANEL */}
           <div
             className="grid grid-cols-1 md:grid-cols-2"
-            style={{ borderBottom: "1px solid rgba(0,0,0,0.1)", minHeight: "280px" }}
+            style={{ minHeight: "280px" }}
           >
 
             {/* LEFT — description */}
@@ -282,6 +284,8 @@ export function Process() {
             </div>
 
           </div>
+
+          </div>{/* end rounded wrapper */}
 
         </Reveal>
       </Container>
