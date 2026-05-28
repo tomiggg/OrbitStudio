@@ -116,15 +116,16 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
             <h1
               className={plusJakarta.className}
               style={{
-                fontSize: "clamp(100px, 17vw, 260px)",
+                fontSize: "clamp(86px, 22vw, 260px)",
                 lineHeight: 0.86,
                 letterSpacing: "-0.04em",
                 margin: 0,
                 color: "#fff",
+                textTransform: "none",
               }}
             >
-              shift<br />
-              <em style={{ fontStyle: "italic", color: "#9EC7D4" }}>Studio.</em>
+              shift<span style={{ fontSize: "0.3em", position: "relative", top: "-1.8em", letterSpacing: 0 }}>©</span><br />
+              <em style={{ fontStyle: "italic", color: "#9EC7D4" }}>studio.</em>
             </h1>
           </motion.div>
         </motion.div>

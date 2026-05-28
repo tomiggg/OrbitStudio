@@ -230,7 +230,7 @@ export function FeaturedProjects() {
                                   margin: 0,
                                 }}
                               >
-                                // EN CONSTRUCCIÓN
+                                {/* EN CONSTRUCCIÓN */}
                               </p>
                               <p
                                 className={plusJakarta.className}

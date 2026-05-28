@@ -110,6 +110,7 @@ export function Process() {
   useEffect(() => { activateRef.current = activate; }, [activate]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     activate(0);
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps

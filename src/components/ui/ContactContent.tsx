@@ -61,11 +61,11 @@ const groupStyle: React.CSSProperties = {
   overflow: "hidden",
 };
 
-export function ContactContent({ value, onChange, onClose: _, onSend, onSendEmail, canSend }: Props) {
+export function ContactContent({ value, onChange, onClose: _onClose, onSend, onSendEmail, canSend }: Props) {
   const [sendMethod, setSendMethod] = useState<SendMethod>("whatsapp");
 
   function handleSend() {
-    sendMethod === "email" ? onSendEmail() : onSend();
+    if (sendMethod === "email") onSendEmail(); else onSend();
   }
 
   return (
