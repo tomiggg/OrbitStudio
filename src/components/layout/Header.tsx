@@ -41,7 +41,7 @@ export function Header() {
           background: "#f0f0ee",
         }}
       >
-        <div className="relative mx-auto flex h-12 w-full max-w-[1100px] items-center justify-between px-5 md:h-14 md:px-8">
+        <div className="relative mx-auto flex h-10 w-full max-w-[1100px] items-center justify-between px-5 md:h-12 md:px-8">
 
           {/* Logo — mark only, ink + sky echo */}
           <Link href="/" className="flex items-center no-underline" aria-label="Shift Studio">
