@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { MobileMenuSheet } from "@/components/ui/MobileMenuSheet";
 import { useContact } from "@/components/contact/ContactProvider";
+import { Logo } from "@/components/ui/Logo";
 
 const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 
@@ -37,19 +38,14 @@ export function Header() {
     <header className="fixed inset-x-0 top-0 z-50">
       <div
         style={{
-          background: "#fff",
+          background: "#f0f0ee",
         }}
       >
         <div className="relative mx-auto flex h-12 w-full max-w-[1100px] items-center justify-between px-5 md:h-14 md:px-8">
 
-          {/* Logo */}
+          {/* Logo — mark only, ink + sky echo */}
           <Link href="/" className="flex items-center no-underline" aria-label="Shift Studio">
-            <span
-              className={plusJakarta.className}
-              style={{ fontSize: "clamp(22px, 2.5vw, 28px)", color: "#000", lineHeight: "1" }}
-            >
-              shift
-            </span>
+            <Logo variant="mark" theme="light" size={32} />
           </Link>
 
           {/* Desktop nav */}

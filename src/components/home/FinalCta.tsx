@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Plus_Jakarta_Sans } from "next/font/google";
-import { Container } from "@/components/ui/Container";
 
 const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 
@@ -15,7 +14,6 @@ const ease = [0.22, 1, 0.36, 1] as const;
 type FinalCtaProps = { onOpenContact?: () => void };
 
 export function FinalCta({ onOpenContact }: FinalCtaProps) {
-  const [hovered, setHovered] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -23,7 +21,6 @@ export function FinalCta({ onOpenContact }: FinalCtaProps) {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
     const tile = document.createElement("canvas");
     tile.width = GRAIN_TILE;
     tile.height = GRAIN_TILE;
@@ -69,7 +66,6 @@ export function FinalCta({ onOpenContact }: FinalCtaProps) {
       }
       animId = requestAnimationFrame(drawGrain);
     }
-
     animId = requestAnimationFrame(drawGrain);
     return () => {
       cancelAnimationFrame(animId);
@@ -78,14 +74,17 @@ export function FinalCta({ onOpenContact }: FinalCtaProps) {
   }, []);
 
   return (
-    <div style={{ background: "#fff", padding: "8px" }}>
+    <div style={{ background: "#f0f0ee", padding: "8px" }}>
       <section
         id="contact"
         className="relative overflow-hidden"
         style={{
           background: "#0d0d0d",
           borderRadius: "24px",
-          padding: "clamp(48px, 8vw, 96px) 0",
+          minHeight: "60svh",
+          display: "flex",
+          flexDirection: "column",
+          padding: "clamp(28px, 4vw, 48px)",
         }}
       >
         {/* Grain */}
@@ -96,116 +95,92 @@ export function FinalCta({ onOpenContact }: FinalCtaProps) {
           style={{ zIndex: 0, opacity: 0.07, mixBlendMode: "screen", pointerEvents: "none" }}
         />
 
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <Container>
-            <div
+        {/* Title — ocupa el espacio central */}
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.2, ease }}
+          style={{ flex: 1, display: "flex", alignItems: "center", position: "relative", zIndex: 10 }}
+        >
+          <h2
+            className={plusJakarta.className}
+            style={{
+              fontSize: "clamp(72px, 12vw, 200px)",
+              lineHeight: 0.86,
+              letterSpacing: "-0.04em",
+              margin: 0,
+              color: "#fff",
+              textTransform: "none",
+            }}
+          >
+            ¿Listo para<br />
+            <em style={{ fontStyle: "italic", color: "#9EC7D4" }}>construir?</em>
+          </h2>
+        </motion.div>
+
+        {/* Bottom row — igual que Hero */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.45, ease }}
+          style={{
+            position: "relative",
+            zIndex: 10,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            gap: "32px",
+            paddingTop: "24px",
+            borderTop: "1px solid rgba(255,255,255,0.07)",
+          }}
+        >
+          {/* Meta */}
+          <p
+            className={plusJakarta.className}
+            style={{
+              fontSize: "clamp(13px, 1.4vw, 16px)",
+              fontWeight: 400,
+              color: "rgba(255,255,255,0.5)",
+              lineHeight: 1.65,
+              margin: 0,
+            }}
+          >
+            Respuesta en el día ·{" "}
+            <span style={{ color: "#9EC7D4" }}>Córdoba, AR</span>
+          </p>
+
+          {/* Hablemos — CTA tipográfico grande */}
+          <button
+            type="button"
+            onClick={onOpenContact}
+            className={plusJakarta.className}
+            style={{
+              background: "none",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+              flexShrink: 0,
+            }}
+          >
+            <motion.em
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-end",
-                gap: "32px",
-                flexWrap: "wrap",
+                fontStyle: "italic",
+                color: "#9EC7D4",
+                fontSize: "clamp(40px, 6vw, 96px)",
+                lineHeight: 0.86,
+                letterSpacing: "-0.04em",
+                display: "block",
               }}
+              whileHover={{ opacity: 0.65 }}
+              transition={{ duration: 0.2 }}
             >
+              Hablemos →
+            </motion.em>
+          </button>
+        </motion.div>
 
-              {/* LEFT — Title */}
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, ease }}
-              >
-                <span
-                  className={plusJakarta.className}
-                  style={{
-                    display: "block",
-                    fontSize: "clamp(40px, 6vw, 80px)",
-                    color: "#fff",
-                    lineHeight: "0.85",
-                    letterSpacing: "-0.03em",
-                  }}
-                >
-                  ¿Listo para
-                </span>
-                <span
-                  className={plusJakarta.className}
-                  style={{
-                    display: "block",
-                    fontSize: "clamp(40px, 6vw, 80px)",
-                    color: "#93cecc",
-                    lineHeight: "0.85",
-                    letterSpacing: "-0.03em",
-                  }}
-                >
-                  construir?
-                </span>
-              </motion.div>
-
-              {/* RIGHT — Meta + Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.15, ease }}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-end",
-                  gap: "20px",
-                }}
-              >
-                <p
-                  style={{
-                    fontFamily: "monospace",
-                    fontSize: "9px",
-                    color: "rgba(255,255,255,0.3)",
-                    letterSpacing: "0.18em",
-                    textAlign: "right",
-                    textTransform: "uppercase",
-                    lineHeight: 1.8,
-                    margin: 0,
-                  }}
-                >
-                  Respuesta en el día
-                  <br />
-                  Córdoba, AR · WhatsApp
-                </p>
-
-                <button
-                  type="button"
-                  onClick={onOpenContact}
-                  onMouseEnter={() => setHovered(true)}
-                  onMouseLeave={() => setHovered(false)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 0,
-                  }}
-                >
-                  <span
-                    className={plusJakarta.className}
-                    style={{ fontSize: "16px", color: "#93cecc" }}
-                  >
-                    Hablemos
-                  </span>
-                  <div
-                    style={{
-                      width: hovered ? "56px" : "32px",
-                      height: "1px",
-                      background: "#93cecc",
-                      transition: "width 0.3s ease",
-                    }}
-                  />
-                </button>
-              </motion.div>
-
-            </div>
-          </Container>
-        </div>
       </section>
     </div>
   );

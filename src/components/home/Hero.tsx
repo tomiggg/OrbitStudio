@@ -16,6 +16,7 @@ type HeroProps = { onOpenContact?: () => void };
 export function Hero({ onOpenContact: _ }: HeroProps) {
   const { scrollY } = useScroll();
   const titleY = useTransform(scrollY, [0, 600], [0, -80]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -25,14 +26,11 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
     }
   }, []);
 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
     const tile = document.createElement("canvas");
     tile.width = GRAIN_TILE;
     tile.height = GRAIN_TILE;
@@ -78,9 +76,7 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
       }
       animId = requestAnimationFrame(drawGrain);
     }
-
     animId = requestAnimationFrame(drawGrain);
-
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
@@ -88,120 +84,104 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
   }, []);
 
   return (
-    <div style={{ background: "#fff", padding: "64px 8px 8px" }}>
-    <section
-      id="top"
-      className="relative overflow-hidden"
-      style={{
-        minHeight: "calc(100svh - 72px)",
-        borderRadius: "24px",
-        background: "#0d0d0d",
-      }}
-    >
-      <canvas
-        ref={canvasRef}
-        aria-hidden="true"
-        className="absolute inset-0 w-full h-full"
-        style={{ zIndex: 0, opacity: 0.07, mixBlendMode: "screen" }}
-      />
-
-      {/* TITLE BLOCK — left side, vertically centered */}
-      <div
-        className="absolute"
+    <div style={{ background: "#f0f0ee", padding: "64px 8px 8px" }}>
+      <section
+        id="top"
+        className="relative overflow-hidden"
         style={{
-          left: "clamp(16px, 2vw, 40px)",
-          top: "38%",
-          transform: "translateY(-50%)",
-          zIndex: 10,
+          minHeight: "88svh",
+          borderRadius: "24px",
+          background: "#0d0d0d",
+          display: "flex",
+          flexDirection: "column",
+          padding: "clamp(28px, 4vw, 48px)",
         }}
       >
-        <motion.div style={{ y: titleY }}>
+        <canvas
+          ref={canvasRef}
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full"
+          style={{ zIndex: 0, opacity: 0.1, mixBlendMode: "screen" }}
+        />
+
+        {/* Headline */}
+        <motion.div
+          style={{ y: titleY, flex: 1, display: "flex", alignItems: "center", position: "relative", zIndex: 10 }}
+        >
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.35, ease }}
+            transition={{ duration: 0.7, delay: 0.3, ease }}
           >
-            <span style={{ display: "block", lineHeight: "0.82", marginLeft: "-8px" }}>
-              <span
-                className={plusJakarta.className}
-                style={{ fontSize: "clamp(180px, 24vw, 380px)", color: "#fff", display: "inline-block" }}
-              >
-                shift
-              </span>
-            </span>
-            <span
+            <h1
               className={plusJakarta.className}
               style={{
-                display: "block",
-                fontSize: "clamp(56px, 7vw, 112px)",
-                lineHeight: "1",
-                color: "#93cecc",
-                textAlign: "right",
-                width: "100%",
-                marginTop: "8px",
+                fontSize: "clamp(100px, 17vw, 260px)",
+                lineHeight: 0.86,
+                letterSpacing: "-0.04em",
+                margin: 0,
+                color: "#fff",
               }}
             >
-              Studio.
-            </span>
+              shift<br />
+              <em style={{ fontStyle: "italic", color: "#9EC7D4" }}>Studio.</em>
+            </h1>
           </motion.div>
         </motion.div>
-      </div>
 
-      {/* CORNER PLUS SIGNS */}
-      <motion.span aria-hidden="true" className="absolute font-mono"
-        style={{ top: "45%", left: 0, fontSize: "18px", color: "rgba(255,255,255,0.3)", zIndex: 10 }}
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.2, ease }}
-      >+</motion.span>
-      <motion.span aria-hidden="true" className="absolute font-mono"
-        style={{ top: "45%", right: 0, fontSize: "18px", color: "rgba(255,255,255,0.3)", zIndex: 10 }}
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.2, ease }}
-      >+</motion.span>
-      <motion.span aria-hidden="true" className="absolute font-mono"
-        style={{ bottom: "28%", left: 0, fontSize: "18px", color: "rgba(255,255,255,0.3)", zIndex: 10 }}
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.2, ease }}
-      >+</motion.span>
-      <motion.span aria-hidden="true" className="absolute font-mono"
-        style={{ bottom: "28%", right: 0, fontSize: "18px", color: "rgba(255,255,255,0.3)", zIndex: 10 }}
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.2, ease }}
-      >+</motion.span>
-
-      {/* SERVICES LIST — right side, desktop only */}
-      <div
-        className="hidden md:block absolute"
-        style={{ right: "clamp(24px, 4vw, 64px)", top: "50%", transform: "translateY(-50%)", zIndex: 10 }}
-      >
+        {/* Bottom row */}
         <motion.div
-          initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.55, ease }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.55, ease }}
+          style={{
+            position: "relative",
+            zIndex: 10,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            gap: "32px",
+            paddingTop: "24px",
+            borderTop: "1px solid rgba(255,255,255,0.07)",
+          }}
         >
-          <ul
+          <p
             className={plusJakarta.className}
-            style={{ fontSize: "14px", color: "rgba(255,255,255,0.75)", lineHeight: "2.4", listStyle: "none", margin: 0, padding: 0 }}
+            style={{
+              fontSize: "clamp(13px, 1.4vw, 16px)",
+              fontWeight: 400,
+              color: "rgba(255,255,255,0.5)",
+              maxWidth: "380px",
+              lineHeight: 1.65,
+              margin: 0,
+            }}
+          >
+            Automatizamos <span style={{ color: "#9EC7D4" }}>operaciones</span>, construimos{" "}
+            <span style={{ color: "#9EC7D4" }}>sistemas</span> y diseñamos la{" "}
+            <span style={{ color: "#9EC7D4" }}>identidad</span> que te posiciona con{" "}
+            <span style={{ color: "#9EC7D4" }}>autoridad</span>.
+          </p>
+
+          <ul
+            className={`hidden md:block ${plusJakarta.className}`}
+            style={{
+              fontSize: "13px",
+              color: "rgba(255,255,255,0.35)",
+              lineHeight: 2,
+              listStyle: "none",
+              margin: 0,
+              padding: 0,
+              textAlign: "right",
+              flexShrink: 0,
+            }}
           >
             <li>Sistemas &amp; Automatización</li>
             <li>Web de Alta Conversión</li>
             <li>Identidad &amp; Autoridad</li>
           </ul>
         </motion.div>
-      </div>
 
-      {/* BOTTOM LEFT — copy block */}
-      <motion.div
-        className="absolute"
-        style={{ bottom: "clamp(32px, 5vh, 52px)", left: "clamp(20px, 3vw, 48px)", zIndex: 10 }}
-        initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.65, ease }}
-      >
-        <p
-          className={plusJakarta.className}
-          style={{ fontSize: "14px", fontWeight: 600, color: "rgba(255,255,255,0.75)", maxWidth: "360px", lineHeight: "1.7", margin: 0 }}
-        >
-          Automatizamos <span style={{ color: "#93cecc" }}>operaciones</span>, construimos <span style={{ color: "#93cecc" }}>sistemas</span> y diseñamos la{" "}
-          <span style={{ color: "#93cecc" }}>identidad</span> que te posiciona con <span style={{ color: "#93cecc" }}>autoridad</span>. Sin fricciones. Sin excusas.
-        </p>
-      </motion.div>
-
-    </section>
+      </section>
     </div>
   );
 }

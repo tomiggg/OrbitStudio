@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Plus_Jakarta_Sans } from "next/font/google";
 import { Container } from "@/components/ui/Container";
-
-const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
+import { Logo } from "@/components/ui/Logo";
 
 export function Footer() {
   const [copied, setCopied] = useState(false);
@@ -19,7 +17,7 @@ export function Footer() {
     <footer
       className="py-6"
       style={{
-        background: "#fff",
+        background: "#f0f0ee",
         borderTop: "1px solid rgba(0,0,0,0.08)",
       }}
     >
@@ -35,16 +33,7 @@ export function Footer() {
         >
 
           {/* LEFT — Brand */}
-          <span
-            className={plusJakarta.className}
-            style={{
-              fontSize: "14px",
-              color: "#000",
-              letterSpacing: "-0.02em",
-            }}
-          >
-            SHIFT_STUDIO
-          </span>
+          <Logo theme="light" size={28} variant="mark" />
 
           {/* CENTER — Nav links (desktop only) */}
           <div className="hidden md:flex" style={{ gap: "24px" }}>

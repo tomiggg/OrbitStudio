@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus_Jakarta_Sans } from "next/font/google";
 
 const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
+const plusJakartaBody = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "400" });
 
 export type BudgetRange =
   | "No lo sé"
@@ -35,27 +36,36 @@ type Props = {
   canSend: boolean;
 };
 
-const inputClass =
-  "w-full rounded-lg text-[13px] text-black outline-none transition-[border-color,background] duration-200 placeholder:text-[rgba(7,43,42,0.35)] focus:border-[rgba(10,186,181,0.4)] focus:bg-[rgba(10,186,181,0.04)]";
+type SendMethod = "whatsapp" | "email";
 
-const inputStyle = {
-  padding: "12px 14px",
-  background: "rgba(7,43,42,0.05)",
-  border: "1px solid transparent",
-  fontFamily: "var(--font-body)",
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  background: "transparent",
+  border: "none",
+  color: "#fff",
+  fontSize: "15px",
+  outline: "none",
+  padding: 0,
 };
 
-type SendMethod = "whatsapp" | "email";
+const rowSep: React.CSSProperties = {
+  height: "1px",
+  background: "rgba(255,255,255,0.07)",
+  marginLeft: "16px",
+};
+
+const groupStyle: React.CSSProperties = {
+  background: "rgba(255,255,255,0.05)",
+  marginBottom: "16px",
+  borderRadius: "12px",
+  overflow: "hidden",
+};
 
 export function ContactContent({ value, onChange, onClose: _, onSend, onSendEmail, canSend }: Props) {
   const [sendMethod, setSendMethod] = useState<SendMethod>("whatsapp");
 
   function handleSend() {
-    if (sendMethod === "email") {
-      onSendEmail();
-    } else {
-      onSend();
-    }
+    sendMethod === "email" ? onSendEmail() : onSend();
   }
 
   return (
@@ -65,117 +75,98 @@ export function ContactContent({ value, onChange, onClose: _, onSend, onSendEmai
       <h2
         className={plusJakarta.className}
         style={{
-          fontSize: "clamp(32px, 5vw, 44px)",
-          color: "#000",
-          lineHeight: 0.85,
-          letterSpacing: "-0.03em",
+          fontSize: "clamp(26px, 6vw, 34px)",
+          color: "#fff",
+          lineHeight: 0.9,
+          letterSpacing: "-0.04em",
+          marginBottom: "28px",
           textTransform: "none",
-          marginBottom: "32px",
         }}
       >
-        ¿Tenés un proyecto
-        <br />
-        en mente?
+        ¿Tenés un proyecto<br />
+        <em style={{ fontStyle: "italic", color: "#9EC7D4" }}>en mente?</em>
       </h2>
 
-      {/* Fields */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-
-        <Field label="Tu nombre *">
+      {/* Group 1: contact info */}
+      <div style={groupStyle}>
+        <FormRow label="Tu nombre *">
           <input
             type="text"
             value={value.name}
             onChange={(e) => onChange({ name: e.target.value })}
-            className={inputClass}
-            style={inputStyle}
+            className={plusJakartaBody.className}
             placeholder="Nombre"
+            style={inputStyle}
           />
-        </Field>
-
-        <Field label="¿Cuál es tu negocio?">
+        </FormRow>
+        <div style={rowSep} />
+        <FormRow label="¿Cuál es tu negocio?">
           <input
             type="text"
             value={value.business}
             onChange={(e) => onChange({ business: e.target.value })}
-            className={inputClass}
+            className={plusJakartaBody.className}
+            placeholder="Inmobiliaria, ecommerce, estudio..."
             style={inputStyle}
-            placeholder="Ej: inmobiliaria, ecommerce, estudio..."
           />
-        </Field>
-
-        <Field label="¿Qué necesitás?">
+        </FormRow>
+        <div style={rowSep} />
+        <FormRow label="¿Qué necesitás?">
           <input
             type="text"
             value={value.service}
             onChange={(e) => onChange({ service: e.target.value })}
-            className={inputClass}
+            className={plusJakartaBody.className}
+            placeholder="Web, branding, sistema a medida..."
             style={inputStyle}
-            placeholder="Ej: web, branding, sistema a medida..."
           />
-        </Field>
+        </FormRow>
+      </div>
 
-        <Field label="Objetivo principal *">
+      {/* Group 2: goal */}
+      <div style={groupStyle}>
+        <FormRow label="Objetivo principal *">
           <textarea
             value={value.goal}
             onChange={(e) => onChange({ goal: e.target.value })}
-            className={inputClass}
-            style={{ ...inputStyle, resize: "none" }}
+            className={plusJakartaBody.className}
             placeholder="Contanos qué problema querés resolver..."
             rows={3}
+            style={{ ...inputStyle, resize: "none" }}
           />
-        </Field>
-
+        </FormRow>
       </div>
 
-      {/* Divider */}
-      <div style={{ margin: "24px 0 0", height: "1px", background: "rgba(7,43,42,0.07)" }} />
-
-      {/* Send method switch */}
-      <div
-        style={{
-          marginTop: "20px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "12px",
-        }}
-      >
+      {/* Send method toggle */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
         <span
+          className={plusJakartaBody.className}
           style={{
-            fontFamily: "var(--font-body)",
             fontSize: "11px",
-            color: "rgba(7,43,42,0.45)",
-            letterSpacing: "0.05em",
+            color: "rgba(255,255,255,0.3)",
+            letterSpacing: "0.12em",
             textTransform: "uppercase",
-            flexShrink: 0,
           }}
         >
           Enviar por
         </span>
 
-        <div
-          style={{
-            display: "flex",
-            border: "1px solid rgba(7,43,42,0.12)",
-            borderRadius: "8px",
-            overflow: "hidden",
-          }}
-        >
+        <div style={{ display: "flex", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", overflow: "hidden" }}>
           {(["whatsapp", "email"] as SendMethod[]).map((method, i) => (
             <button
               key={method}
               type="button"
               onClick={() => setSendMethod(method)}
+              className={plusJakartaBody.className}
               style={{
-                padding: "8px 18px",
-                background: sendMethod === method ? "#000" : "transparent",
-                color: sendMethod === method ? "#fff" : "rgba(7,43,42,0.45)",
+                padding: "8px 20px",
+                background: sendMethod === method ? "#fff" : "transparent",
+                color: sendMethod === method ? "#000" : "rgba(255,255,255,0.35)",
                 border: "none",
-                borderLeft: i === 1 ? "1px solid rgba(7,43,42,0.12)" : "none",
+                borderLeft: i === 1 ? "1px solid rgba(255,255,255,0.12)" : "none",
                 cursor: "pointer",
-                fontFamily: "var(--font-body)",
-                fontSize: "11px",
-                letterSpacing: "0.05em",
+                fontSize: "10px",
+                letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 transition: "background 0.2s, color 0.2s",
               }}
@@ -186,94 +177,103 @@ export function ContactContent({ value, onChange, onClose: _, onSend, onSendEmai
         </div>
       </div>
 
-      {/* Buttons */}
-      <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "10px" }}>
+      {/* Primary CTA */}
+      <button
+        type="button"
+        onClick={handleSend}
+        disabled={!canSend}
+        className={plusJakarta.className}
+        style={{
+          width: "100%",
+          padding: "18px",
+          background: canSend ? "#0ABAB5" : "rgba(255,255,255,0.08)",
+          color: canSend ? "#000" : "rgba(255,255,255,0.25)",
+          fontSize: "13px",
+          letterSpacing: "0.1em",
+          border: "none",
+          borderRadius: "12px",
+          cursor: canSend ? "pointer" : "not-allowed",
+          textTransform: "uppercase",
+          marginBottom: "10px",
+          transition: "opacity 0.2s",
+        }}
+        onMouseEnter={(e) => canSend && (e.currentTarget.style.opacity = "0.85")}
+        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+      >
+        {sendMethod === "whatsapp" ? "Enviar por WhatsApp" : "Enviar por Email"}
+      </button>
 
-        <button
-          type="button"
-          onClick={handleSend}
-          disabled={!canSend}
-          className={plusJakarta.className}
-          style={{
-            width: "100%",
-            padding: "16px",
-            background: "#000",
-            color: "#fff",
-            fontSize: "15px",
-            borderRadius: "10px",
-            border: "none",
-            cursor: canSend ? "pointer" : "not-allowed",
-            opacity: canSend ? 1 : 0.4,
-            transition: "opacity 0.2s",
-            textTransform: "none",
-          }}
-        >
-          {sendMethod === "whatsapp" ? "Enviar por WhatsApp" : "Enviar por Email"}
-        </button>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{ flex: 1, height: "1px", background: "rgba(7,43,42,0.08)" }} />
-          <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "rgba(7,43,42,0.3)" }}>o</span>
-          <div style={{ flex: 1, height: "1px", background: "rgba(7,43,42,0.08)" }} />
-        </div>
-
-        <button
-          type="button"
-          onClick={() =>
-            window.open(
-              "https://wa.me/5493512261334?text=" +
-                encodeURIComponent("Hola Shift Studio, quiero agendar una llamada"),
-              "_blank",
-              "noreferrer"
-            )
-          }
-          className={plusJakarta.className}
-          style={{
-            width: "100%",
-            padding: "14px",
-            background: "transparent",
-            color: "rgba(7,43,42,0.7)",
-            fontSize: "14px",
-            borderRadius: "10px",
-            border: "1px solid rgba(7,43,42,0.2)",
-            cursor: "pointer",
-            transition: "border-color 0.2s",
-            textTransform: "none",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(7,43,42,0.4)")}
-          onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(7,43,42,0.2)")}
-        >
-          Agenda una llamada
-        </button>
-
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "10px",
-            color: "rgba(7,43,42,0.3)",
-            textAlign: "center",
-            marginTop: "8px",
-          }}
-        >
-          Al enviar aceptás nuestros Términos y Política de Privacidad
-        </p>
-
+      {/* Divider */}
+      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
+        <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.07)" }} />
+        <span className={plusJakartaBody.className} style={{ fontSize: "10px", color: "rgba(255,255,255,0.2)" }}>o</span>
+        <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.07)" }} />
       </div>
+
+      {/* Secondary: call */}
+      <button
+        type="button"
+        onClick={() =>
+          window.open(
+            "https://wa.me/5493512261334?text=" +
+              encodeURIComponent("Hola Shift Studio, quiero agendar una llamada"),
+            "_blank",
+            "noreferrer"
+          )
+        }
+        className={plusJakartaBody.className}
+        style={{
+          width: "100%",
+          padding: "16px",
+          background: "rgba(255,255,255,0.06)",
+          color: "rgba(255,255,255,0.5)",
+          fontSize: "14px",
+          border: "none",
+          borderRadius: "12px",
+          cursor: "pointer",
+          marginBottom: "20px",
+          transition: "background 0.2s, color 0.2s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+          e.currentTarget.style.color = "rgba(255,255,255,0.85)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+          e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+        }}
+      >
+        Agenda una llamada
+      </button>
+
+      {/* Legal */}
+      <p
+        className={plusJakartaBody.className}
+        style={{
+          fontSize: "10px",
+          color: "rgba(255,255,255,0.2)",
+          textAlign: "center",
+        }}
+      >
+        Al enviar aceptás nuestros Términos y Política de Privacidad
+      </p>
+
     </div>
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function FormRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div>
+    <div style={{ padding: "12px 16px" }}>
       <label
+        className={plusJakartaBody.className}
         style={{
-          fontFamily: "var(--font-body)",
-          fontSize: "12px",
-          color: "rgba(7,43,42,0.6)",
-          fontWeight: 600,
-          marginBottom: "4px",
+          fontSize: "10px",
+          color: "rgba(255,255,255,0.35)",
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
           display: "block",
+          marginBottom: "5px",
         }}
       >
         {label}

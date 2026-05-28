@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap");
 @import "tailwindcss";
 
 /* Shift Studio Design System — CSS Variables */
@@ -6,10 +6,23 @@
   --teal: #0ABAB5;
   --dark: #072B2A;
   --black: #000000;
-  --bg-light: #ffffff;
+  --bg-light: #f0f0ee;
   --bg-teal: rgba(167, 233, 231, 0.37);
   --white: #FFFFFF;
   --mono-muted: rgba(7, 43, 42, 0.5);
+
+  /* Brand Kit v1 tokens */
+  --ink: #0d0d0d;
+  --ink-2: #1a1a1a;
+  --paper: #FAFCFC;
+  --cream: #f0f0ee;
+  --cream-2: #e6e6e1;
+  --sky: #9EC7D4;
+  --sky-soft: #c7e0e6;
+  --sky-deep: #5fa3b8;
+  --mute: #7a7a7a;
+  --mute-2: #a8a8a3;
+  --rule: #dcdcd6;
 
   /* --font-title and --font-body are injected by next/font as CSS variables */
 }

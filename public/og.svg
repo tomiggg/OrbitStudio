@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#0d0d0d"/>
+  <g transform="translate(64 64) scale(0.6)">
+    <g transform="translate(22 0) skewX(-11)">
+      <path d="M 12 44 L 170 44 C 208 44 208 92 172 108 C 148 118 100 122 70 132 C 32 144 32 196 70 196 L 222 196"
+            transform="translate(14 14)" fill="none" stroke="#9EC7D4"
+            stroke-width="48" stroke-linecap="butt"/>
+      <path d="M 12 44 L 170 44 C 208 44 208 92 172 108 C 148 118 100 122 70 132 C 32 144 32 196 70 196 L 222 196"
+            fill="none" stroke="white" stroke-width="48" stroke-linecap="butt"/>
+    </g>
+  </g>
+  <text x="64" y="360" font-family="Plus Jakarta Sans, sans-serif"
+        font-weight="800" font-size="160" fill="white"
+        letter-spacing="-6">shift</text>
+  <text x="64" y="480" font-family="Plus Jakarta Sans, sans-serif"
+        font-weight="800" font-size="80" fill="#9EC7D4"
+        letter-spacing="-3">Studio.</text>
+  <text x="900" y="280" font-family="monospace" font-size="13"
+        fill="#9EC7D4" letter-spacing="3">// SISTEMAS &amp; AUTOMATIZACIÓN</text>
+  <text x="900" y="320" font-family="monospace" font-size="13"
+        fill="#9EC7D4" letter-spacing="3">// WEB DE ALTA CONVERSIÓN</text>
+  <text x="900" y="360" font-family="monospace" font-size="13"
+        fill="#9EC7D4" letter-spacing="3">// IDENTIDAD &amp; AUTORIDAD</text>
+  <line x1="64" y1="570" x2="1136" y2="570" stroke="#9EC7D4" stroke-width="1"/>
+  <text x="64" y="590" font-family="monospace" font-size="11"
+        fill="#7a7a7a" letter-spacing="3">SHIFTSTUDIO.COM · CÓRDOBA, AR</text>
+</svg>

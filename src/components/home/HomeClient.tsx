@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Hero } from "@/components/home/Hero";
 import { Services } from "@/components/home/Services";
+import { MarqueeDivider } from "@/components/home/MarqueeDivider";
 import { FeaturedProjects } from "@/components/home/FeaturedProjects";
 import { Process } from "@/components/home/Process";
 import { FinalCta } from "@/components/home/FinalCta";
@@ -23,9 +24,10 @@ export default function HomeClient() {
   }
 
   return (
-    <main>
+    <main style={{ background: "#f0f0ee" }}>
       <Hero onOpenContact={openContact} />
       <Services onOpenContact={openContact} />
+      <MarqueeDivider />
       <FeaturedProjects />
       <Process />
       <FinalCta onOpenContact={openContact} />

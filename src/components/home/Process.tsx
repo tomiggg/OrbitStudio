@@ -11,6 +11,12 @@ const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 const plusJakartaBody = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "500" });
 const ease = [0.22, 1, 0.36, 1] as const;
 
+const ink = "#0d0d0d";
+const mute = "#7a7a7a";
+const rule = "#dcdcd6";
+const teal = "#0ABAB5";
+const skyDeep = "#5fa3b8";
+
 const STEP_HIGHLIGHTS: string[][] = [
   ["fugas de eficiencia", "problema real"],
   ["núcleo visual", "autoridad", "lógica de negocio"],
@@ -34,62 +40,27 @@ function renderHighlighted(text: string, highlights: string[]) {
     .filter((p) => p.text !== "")
     .map((p, i) =>
       p.bold ? (
-        <span key={i} className={plusJakarta.className} style={{ color: "rgba(0,0,0,0.75)" }}>
-          {p.text}
-        </span>
+        <span key={i} style={{ color: skyDeep, fontWeight: 600 }}>{p.text}</span>
       ) : (
         <span key={i}>{p.text}</span>
       )
     );
 }
 
-const TERMINAL_LINES: Record<number, { prefix: string; text: string; color: string }[]> = {
-  0: [
-    { prefix: "→", text: "analyzing business model...", color: "#0ABAB5" },
-    { prefix: " ", text: "✓ friction points detected: 3", color: "rgba(0,0,0,0.4)" },
-    { prefix: " ", text: "✓ digital gaps mapped", color: "rgba(0,0,0,0.4)" },
-    { prefix: "→", text: "validating solution fit...", color: "#0ABAB5" },
-    { prefix: " ", text: "status: AUDITORIA_COMPLETA", color: "rgba(0,0,0,0.4)" },
-  ],
-  1: [
-    { prefix: "→", text: "building brand architecture...", color: "#0ABAB5" },
-    { prefix: " ", text: "✓ visual identity: defined", color: "rgba(0,0,0,0.4)" },
-    { prefix: " ", text: "✓ design system: ready", color: "rgba(0,0,0,0.4)" },
-    { prefix: "→", text: "applying authority layer...", color: "#0ABAB5" },
-    { prefix: " ", text: "status: IDENTIDAD_LISTA", color: "rgba(0,0,0,0.4)" },
-  ],
-  2: [
-    { prefix: "→", text: "initializing stack: next.js + python", color: "#0ABAB5" },
-    { prefix: " ", text: "✓ architecture: scalable", color: "rgba(0,0,0,0.4)" },
-    { prefix: " ", text: "✓ performance: optimized", color: "rgba(0,0,0,0.4)" },
-    { prefix: "→", text: "deploying to vercel...", color: "#0ABAB5" },
-    { prefix: " ", text: "status: BUILD_SUCCESS", color: "rgba(0,0,0,0.4)" },
-  ],
-  3: [
-    { prefix: "→", text: "transferring ownership...", color: "#0ABAB5" },
-    { prefix: " ", text: "✓ codebase: 100% yours", color: "rgba(0,0,0,0.4)" },
-    { prefix: " ", text: "✓ docs: delivered", color: "rgba(0,0,0,0.4)" },
-    { prefix: "→", text: "sys_status: ACTIVO", color: "#0ABAB5" },
-    { prefix: " ", text: "uptime: COMPROMETIDO ●", color: "#0ABAB5" },
-  ],
-};
-
 const STEP_DURATION = 4000;
 
 export function Process() {
   const [activeStep, setActiveStep] = useState(0);
-  const [visibleLines, setVisibleLines] = useState<number>(0);
   const [progressWidth, setProgressWidth] = useState(0);
 
   const rafRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
-  const lineTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const activateRef = useRef<(i: number) => void>(null!);
+  const activeStepRef = useRef(0);
 
   const startProgress = useCallback((step: number) => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     startTimeRef.current = performance.now();
-
     const tick = (now: number) => {
       const elapsed = now - (startTimeRef.current ?? now);
       const pct = Math.min(100, (elapsed / STEP_DURATION) * 100);
@@ -104,191 +75,195 @@ export function Process() {
   }, []);
 
   const activate = useCallback((i: number) => {
+    activeStepRef.current = i;
     setActiveStep(i);
-    setVisibleLines(0);
     setProgressWidth(0);
     startProgress(i);
-    lineTimersRef.current.forEach(clearTimeout);
-    lineTimersRef.current = [];
-    TERMINAL_LINES[i].forEach((_, idx) => {
-      const t = setTimeout(() => setVisibleLines(idx + 1), 280 * (idx + 1));
-      lineTimersRef.current.push(t);
-    });
   }, [startProgress]);
 
-  useEffect(() => {
-    activateRef.current = activate;
-  }, [activate]);
+  // Hover: pausa el auto-advance y abre ese step
+  const handleRowMouseEnter = useCallback((i: number) => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    activeStepRef.current = i;
+    setActiveStep(i);
+    setProgressWidth(0);
+  }, []);
+
+  // Mouse sale del bloque: reanuda desde el step actual
+  const handleSectionMouseLeave = useCallback(() => {
+    const step = activeStepRef.current >= 0 ? activeStepRef.current : 0;
+    startProgress(step);
+  }, [startProgress]);
+
+  // Click: toggle — cierra si ya está abierto, abre si está cerrado
+  const handleClick = useCallback((i: number) => {
+    if (activeStepRef.current === i && activeStep === i) {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      activeStepRef.current = -1;
+      setActiveStep(-1);
+      setProgressWidth(0);
+    } else {
+      activate(i);
+    }
+  }, [activeStep, activate]);
+
+  useEffect(() => { activateRef.current = activate; }, [activate]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     activate(0);
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      lineTimersRef.current.forEach(clearTimeout);
-    };
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <section id="process" className="py-20 md:py-28" style={{ background: "#fff" }}>
+    <section id="process" className="relative py-8 md:py-12" style={{ background: "#f0f0ee" }}>
       <Container>
 
-        {/* Header */}
+        {/* Heading */}
         <Reveal>
-          <div className="mb-12">
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "9px", color: "rgba(0,0,0,0.4)", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: "16px" }}>
+          <div className="mb-14">
+            <p
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "11px",
+                color: mute,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                marginBottom: "16px",
+              }}
+            >
               {"// CÓMO TRABAJAMOS"}
             </p>
             <h2
               className={plusJakarta.className}
-              style={{ fontSize: "clamp(56px, 8vw, 120px)", color: "#000", lineHeight: "0.85", letterSpacing: "-0.03em", textTransform: "none", paddingBottom: "8px" }}
+              style={{
+                fontSize: "clamp(56px, 8vw, 120px)",
+                color: ink,
+                lineHeight: "0.86",
+                letterSpacing: "-0.04em",
+                textTransform: "none",
+                margin: 0,
+              }}
             >
               proceso.
             </h2>
           </div>
         </Reveal>
 
-        <Reveal delay={0.2}>
-
-          <div style={{ border: "1px solid rgba(0,0,0,0.08)", borderRadius: "20px", overflow: "hidden" }}>
-
-          {/* TABS */}
-          <div style={{ display: "flex", borderBottom: "1px solid rgba(0,0,0,0.1)" }}>
+        {/* Accordion rows */}
+        <Reveal delay={0.15}>
+          <div style={{ borderTop: `1px solid ${rule}` }} onMouseLeave={handleSectionMouseLeave}>
             {PROCESS_STEPS.map((step, i) => {
               const isActive = activeStep === i;
               return (
-                <div
-                  key={step.title}
-                  onClick={() => activate(i)}
-                  style={{
-                    flex: 1,
-                    padding: "18px 20px",
-                    cursor: "pointer",
-                    position: "relative",
-                    borderRight: i < PROCESS_STEPS.length - 1 ? "1px solid rgba(0,0,0,0.08)" : "none",
-                    background: isActive ? "#fafafa" : "transparent",
-                    transition: "background 0.2s",
-                  }}
-                >
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "9px", color: "rgba(0,0,0,0.25)", letterSpacing: "0.12em", marginBottom: "4px" }}>
-                    {String(i + 1).padStart(2, "0")}
-                  </p>
-                  <p
-                    className={plusJakarta.className}
-                    style={{ fontSize: "13px", color: isActive ? "#000" : "rgba(0,0,0,0.3)", transition: "color 0.2s", letterSpacing: "-0.01em", lineHeight: 1.2, textTransform: "none" }}
+                <div key={step.title} style={{ borderBottom: `1px solid ${rule}`, position: "relative" }}>
+
+                  {/* Progress bar */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      height: "1px",
+                      background: ink,
+                      width: isActive ? `${progressWidth}%` : "0%",
+                      zIndex: 1,
+                    }}
+                  />
+
+                  {/* Row header */}
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onMouseEnter={() => handleRowMouseEnter(i)}
+                    onClick={() => handleClick(i)}
+                    onKeyDown={(e) => e.key === "Enter" && handleClick(i)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "20px",
+                      padding: "clamp(14px, 2vw, 24px) 0",
+                      cursor: "pointer",
+                    }}
                   >
-                    {step.title}
-                  </p>
-                  {isActive && (
-                    <div style={{ position: "absolute", bottom: 0, left: 0, height: "2px", background: "#0ABAB5", width: `${progressWidth}%` }} />
-                  )}
+                    {/* Giant number — left */}
+                    <motion.span
+                      className={plusJakarta.className}
+                      style={{
+                        fontSize: "clamp(48px, 7vw, 100px)",
+                        letterSpacing: "-0.05em",
+                        lineHeight: 0.82,
+                        flexShrink: 0,
+                        textTransform: "none",
+                        width: "clamp(100px, 14vw, 180px)",
+                      }}
+                      animate={{ color: isActive ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.06)" }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </motion.span>
+
+                    {/* Title */}
+                    <motion.span
+                      className={`${plusJakarta.className} flex-1`}
+                      style={{
+                        fontSize: "clamp(28px, 4vw, 56px)",
+                        letterSpacing: "-0.035em",
+                        lineHeight: 0.92,
+                        display: "block",
+                        textTransform: "none",
+                      }}
+                      animate={{ color: isActive ? ink : mute }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      {step.title}
+                    </motion.span>
+
+                  </div>
+
+                  {/* Expanded content */}
+                  <AnimatePresence initial={false}>
+                    {isActive && (
+                      <motion.div
+                        key="expand"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.4, ease }}
+                        style={{ overflow: "hidden" }}
+                      >
+                        <div
+                          style={{
+                            paddingBottom: "clamp(20px, 2.5vw, 32px)",
+                            paddingLeft: "clamp(108px, 15vw, 200px)",
+                          }}
+                        >
+                          <motion.p
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.35, delay: 0.05, ease }}
+                            className={plusJakartaBody.className}
+                            style={{
+                              fontSize: "clamp(14px, 1.4vw, 17px)",
+                              color: "#444",
+                              lineHeight: 1.55,
+                              maxWidth: "480px",
+                              margin: 0,
+                            }}
+                          >
+                            {renderHighlighted(step.desc, STEP_HIGHLIGHTS[i])}
+                          </motion.p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                 </div>
               );
             })}
           </div>
-
-          {/* CONTENT PANEL */}
-          <div
-            className="grid grid-cols-1 md:grid-cols-2"
-            style={{ minHeight: "280px" }}
-          >
-
-            {/* LEFT — description */}
-            <div
-              className="md:border-r"
-              style={{ padding: "40px 40px 40px 0", borderColor: "rgba(0,0,0,0.08)", position: "relative", overflow: "hidden" }}
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeStep}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3, ease }}
-                >
-                  <motion.p
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: 0.05, ease }}
-                    style={{ fontFamily: "var(--font-body)", fontSize: "9px", color: "#0ABAB5", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "16px" }}
-                  >
-                    {"// "}{PROCESS_STEPS[activeStep].title}
-                  </motion.p>
-                  <motion.h3
-                    className={plusJakarta.className}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: 0.08, ease }}
-                    style={{ fontSize: "clamp(24px, 3vw, 36px)", color: "#000", letterSpacing: "-0.03em", lineHeight: 0.95, marginBottom: "20px", textTransform: "none" }}
-                  >
-                    {PROCESS_STEPS[activeStep].title}
-                  </motion.h3>
-                  <motion.p
-                    className={plusJakartaBody.className}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: 0.12, ease }}
-                    style={{ fontSize: "15px", color: "rgba(0,0,0,0.5)", lineHeight: 1.8, maxWidth: "340px" }}
-                  >
-                    {renderHighlighted(PROCESS_STEPS[activeStep].desc, STEP_HIGHLIGHTS[activeStep])}
-                  </motion.p>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            {/* RIGHT — Terminal */}
-            <div className="hidden md:flex flex-col" style={{ background: "#f0f0ee", height: "100%" }}>
-              {/* Terminal bar */}
-              <div style={{ background: "rgba(0,0,0,0.03)", borderBottom: "1px solid rgba(0,0,0,0.08)", padding: "10px 16px", display: "flex", alignItems: "center", gap: "8px" }}>
-                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#ff5f57", display: "inline-block" }} />
-                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#febc2e", display: "inline-block" }} />
-                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#28c840", display: "inline-block" }} />
-                <span style={{ fontFamily: "var(--font-body)", fontSize: "9px", color: "rgba(0,0,0,0.3)", marginLeft: "8px" }}>
-                  shift_studio — process.sh
-                </span>
-              </div>
-
-              {/* Terminal body */}
-              <div style={{ padding: "20px", flex: 1, fontFamily: "var(--font-body)", fontSize: "11px", lineHeight: 1.9 }}>
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeStep}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {TERMINAL_LINES[activeStep].slice(0, visibleLines).map((line, i) => {
-                      const isLast = i === visibleLines - 1;
-                      return (
-                        <div key={i} style={{ display: "flex", gap: "8px" }}>
-                          <span style={{ color: line.color, flexShrink: 0 }}>{line.prefix}</span>
-                          <span style={{ color: line.color }}>
-                            {line.text}
-                            {isLast && (
-                              <span style={{ display: "inline-block", width: "7px", height: "12px", background: "#0ABAB5", marginLeft: "3px", verticalAlign: "middle", animation: "blink 1s step-end infinite" }} />
-                            )}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </motion.div>
-                </AnimatePresence>
-                <style>{`@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }`}</style>
-              </div>
-
-              {/* Terminal footer */}
-              <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)", padding: "12px 20px", fontFamily: "var(--font-body)", fontSize: "9px", color: "rgba(0,0,0,0.3)", letterSpacing: "0.18em", textTransform: "uppercase" }}>
-                SHIFT_STUDIO · CÓRDOBA_AR · NEXT.JS + PYTHON
-              </div>
-            </div>
-
-          </div>
-
-          </div>{/* end rounded wrapper */}
-
         </Reveal>
+
       </Container>
     </section>
   );
