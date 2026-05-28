@@ -123,7 +123,7 @@ export function FinalCta({ onOpenContact }: FinalCtaProps) {
 
     let W = 0, H = 0;
     function resize() {
-      if (!cv || !grainCV) return;
+      if (!cv || !grainCV || !gl) return;
       W = cv.width = cv.offsetWidth;
       H = cv.height = cv.offsetHeight;
       grainCV.width = grainCV.offsetWidth;
