@@ -74,7 +74,7 @@ export function FinalCta({ onOpenContact }: FinalCtaProps) {
   }, []);
 
   return (
-    <div style={{ background: "#f0f0ee", padding: "8px" }}>
+    <div style={{ background: "#f0f0ee", padding: "4px" }}>
       <section
         id="contact"
         className="relative overflow-hidden"

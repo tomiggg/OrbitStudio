@@ -18,8 +18,6 @@ type Props = {
   onCta: () => void;
 };
 
-const ease = [0.22, 1, 0.36, 1] as const;
-
 export function MobileMenuSheet({ open, onClose, items, cta, onCta }: Props) {
   useEffect(() => {
     if (!open) return;
@@ -43,34 +41,29 @@ export function MobileMenuSheet({ open, onClose, items, cta, onCta }: Props) {
           {/* Backdrop */}
           <motion.div
             onClick={onClose}
-            style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.65)" }}
+            style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.35)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           />
 
-          {/* Bottom sheet */}
+          {/* Top sheet */}
           <motion.div
             style={{
               position: "absolute",
-              bottom: 0,
+              top: 0,
               left: 0,
               right: 0,
-              background: "#0d0d0d",
-              borderRadius: "20px 20px 0 0",
+              background: "#f0f0ee",
+              borderRadius: "0 0 20px 20px",
               display: "flex",
               flexDirection: "column",
             }}
-            initial={{ y: "100%" }}
+            initial={{ y: "-100%" }}
             animate={{ y: 0 }}
-            exit={{ y: "100%" }}
+            exit={{ y: "-100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 280 }}
           >
-            {/* Drag handle */}
-            <div style={{ display: "flex", justifyContent: "center", padding: "12px 0 4px" }}>
-              <div style={{ width: "36px", height: "4px", borderRadius: "2px", background: "rgba(255,255,255,0.15)" }} />
-            </div>
-
             {/* Header */}
             <div
               style={{
@@ -79,10 +72,10 @@ export function MobileMenuSheet({ open, onClose, items, cta, onCta }: Props) {
                 alignItems: "center",
                 justifyContent: "space-between",
                 padding: "0 20px",
-                borderBottom: "1px solid rgba(255,255,255,0.07)",
+                borderBottom: "1px solid rgba(0,0,0,0.07)",
               }}
             >
-              <Logo variant="mark" theme="dark" size={28} />
+              <Logo variant="mark" theme="light" size={28} />
               <button
                 type="button"
                 onClick={onClose}
@@ -91,9 +84,9 @@ export function MobileMenuSheet({ open, onClose, items, cta, onCta }: Props) {
                   width: "30px",
                   height: "30px",
                   borderRadius: "50%",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  background: "rgba(255,255,255,0.06)",
-                  color: "rgba(255,255,255,0.55)",
+                  border: "1px solid rgba(0,0,0,0.15)",
+                  background: "rgba(0,0,0,0.05)",
+                  color: "rgba(0,0,0,0.5)",
                   fontSize: "12px",
                   display: "flex",
                   alignItems: "center",
@@ -102,12 +95,12 @@ export function MobileMenuSheet({ open, onClose, items, cta, onCta }: Props) {
                   transition: "background 0.2s, color 0.2s",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.14)";
-                  e.currentTarget.style.color = "#fff";
+                  e.currentTarget.style.background = "rgba(0,0,0,0.1)";
+                  e.currentTarget.style.color = "#000";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.06)";
-                  e.currentTarget.style.color = "rgba(255,255,255,0.55)";
+                  e.currentTarget.style.background = "rgba(0,0,0,0.05)";
+                  e.currentTarget.style.color = "rgba(0,0,0,0.5)";
                 }}
               >
                 ✕
@@ -126,7 +119,7 @@ export function MobileMenuSheet({ open, onClose, items, cta, onCta }: Props) {
                     alignItems: "center",
                     justifyContent: "space-between",
                     padding: "18px 20px",
-                    borderBottom: "1px solid rgba(255,255,255,0.07)",
+                    borderBottom: "1px solid rgba(0,0,0,0.06)",
                     textDecoration: "none",
                   }}
                 >
@@ -134,7 +127,7 @@ export function MobileMenuSheet({ open, onClose, items, cta, onCta }: Props) {
                     className={plusJakarta.className}
                     style={{
                       fontSize: "22px",
-                      color: "#fff",
+                      color: "#0d0d0d",
                       letterSpacing: "-0.03em",
                       textTransform: "none",
                     }}
@@ -143,7 +136,7 @@ export function MobileMenuSheet({ open, onClose, items, cta, onCta }: Props) {
                   </span>
                   <span
                     className={plusJakartaBody.className}
-                    style={{ color: "rgba(255,255,255,0.25)", fontSize: "16px" }}
+                    style={{ color: "rgba(0,0,0,0.2)", fontSize: "16px" }}
                   >
                     →
                   </span>
@@ -152,7 +145,7 @@ export function MobileMenuSheet({ open, onClose, items, cta, onCta }: Props) {
             </nav>
 
             {/* CTA */}
-            <div style={{ padding: "16px 20px 48px" }}>
+            <div style={{ padding: "16px 20px 20px" }}>
               <button
                 type="button"
                 onClick={() => { onClose(); onCta(); }}
@@ -160,8 +153,8 @@ export function MobileMenuSheet({ open, onClose, items, cta, onCta }: Props) {
                 style={{
                   width: "100%",
                   padding: "18px",
-                  background: "#9EC7D4",
-                  color: "#000",
+                  background: "#0d0d0d",
+                  color: "#fff",
                   fontSize: "13px",
                   border: "none",
                   borderRadius: "12px",
@@ -172,6 +165,11 @@ export function MobileMenuSheet({ open, onClose, items, cta, onCta }: Props) {
               >
                 {cta.label}
               </button>
+            </div>
+
+            {/* Drag handle — bottom */}
+            <div style={{ display: "flex", justifyContent: "center", padding: "12px 0 16px" }}>
+              <div style={{ width: "36px", height: "4px", borderRadius: "2px", background: "rgba(0,0,0,0.12)" }} />
             </div>
 
           </motion.div>

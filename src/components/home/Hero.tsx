@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Plus_Jakarta_Sans } from "next/font/google";
 
 const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
+const plusJakartaBody = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "400" });
 
 const GRAIN_FPS = 30;
 const GRAIN_TILE = 256;
@@ -13,10 +14,18 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 type HeroProps = { onOpenContact?: () => void };
 
-export function Hero({ onOpenContact: _ }: HeroProps) {
+export function Hero({ onOpenContact: _onOpenContact }: HeroProps) {
   const { scrollY } = useScroll();
   const titleY = useTransform(scrollY, [0, 600], [0, -80]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -83,13 +92,33 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
     };
   }, []);
 
+  const services = (
+    <ul
+      className={plusJakarta.className}
+      style={{
+        fontSize: "13px",
+        color: "rgba(255,255,255,0.35)",
+        lineHeight: 2.2,
+        listStyle: "none",
+        margin: 0,
+        padding: 0,
+        textAlign: "right",
+        flexShrink: 0,
+      }}
+    >
+      <li>Sistemas &amp; Automatización</li>
+      <li>Web de Alta Conversión</li>
+      <li>Identidad &amp; Autoridad</li>
+    </ul>
+  );
+
   return (
-    <div style={{ background: "#f0f0ee", padding: "64px 8px 8px" }}>
+    <div style={{ background: "#f0f0ee", padding: isMobile ? "60px 3px 3px" : "64px 4px 4px" }}>
       <section
         id="top"
         className="relative overflow-hidden"
         style={{
-          minHeight: "88svh",
+          minHeight: isMobile ? "94svh" : "88svh",
           borderRadius: "24px",
           background: "#0d0d0d",
           display: "flex",
@@ -106,7 +135,14 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
 
         {/* Headline */}
         <motion.div
-          style={{ y: titleY, flex: 1, display: "flex", alignItems: "center", position: "relative", zIndex: 10 }}
+          style={{
+            y: titleY,
+            flex: isMobile ? 0 : 1,
+            display: "flex",
+            alignItems: isMobile ? "flex-start" : "center",
+            position: "relative",
+            zIndex: 10,
+          }}
         >
           <motion.div
             initial={{ opacity: 0, y: 18 }}
@@ -116,7 +152,7 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
             <h1
               className={plusJakarta.className}
               style={{
-                fontSize: "clamp(86px, 22vw, 260px)",
+                fontSize: "clamp(100px, 26vw, 260px)",
                 lineHeight: 0.86,
                 letterSpacing: "-0.04em",
                 margin: 0,
@@ -130,11 +166,30 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
           </motion.div>
         </motion.div>
 
+        {/* Mobile center — services list */}
+        {isMobile && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.55, ease }}
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              position: "relative",
+              zIndex: 10,
+            }}
+          >
+            {services}
+          </motion.div>
+        )}
+
         {/* Bottom row */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.55, ease }}
+          transition={{ duration: 0.6, delay: 0.65, ease }}
           style={{
             position: "relative",
             zIndex: 10,
@@ -147,10 +202,9 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
           }}
         >
           <p
-            className={plusJakarta.className}
+            className={plusJakartaBody.className}
             style={{
-              fontSize: "clamp(13px, 1.4vw, 16px)",
-              fontWeight: 400,
+              fontSize: isMobile ? "16px" : "clamp(13px, 1.4vw, 16px)",
               color: "rgba(255,255,255,0.5)",
               maxWidth: "380px",
               lineHeight: 1.65,
@@ -163,23 +217,8 @@ export function Hero({ onOpenContact: _ }: HeroProps) {
             <span style={{ color: "#9EC7D4" }}>autoridad</span>.
           </p>
 
-          <ul
-            className={`hidden md:block ${plusJakarta.className}`}
-            style={{
-              fontSize: "13px",
-              color: "rgba(255,255,255,0.35)",
-              lineHeight: 2,
-              listStyle: "none",
-              margin: 0,
-              padding: 0,
-              textAlign: "right",
-              flexShrink: 0,
-            }}
-          >
-            <li>Sistemas &amp; Automatización</li>
-            <li>Web de Alta Conversión</li>
-            <li>Identidad &amp; Autoridad</li>
-          </ul>
+          {/* Desktop only */}
+          {!isMobile && services}
         </motion.div>
 
       </section>

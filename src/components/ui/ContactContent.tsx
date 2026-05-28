@@ -42,7 +42,7 @@ const inputStyle: React.CSSProperties = {
   width: "100%",
   background: "transparent",
   border: "none",
-  color: "#fff",
+  color: "#0d0d0d",
   fontSize: "15px",
   outline: "none",
   padding: 0,
@@ -50,12 +50,12 @@ const inputStyle: React.CSSProperties = {
 
 const rowSep: React.CSSProperties = {
   height: "1px",
-  background: "rgba(255,255,255,0.07)",
+  background: "rgba(0,0,0,0.07)",
   marginLeft: "16px",
 };
 
 const groupStyle: React.CSSProperties = {
-  background: "rgba(255,255,255,0.05)",
+  background: "rgba(0,0,0,0.05)",
   marginBottom: "16px",
   borderRadius: "12px",
   overflow: "hidden",
@@ -76,7 +76,7 @@ export function ContactContent({ value, onChange, onClose: _onClose, onSend, onS
         className={plusJakarta.className}
         style={{
           fontSize: "clamp(26px, 6vw, 34px)",
-          color: "#fff",
+          color: "#0d0d0d",
           lineHeight: 0.9,
           letterSpacing: "-0.04em",
           marginBottom: "28px",
@@ -143,7 +143,7 @@ export function ContactContent({ value, onChange, onClose: _onClose, onSend, onS
           className={plusJakartaBody.className}
           style={{
             fontSize: "11px",
-            color: "rgba(255,255,255,0.3)",
+            color: "rgba(0,0,0,0.4)",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
           }}
@@ -151,7 +151,7 @@ export function ContactContent({ value, onChange, onClose: _onClose, onSend, onS
           Enviar por
         </span>
 
-        <div style={{ display: "flex", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", overflow: "hidden" }}>
+        <div style={{ display: "flex", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "8px", overflow: "hidden" }}>
           {(["whatsapp", "email"] as SendMethod[]).map((method, i) => (
             <button
               key={method}
@@ -160,10 +160,10 @@ export function ContactContent({ value, onChange, onClose: _onClose, onSend, onS
               className={plusJakartaBody.className}
               style={{
                 padding: "8px 20px",
-                background: sendMethod === method ? "#fff" : "transparent",
-                color: sendMethod === method ? "#000" : "rgba(255,255,255,0.35)",
+                background: sendMethod === method ? "#0d0d0d" : "transparent",
+                color: sendMethod === method ? "#fff" : "rgba(0,0,0,0.4)",
                 border: "none",
-                borderLeft: i === 1 ? "1px solid rgba(255,255,255,0.12)" : "none",
+                borderLeft: i === 1 ? "1px solid rgba(0,0,0,0.12)" : "none",
                 cursor: "pointer",
                 fontSize: "10px",
                 letterSpacing: "0.1em",
@@ -186,8 +186,8 @@ export function ContactContent({ value, onChange, onClose: _onClose, onSend, onS
         style={{
           width: "100%",
           padding: "18px",
-          background: canSend ? "#0ABAB5" : "rgba(255,255,255,0.08)",
-          color: canSend ? "#000" : "rgba(255,255,255,0.25)",
+          background: canSend ? "#9EC7D4" : "rgba(0,0,0,0.08)",
+          color: canSend ? "#000" : "rgba(0,0,0,0.25)",
           fontSize: "13px",
           letterSpacing: "0.1em",
           border: "none",
@@ -205,9 +205,9 @@ export function ContactContent({ value, onChange, onClose: _onClose, onSend, onS
 
       {/* Divider */}
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
-        <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.07)" }} />
-        <span className={plusJakartaBody.className} style={{ fontSize: "10px", color: "rgba(255,255,255,0.2)" }}>o</span>
-        <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.07)" }} />
+        <div style={{ flex: 1, height: "1px", background: "rgba(0,0,0,0.07)" }} />
+        <span className={plusJakartaBody.className} style={{ fontSize: "10px", color: "rgba(0,0,0,0.25)" }}>o</span>
+        <div style={{ flex: 1, height: "1px", background: "rgba(0,0,0,0.07)" }} />
       </div>
 
       {/* Secondary: call */}
@@ -225,8 +225,8 @@ export function ContactContent({ value, onChange, onClose: _onClose, onSend, onS
         style={{
           width: "100%",
           padding: "16px",
-          background: "rgba(255,255,255,0.06)",
-          color: "rgba(255,255,255,0.5)",
+          background: "rgba(0,0,0,0.06)",
+          color: "rgba(0,0,0,0.5)",
           fontSize: "14px",
           border: "none",
           borderRadius: "12px",
@@ -235,12 +235,12 @@ export function ContactContent({ value, onChange, onClose: _onClose, onSend, onS
           transition: "background 0.2s, color 0.2s",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = "rgba(255,255,255,0.1)";
-          e.currentTarget.style.color = "rgba(255,255,255,0.85)";
+          e.currentTarget.style.background = "rgba(0,0,0,0.1)";
+          e.currentTarget.style.color = "rgba(0,0,0,0.85)";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = "rgba(255,255,255,0.06)";
-          e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+          e.currentTarget.style.background = "rgba(0,0,0,0.06)";
+          e.currentTarget.style.color = "rgba(0,0,0,0.5)";
         }}
       >
         Agenda una llamada
@@ -251,7 +251,7 @@ export function ContactContent({ value, onChange, onClose: _onClose, onSend, onS
         className={plusJakartaBody.className}
         style={{
           fontSize: "10px",
-          color: "rgba(255,255,255,0.2)",
+          color: "rgba(0,0,0,0.3)",
           textAlign: "center",
         }}
       >
@@ -269,7 +269,7 @@ function FormRow({ label, children }: { label: string; children: React.ReactNode
         className={plusJakartaBody.className}
         style={{
           fontSize: "10px",
-          color: "rgba(255,255,255,0.35)",
+          color: "rgba(0,0,0,0.4)",
           letterSpacing: "0.08em",
           textTransform: "uppercase",
           display: "block",
