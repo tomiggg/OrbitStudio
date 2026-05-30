@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
+import { SmokeCanvas } from "@/components/ui/SmokeCanvas";
 
 const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 const plusJakartaBody = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "400" });
@@ -42,7 +43,7 @@ const PROJECTS_DATA = [
     tag: "OPTIMIZACIÓN DE PROCESOS",
     title: "Caos de datos → control total.",
     desc: "Sistema académico complejo y antiguo transformado en una herramienta simple. Diseño centrado en decisiones rápidas.",
-    href: "/proyectos/tu-utn",
+    href: "https://tu-utn.vercel.app/",
     bg: paper,
     tc: ink,
     iconBg: ink,
@@ -61,7 +62,7 @@ const PROJECTS_DATA = [
     tag: "SITIO WEB + ADMIN",
     title: "Web + panel de propiedades.",
     desc: "Sin presencia formal ni forma de actualizar el catálogo. Creamos web y panel admin para publicar, editar y captar consultas.",
-    href: "/proyectos/pb-inmobiliaria",
+    href: "https://www.pbinmobiliaria.com.ar/",
     bg: ink,
     tc: paper,
     iconBg: sky,
@@ -117,7 +118,7 @@ export function FeaturedProjects() {
         {/* STACK */}
         <Reveal delay={0.12}>
           <div
-            className="flex flex-col w-full max-w-[840px] mx-auto mt-8"
+            className="flex flex-col mt-8 -mx-9 w-[calc(100%+72px)] px-[3px] md:px-0 md:mx-auto md:w-full md:max-w-[840px]"
             style={{ gap: 0 }}
           >
             {PROJECTS_DATA.map((p, i) => {
@@ -137,6 +138,8 @@ export function FeaturedProjects() {
                     transition: "box-shadow 0.3s ease",
                   }}
                 >
+                  {p.id === "pb-inmobiliaria" && <SmokeCanvas />}
+
                   {/* CARD HEADER */}
                   <div
                     className="flex items-center justify-between px-6 md:px-8 relative z-10"
@@ -206,7 +209,7 @@ export function FeaturedProjects() {
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.45, ease }}
-                        style={{ overflow: "hidden" }}
+                        style={{ overflow: "hidden", position: "relative", zIndex: 2 }}
                       >
                         <div style={{ paddingLeft: 32, paddingRight: 32, paddingBottom: 36 }}>
                           {p.comingSoon ? (
@@ -312,6 +315,8 @@ export function FeaturedProjects() {
                                 </p>
                                 <a
                                   href={p.href}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
                                   className={`${jetBrainsMono.className} inline-flex items-center gap-2 no-underline`}
                                   style={{
