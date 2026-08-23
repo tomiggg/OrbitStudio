@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { notFound, useRouter } from "next/navigation";
 import { use } from "react";
 import Link from "next/link";
@@ -9,11 +9,14 @@ import {
   addComment,
   addFile,
   deleteProject,
+  markSeenByAdmin,
   updateProjectNotes,
   updateProjectStatus,
 } from "@/lib/admin/store";
 import type { ProjectStatus } from "@/lib/admin/types";
+import { useAdminSession } from "@/lib/admin/auth";
 import { StatusStepper } from "@/components/admin/StatusStepper";
+import { StatusHistory } from "@/components/admin/StatusHistory";
 import { CommentThread } from "@/components/admin/CommentThread";
 import { FileUploadPanel } from "@/components/admin/FileUploadPanel";
 import { PortalLinkCard } from "@/components/admin/PortalLinkCard";
@@ -32,13 +35,22 @@ export default function AdminProjectDetailPage({
   const { id } = use(params);
   const project = useProject(id);
   const router = useRouter();
+  const session = useAdminSession();
   const [notes, setNotes] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (project) markSeenByAdmin(project.id);
+    // Solo al entrar al detalle; nuevos comentarios mientras está abierto
+    // no deberían re-marcar en loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   if (!project) {
     notFound();
   }
 
   const notesValue = notes ?? project.notes;
+  const adminName = session?.name || "Shift Studio";
 
   function handleStatusChange(status: ProjectStatus) {
     updateProjectStatus(project!.id, status);
@@ -97,6 +109,13 @@ export default function AdminProjectDetailPage({
         </AdminCard>
       </div>
 
+      <AdminCard className="p-5">
+        <AdminLabel>Historial de estado</AdminLabel>
+        <div className="mt-4">
+          <StatusHistory history={project!.statusHistory} />
+        </div>
+      </AdminCard>
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <AdminCard className="p-5">
           <AdminLabel>Comentarios con el cliente</AdminLabel>
@@ -104,8 +123,8 @@ export default function AdminProjectDetailPage({
             <CommentThread
               comments={project!.comments}
               currentRole="admin"
-              currentName="Shift Studio"
-              onSend={(body) => addComment(project!.id, "admin", "Shift Studio", body)}
+              currentName={adminName}
+              onSend={(body) => addComment(project!.id, "admin", adminName, body)}
             />
           </div>
         </AdminCard>

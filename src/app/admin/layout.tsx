@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminAuthGate } from "@/components/admin/AdminAuthGate";
 
 export const metadata = {
   title: "Admin — Shift Studio",
@@ -25,7 +26,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </nav>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-5 py-8">{children}</main>
+      <main className="mx-auto max-w-6xl px-5 py-8">
+        <AdminAuthGate>{children}</AdminAuthGate>
+      </main>
     </div>
   );
 }

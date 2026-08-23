@@ -1,10 +1,11 @@
 "use client";
 
-import { use } from "react";
+import { use, useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import { useProjectByToken } from "@/lib/admin/useProjects";
-import { addComment, addFile } from "@/lib/admin/store";
+import { addComment, addFile, hasUnreadForClient, markSeenByClient } from "@/lib/admin/store";
 import { StatusStepper } from "@/components/admin/StatusStepper";
+import { StatusHistory } from "@/components/admin/StatusHistory";
 import { CommentThread } from "@/components/admin/CommentThread";
 import { FileUploadPanel } from "@/components/admin/FileUploadPanel";
 import { AdminCard, AdminLabel } from "@/components/admin/ui/AdminPrimitives";
@@ -17,6 +18,19 @@ export default function ClientPortalPage({
 }) {
   const { token } = use(params);
   const project = useProjectByToken(token);
+  // Render inicial en null a propósito (igual que el origin en
+  // PortalLinkCard): se completa recién tras el mount, capturando el
+  // estado ANTES de marcar como visto, para poder avisarle al cliente
+  // que hubo novedades desde su última visita.
+  const [hadUpdates, setHadUpdates] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!project) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setHadUpdates((prev) => (prev === null ? hasUnreadForClient(project) : prev));
+    markSeenByClient(project.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project?.id]);
 
   if (!project) {
     notFound();
@@ -43,10 +57,25 @@ export default function ClientPortalPage({
           </h1>
         </div>
 
+        {hadUpdates && (
+          <div className="border border-[var(--teal)] bg-[var(--teal)]/10 px-4 py-3">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--teal)]">
+              Hay novedades desde tu última visita
+            </p>
+          </div>
+        )}
+
         <AdminCard className="p-5">
           <AdminLabel>Estado actual</AdminLabel>
           <div className="mt-4">
             <StatusStepper status={project!.status} />
+          </div>
+        </AdminCard>
+
+        <AdminCard className="p-5">
+          <AdminLabel>Historial de estado</AdminLabel>
+          <div className="mt-4">
+            <StatusHistory history={project!.statusHistory} />
           </div>
         </AdminCard>
 

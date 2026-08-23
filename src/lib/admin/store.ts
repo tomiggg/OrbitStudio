@@ -1,6 +1,6 @@
 "use client";
 
-import type { Project, ProjectComment, ProjectFile, ProjectStatus } from "./types";
+import type { Project, ProjectComment, ProjectFile, ProjectStatus, StatusChange } from "./types";
 
 const STORAGE_KEY = "shift-studio-admin-projects-v1";
 
@@ -40,6 +40,14 @@ function seedProjects(): Project[] {
         },
       ],
       files: [],
+      statusHistory: [
+        { status: "brief", changedAt: "2026-07-01T12:00:00.000Z" },
+        { status: "diseno", changedAt: "2026-07-10T12:00:00.000Z" },
+        { status: "desarrollo", changedAt: "2026-08-01T12:00:00.000Z" },
+      ],
+      // el admin todavía no vio el comentario del cliente del 02/08
+      lastSeenByAdmin: "2026-08-02T08:00:00.000Z",
+      lastSeenByClient: "2026-08-02T09:30:00.000Z",
     },
     {
       id: "proj-2",
@@ -60,6 +68,15 @@ function seedProjects(): Project[] {
         },
       ],
       files: [],
+      statusHistory: [
+        { status: "brief", changedAt: "2026-06-15T12:00:00.000Z" },
+        { status: "diseno", changedAt: "2026-07-01T12:00:00.000Z" },
+        { status: "desarrollo", changedAt: "2026-07-20T12:00:00.000Z" },
+        { status: "revision", changedAt: "2026-08-14T18:00:00.000Z" },
+      ],
+      lastSeenByAdmin: "2026-08-15T12:00:00.000Z",
+      // el cliente todavía no vio que el admin subió la nueva versión
+      lastSeenByClient: "2026-08-13T12:00:00.000Z",
     },
     {
       id: "proj-3",
@@ -72,8 +89,26 @@ function seedProjects(): Project[] {
       notes: "Reunión de kickoff agendada para la próxima semana.",
       comments: [],
       files: [],
+      statusHistory: [{ status: "brief", changedAt: "2026-08-18T12:00:00.000Z" }],
+      lastSeenByAdmin: "2026-08-18T12:00:00.000Z",
+      lastSeenByClient: "2026-08-18T12:00:00.000Z",
     },
   ];
+}
+
+// Normaliza proyectos leídos de localStorage: rellena campos agregados en
+// sesiones posteriores (statusHistory, lastSeenBy*) para que datos viejos
+// guardados en el navegador del usuario no rompan la UI nueva.
+function normalizeProject(raw: Project): Project {
+  return {
+    ...raw,
+    statusHistory:
+      Array.isArray(raw.statusHistory) && raw.statusHistory.length > 0
+        ? raw.statusHistory
+        : [{ status: raw.status, changedAt: raw.createdAt }],
+    lastSeenByAdmin: raw.lastSeenByAdmin ?? raw.updatedAt ?? raw.createdAt,
+    lastSeenByClient: raw.lastSeenByClient ?? raw.createdAt,
+  };
 }
 
 let cache: Project[] | null = null;
@@ -88,7 +123,8 @@ function readFromStorage(): Project[] {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
       return seeded;
     }
-    return JSON.parse(raw) as Project[];
+    const parsed = JSON.parse(raw) as Project[];
+    return parsed.map(normalizeProject);
   } catch {
     return seedProjects();
   }
@@ -144,27 +180,53 @@ export function createProject(input: {
   projectName: string;
   token: string;
 }): Project {
+  const createdAt = nowIso();
   const project: Project = {
     id: makeId(),
     token: input.token,
     clientName: input.clientName,
     projectName: input.projectName,
     status: "brief",
-    createdAt: nowIso(),
-    updatedAt: nowIso(),
+    createdAt,
+    updatedAt: createdAt,
     notes: "",
     comments: [],
     files: [],
+    statusHistory: [{ status: "brief", changedAt: createdAt }],
+    lastSeenByAdmin: createdAt,
+    lastSeenByClient: createdAt,
   };
   persist([project, ...ensureCache()]);
   return project;
 }
 
 export function updateProjectStatus(id: string, status: ProjectStatus) {
+  const changedAt = nowIso();
   persist(
-    ensureCache().map((p) =>
-      p.id === id ? { ...p, status, updatedAt: nowIso() } : p
-    )
+    ensureCache().map((p) => {
+      if (p.id !== id || p.status === status) return p;
+      const entry: StatusChange = { status, changedAt };
+      return {
+        ...p,
+        status,
+        updatedAt: changedAt,
+        statusHistory: [...p.statusHistory, entry],
+      };
+    })
+  );
+}
+
+export function markSeenByAdmin(id: string) {
+  const seenAt = nowIso();
+  persist(
+    ensureCache().map((p) => (p.id === id ? { ...p, lastSeenByAdmin: seenAt } : p))
+  );
+}
+
+export function markSeenByClient(id: string) {
+  const seenAt = nowIso();
+  persist(
+    ensureCache().map((p) => (p.id === id ? { ...p, lastSeenByClient: seenAt } : p))
   );
 }
 
@@ -216,6 +278,27 @@ export function addFile(
 
 export function deleteProject(id: string) {
   persist(ensureCache().filter((p) => p.id !== id));
+}
+
+// Actividad del cliente (comentarios o archivos) más reciente que la última
+// vez que el admin abrió el proyecto.
+export function hasUnreadForAdmin(project: Project): boolean {
+  const clientTimestamps = [
+    ...project.comments.filter((c) => c.author === "client").map((c) => c.createdAt),
+    ...project.files.filter((f) => f.uploadedBy === "client").map((f) => f.uploadedAt),
+  ];
+  return clientTimestamps.some((t) => t > project.lastSeenByAdmin);
+}
+
+// Actividad del admin (comentarios, archivos o cambios de estado) más
+// reciente que la última vez que el cliente abrió su portal.
+export function hasUnreadForClient(project: Project): boolean {
+  const adminTimestamps = [
+    ...project.comments.filter((c) => c.author === "admin").map((c) => c.createdAt),
+    ...project.files.filter((f) => f.uploadedBy === "admin").map((f) => f.uploadedAt),
+    ...project.statusHistory.map((s) => s.changedAt),
+  ];
+  return adminTimestamps.some((t) => t > project.lastSeenByClient);
 }
 
 export function slugify(value: string): string {

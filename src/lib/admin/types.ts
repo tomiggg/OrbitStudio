@@ -21,6 +21,11 @@ export const PROJECT_STATUS_LABEL: Record<ProjectStatus, string> = {
   entregado: "Entregado",
 };
 
+export type StatusChange = {
+  status: ProjectStatus;
+  changedAt: string; // ISO
+};
+
 export type AuthorRole = "admin" | "client";
 
 export type ProjectComment = {
@@ -52,4 +57,7 @@ export type Project = {
   notes: string;
   comments: ProjectComment[];
   files: ProjectFile[];
+  statusHistory: StatusChange[];
+  lastSeenByAdmin: string; // ISO
+  lastSeenByClient: string; // ISO
 };
