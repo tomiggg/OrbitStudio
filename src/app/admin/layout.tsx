@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCurrentAdminName } from "@/lib/admin/currentAdmin";
 import { LogoutButton } from "@/components/admin/LogoutButton";
+import { ToastProvider } from "@/components/admin/Toaster";
 
 export const metadata = {
   title: "Admin — Shift Studio",
@@ -33,7 +34,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           )}
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-5 py-8">{children}</main>
+      <main className="mx-auto max-w-6xl px-5 py-8">
+        <ToastProvider>{children}</ToastProvider>
+      </main>
     </div>
   );
 }

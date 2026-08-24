@@ -6,6 +6,8 @@ import { useProjects } from "@/lib/admin/useProjects";
 import { createProjectApi } from "@/lib/admin/apiClient";
 import { hasUnreadForAdmin } from "@/lib/admin/activity";
 import { ClientDate } from "@/components/admin/ClientDate";
+import { FadeIn } from "@/components/admin/FadeIn";
+import { useToast } from "@/components/admin/Toaster";
 import { PROJECT_STATUS_LABEL, type Project, type ProjectStatus } from "@/lib/admin/types";
 import {
   AdminBadge,
@@ -13,6 +15,7 @@ import {
   AdminCard,
   AdminInput,
   AdminLabel,
+  AdminSkeleton,
 } from "@/components/admin/ui/AdminPrimitives";
 
 const STATUS_FILTERS: Array<ProjectStatus | "todos"> = [
@@ -54,25 +57,27 @@ export function DashboardView({ initialProjects }: { initialProjects: Project[] 
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="font-[family-name:var(--font-title)] text-3xl uppercase tracking-tight text-white">
-            Proyectos
-          </h1>
-          <p className="font-mono text-xs text-white/50">
-            {projects
-              ? `${projects.length} proyecto${projects.length === 1 ? "" : "s"} en total${
-                  unreadCount > 0
-                    ? ` · ${unreadCount} con actividad nueva del cliente`
-                    : ""
-                }`
-              : "Cargando..."}
-          </p>
+      <FadeIn>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="font-[family-name:var(--font-title)] text-3xl uppercase tracking-tight text-white">
+              Proyectos
+            </h1>
+            <p className="font-mono text-xs text-white/50">
+              {projects
+                ? `${projects.length} proyecto${projects.length === 1 ? "" : "s"} en total${
+                    unreadCount > 0
+                      ? ` · ${unreadCount} con actividad nueva del cliente`
+                      : ""
+                  }`
+                : "Cargando..."}
+            </p>
+          </div>
+          <AdminButton onClick={() => setShowForm((v) => !v)}>
+            {showForm ? "Cancelar" : "+ Nuevo proyecto"}
+          </AdminButton>
         </div>
-        <AdminButton onClick={() => setShowForm((v) => !v)}>
-          {showForm ? "Cancelar" : "+ Nuevo proyecto"}
-        </AdminButton>
-      </div>
+      </FadeIn>
 
       {error && (
         <p className="font-mono text-xs text-red-400">
@@ -87,34 +92,38 @@ export function DashboardView({ initialProjects }: { initialProjects: Project[] 
         />
       )}
 
-      <div className="flex flex-wrap items-center gap-4">
-        <AdminInput
-          placeholder="Buscar cliente o proyecto..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="max-w-xs"
-        />
-        <div className="flex flex-wrap gap-2">
-          {STATUS_FILTERS.map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`border px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest transition ${
-                filter === f
-                  ? "border-[var(--teal)] bg-[var(--teal)] text-[var(--dark)]"
-                  : "border-[var(--teal)]/30 text-[var(--teal)] hover:bg-[var(--teal)]/10"
-              }`}
-            >
-              {f === "todos" ? "Todos" : PROJECT_STATUS_LABEL[f]}
-            </button>
-          ))}
+      <FadeIn delay={0.05}>
+        <div className="flex flex-wrap items-center gap-4">
+          <AdminInput
+            placeholder="Buscar cliente o proyecto..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="max-w-xs"
+          />
+          <div className="flex flex-wrap gap-2">
+            {STATUS_FILTERS.map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`border px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest transition ${
+                  filter === f
+                    ? "border-[var(--teal)] bg-[var(--teal)] text-[var(--dark)]"
+                    : "border-[var(--teal)]/30 text-[var(--teal)] hover:bg-[var(--teal)]/10"
+                }`}
+              >
+                {f === "todos" ? "Todos" : PROJECT_STATUS_LABEL[f]}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      </FadeIn>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {loading && !projects && (
-          <p className="font-mono text-sm text-white/40">Cargando proyectos...</p>
-        )}
+        {loading &&
+          !projects &&
+          Array.from({ length: 3 }).map((_, i) => (
+            <AdminSkeleton key={i} className="h-[126px] w-full" />
+          ))}
         {filtered.map((project) => (
           <Link
             key={project.id}
@@ -165,6 +174,7 @@ function NewProjectForm({
   onDone: () => void;
   onCreated: () => void;
 }) {
+  const toast = useToast();
   const [clientName, setClientName] = useState("");
   const [projectName, setProjectName] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -181,6 +191,7 @@ function NewProjectForm({
       });
       onCreated();
       onDone();
+      toast("Proyecto creado", "success");
     } catch (e) {
       setError(e instanceof Error ? e.message : "No se pudo crear el proyecto.");
       setSubmitting(false);
@@ -199,6 +210,7 @@ function NewProjectForm({
             value={clientName}
             onChange={(e) => setClientName(e.target.value)}
             placeholder="Ej: PB Inmobiliaria"
+            maxLength={120}
           />
         </div>
         <div className="flex flex-col gap-1.5">
@@ -209,6 +221,7 @@ function NewProjectForm({
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
             placeholder="Ej: Sitio institucional"
+            maxLength={160}
           />
         </div>
       </div>
