@@ -13,7 +13,6 @@
     "framer-motion": "^12.23.26",
     "next": "^15.3.9",
     "next-intl": "^4.6.1",
-    "qrcode.react": "^4.2.0",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
