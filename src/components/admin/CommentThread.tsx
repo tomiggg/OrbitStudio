@@ -22,15 +22,25 @@ export function CommentThread({
   comments: ProjectComment[];
   currentRole: "admin" | "client";
   currentName: string;
-  onSend: (body: string) => void;
+  onSend: (body: string) => Promise<void>;
 }) {
   const [draft, setDraft] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSend() {
+  async function handleSend() {
     const trimmed = draft.trim();
-    if (!trimmed) return;
-    onSend(trimmed);
-    setDraft("");
+    if (!trimmed || sending) return;
+    setSending(true);
+    setError(null);
+    try {
+      await onSend(trimmed);
+      setDraft("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "No se pudo enviar el comentario.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -78,8 +88,9 @@ export function CommentThread({
             }
           }}
         />
-        <AdminButton className="self-end" onClick={handleSend} disabled={!draft.trim()}>
-          Enviar
+        {error && <p className="font-mono text-[10px] text-red-400">{error}</p>}
+        <AdminButton className="self-end" onClick={handleSend} disabled={!draft.trim() || sending}>
+          {sending ? "Enviando..." : "Enviar"}
         </AdminButton>
       </div>
     </div>

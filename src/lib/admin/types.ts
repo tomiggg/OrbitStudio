@@ -38,7 +38,12 @@ export type ProjectFile = {
   mimeType: string;
   uploadedBy: AuthorRole;
   uploadedAt: string; // ISO
-  dataUrl: string;
+  storedName: string; // nombre del archivo en data/uploads/<projectId>/, no exponer al cliente
+};
+
+export type StatusChange = {
+  status: ProjectStatus;
+  changedAt: string; // ISO
 };
 
 export type Project = {
@@ -47,9 +52,20 @@ export type Project = {
   clientName: string;
   projectName: string;
   status: ProjectStatus;
+  statusHistory: StatusChange[];
   createdAt: string; // ISO
   updatedAt: string; // ISO
   notes: string;
   comments: ProjectComment[];
   files: ProjectFile[];
+  lastSeenByAdmin: string | null; // ISO
+  lastSeenByClient: string | null; // ISO
+};
+
+// Proyección pública: lo que ve el portal cliente. Nunca incluye `notes`
+// (notas internas del equipo) ni `storedName` de los archivos.
+export type PublicProjectFile = Omit<ProjectFile, "storedName">;
+
+export type PublicProject = Omit<Project, "notes" | "files"> & {
+  files: PublicProjectFile[];
 };

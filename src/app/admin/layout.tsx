@@ -1,11 +1,15 @@
 import Link from "next/link";
+import { getCurrentAdminName } from "@/lib/admin/currentAdmin";
+import { LogoutButton } from "@/components/admin/LogoutButton";
 
 export const metadata = {
   title: "Admin — Shift Studio",
   robots: { index: false, follow: false },
 };
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const adminName = await getCurrentAdminName();
+
   return (
     <div className="min-h-screen bg-[var(--dark)] text-white">
       <header className="border-b border-[var(--teal)]/20">
@@ -18,11 +22,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               / admin
             </span>
           </Link>
-          <nav className="font-mono text-[11px] uppercase tracking-widest text-[var(--teal)]">
-            <Link href="/admin" className="no-underline hover:text-white">
-              Proyectos
-            </Link>
-          </nav>
+          {adminName && (
+            <nav className="flex items-center gap-5 font-mono text-[11px] uppercase tracking-widest text-[var(--teal)]">
+              <Link href="/admin" className="no-underline hover:text-white">
+                Proyectos
+              </Link>
+              <span className="text-white/40">Sesión: {adminName}</span>
+              <LogoutButton />
+            </nav>
+          )}
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-5 py-8">{children}</main>

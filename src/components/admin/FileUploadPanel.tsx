@@ -1,10 +1,17 @@
 "use client";
 
 import { useRef, useState } from "react";
-import type { ProjectFile } from "@/lib/admin/types";
 import { AdminButton } from "@/components/admin/ui/AdminPrimitives";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB, límite razonable para mock en localStorage
+const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB, ver src/lib/admin/uploadValidation.ts
+
+type FileListItem = {
+  id: string;
+  name: string;
+  size: number;
+  uploadedBy: "admin" | "client";
+  uploadedAt: string;
+};
 
 function formatSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
@@ -22,42 +29,34 @@ function formatDate(iso: string) {
 
 export function FileUploadPanel({
   files,
-  currentRole,
   onUpload,
+  getDownloadUrl,
 }: {
-  files: ProjectFile[];
-  currentRole: "admin" | "client";
-  onUpload: (file: Omit<ProjectFile, "id" | "uploadedAt">) => void;
+  files: FileListItem[];
+  onUpload: (file: File) => Promise<void>;
+  getDownloadUrl: (fileId: string) => string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isReading, setIsReading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
-  function handleFiles(fileList: FileList | null) {
+  async function handleFiles(fileList: FileList | null) {
     if (!fileList || fileList.length === 0) return;
     setError(null);
     const file = fileList[0];
     if (file.size > MAX_FILE_SIZE) {
-      setError("El archivo supera el límite de 5MB (demo local).");
+      setError("El archivo supera el límite de 20MB.");
       return;
     }
-    setIsReading(true);
-    const reader = new FileReader();
-    reader.onload = () => {
-      onUpload({
-        name: file.name,
-        size: file.size,
-        mimeType: file.type || "application/octet-stream",
-        uploadedBy: currentRole,
-        dataUrl: reader.result as string,
-      });
-      setIsReading(false);
-    };
-    reader.onerror = () => {
-      setError("No se pudo leer el archivo.");
-      setIsReading(false);
-    };
-    reader.readAsDataURL(file);
+    setUploading(true);
+    try {
+      await onUpload(file);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "No se pudo subir el archivo.");
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
   }
 
   return (
@@ -76,9 +75,9 @@ export function FileUploadPanel({
         <AdminButton
           variant="ghost"
           onClick={() => inputRef.current?.click()}
-          disabled={isReading}
+          disabled={uploading}
         >
-          {isReading ? "Subiendo..." : "Elegir archivo"}
+          {uploading ? "Subiendo..." : "Elegir archivo"}
         </AdminButton>
         <input
           ref={inputRef}
@@ -100,7 +99,7 @@ export function FileUploadPanel({
             className="flex items-center justify-between gap-3 border border-white/10 px-3 py-2"
           >
             <a
-              href={file.dataUrl}
+              href={getDownloadUrl(file.id)}
               download={file.name}
               className="min-w-0 flex-1 truncate text-sm text-white hover:text-[var(--teal)]"
             >

@@ -38,6 +38,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# mock data store local (admin/portal) — ver src/lib/admin/repository.fileStore.ts
+/data
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
