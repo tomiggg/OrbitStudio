@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { AdminButton, AdminCard, AdminInput } from "@/components/admin/ui/AdminPrimitives";
+import { jakarta } from "@/components/admin/fonts";
 
 export function LoginForm() {
   const router = useRouter();
@@ -39,10 +40,10 @@ export function LoginForm() {
     <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-1">
       <AdminCard className="flex flex-col gap-5 p-6">
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--teal)]">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--sky)]">
             Shift Studio / admin
           </p>
-          <h1 className="mt-1 font-[family-name:var(--font-title)] text-2xl uppercase tracking-tight text-white">
+          <h1 className={`mt-1 ${jakarta.className} text-2xl tracking-tight text-white`}>
             Iniciar sesión
           </h1>
         </div>
@@ -69,7 +70,7 @@ export function LoginForm() {
               placeholder="••••••••"
             />
           </div>
-          {error && <p className="font-mono text-[10px] text-red-400">{error}</p>}
+          {error && <p className="font-mono text-[10px] text-[#c2453a]">{error}</p>}
           <AdminButton type="submit" disabled={loading || !name.trim() || !password}>
             {loading ? "Entrando..." : "Entrar"}
           </AdminButton>

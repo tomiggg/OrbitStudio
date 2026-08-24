@@ -32,9 +32,9 @@ export function StatusStepper({
                 onClick={() => onChange?.(step)}
                 aria-current={isCurrent}
                 animate={{
-                  backgroundColor: isDone || isCurrent ? "var(--teal)" : "rgba(10,186,181,0)",
-                  borderColor: isDone || isCurrent ? "var(--teal)" : "rgba(10,186,181,0.3)",
-                  color: isDone || isCurrent ? "var(--dark)" : "rgba(10,186,181,0.4)",
+                  backgroundColor: isDone || isCurrent ? "var(--sky)" : "rgba(158,199,212,0)",
+                  borderColor: isDone || isCurrent ? "var(--sky)" : "rgba(158,199,212,0.3)",
+                  color: isDone || isCurrent ? "var(--ink)" : "rgba(158,199,212,0.4)",
                 }}
                 transition={{ duration: 0.35, ease: EASE }}
                 className={`flex h-8 w-8 shrink-0 items-center justify-center border font-mono text-[11px] ${
@@ -44,9 +44,9 @@ export function StatusStepper({
                 {index + 1}
               </motion.button>
               {!isLast && (
-                <div className="relative h-[1px] flex-1 overflow-hidden bg-[var(--teal)]/20">
+                <div className="relative h-[1px] flex-1 overflow-hidden bg-[var(--sky)]/20">
                   <motion.div
-                    className="absolute inset-y-0 left-0 w-full bg-[var(--teal)]"
+                    className="absolute inset-y-0 left-0 w-full bg-[var(--sky)]"
                     style={{ transformOrigin: "left" }}
                     initial={false}
                     animate={{ scaleX: isDone ? 1 : 0 }}
@@ -57,7 +57,7 @@ export function StatusStepper({
             </div>
             <span
               className={`mt-2 font-mono text-[9px] uppercase tracking-widest transition-colors duration-300 ${
-                isDone || isCurrent ? "text-[var(--teal)]" : "text-[var(--teal)]/40"
+                isDone || isCurrent ? "text-[var(--sky)]" : "text-[var(--sky)]/40"
               }`}
             >
               {PROJECT_STATUS_LABEL[step]}

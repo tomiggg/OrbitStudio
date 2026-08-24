@@ -8,6 +8,7 @@ import { hasUnreadForAdmin } from "@/lib/admin/activity";
 import { ClientDate } from "@/components/admin/ClientDate";
 import { FadeIn } from "@/components/admin/FadeIn";
 import { useToast } from "@/components/admin/Toaster";
+import { jakarta } from "@/components/admin/fonts";
 import { PROJECT_STATUS_LABEL, type Project, type ProjectStatus } from "@/lib/admin/types";
 import {
   AdminBadge,
@@ -60,7 +61,7 @@ export function DashboardView({ initialProjects }: { initialProjects: Project[] 
       <FadeIn>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="font-[family-name:var(--font-title)] text-3xl uppercase tracking-tight text-white">
+            <h1 className={`${jakarta.className} text-3xl tracking-tight text-white`}>
               Proyectos
             </h1>
             <p className="font-mono text-xs text-white/50">
@@ -80,7 +81,7 @@ export function DashboardView({ initialProjects }: { initialProjects: Project[] 
       </FadeIn>
 
       {error && (
-        <p className="font-mono text-xs text-red-400">
+        <p className="font-mono text-xs text-[#c2453a]">
           No se pudieron cargar los proyectos: {error}
         </p>
       )}
@@ -107,8 +108,8 @@ export function DashboardView({ initialProjects }: { initialProjects: Project[] 
                 onClick={() => setFilter(f)}
                 className={`border px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest transition ${
                   filter === f
-                    ? "border-[var(--teal)] bg-[var(--teal)] text-[var(--dark)]"
-                    : "border-[var(--teal)]/30 text-[var(--teal)] hover:bg-[var(--teal)]/10"
+                    ? "border-[var(--sky)] bg-[var(--sky)] text-[var(--ink)]"
+                    : "border-[var(--sky)]/30 text-[var(--sky)] hover:bg-[var(--sky)]/10"
                 }`}
               >
                 {f === "todos" ? "Todos" : PROJECT_STATUS_LABEL[f]}
@@ -130,13 +131,13 @@ export function DashboardView({ initialProjects }: { initialProjects: Project[] 
             href={`/admin/proyectos/${project.id}`}
             className="no-underline"
           >
-            <AdminCard className="flex h-full flex-col gap-3 p-4 transition hover:border-[var(--teal)]">
+            <AdminCard className="flex h-full flex-col gap-3 p-4 transition hover:border-[var(--sky)]">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="flex items-center gap-2 truncate font-[family-name:var(--font-title)] text-lg uppercase tracking-tight text-white">
+                  <p className={`flex items-center gap-2 truncate ${jakarta.className} text-lg tracking-tight text-white`}>
                     {hasUnreadForAdmin(project) && (
                       <span
-                        className="h-2 w-2 shrink-0 bg-[var(--teal)]"
+                        className="h-2 w-2 shrink-0 bg-[var(--sky)]"
                         title="Actividad nueva del cliente"
                       />
                     )}
@@ -225,7 +226,7 @@ function NewProjectForm({
           />
         </div>
       </div>
-      {error && <p className="font-mono text-[10px] text-red-400">{error}</p>}
+      {error && <p className="font-mono text-[10px] text-[#c2453a]">{error}</p>}
       <AdminButton
         className="self-start"
         onClick={handleSubmit}

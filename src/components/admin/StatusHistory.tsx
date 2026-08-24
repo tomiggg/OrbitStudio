@@ -21,13 +21,13 @@ export function StatusHistory({ history }: { history: StatusChange[] }) {
         <li key={`${entry.status}-${entry.changedAt}`} className="flex items-start gap-3">
           <span
             className={`mt-1.5 h-2 w-2 shrink-0 ${
-              i === 0 ? "bg-[var(--teal)]" : "bg-white/20"
+              i === 0 ? "bg-[var(--sky)]" : "bg-white/20"
             }`}
           />
           <div className="flex flex-col">
             <span
               className={`font-mono text-[11px] uppercase tracking-widest ${
-                i === 0 ? "text-[var(--teal)]" : "text-white/50"
+                i === 0 ? "text-[var(--sky)]" : "text-white/50"
               }`}
             >
               {PROJECT_STATUS_LABEL[entry.status]}

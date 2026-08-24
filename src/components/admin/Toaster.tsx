@@ -11,9 +11,9 @@ const ToastContext = createContext<((message: string, kind?: ToastKind) => void)
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const KIND_STYLES: Record<ToastKind, string> = {
-  success: "border-[var(--teal)] bg-[var(--teal)] text-[var(--dark)]",
-  error: "border-red-500 bg-red-500/90 text-white",
-  info: "border-white/20 bg-[#0a3634] text-white",
+  success: "border-[var(--sky)] bg-[var(--sky)] text-[var(--ink)]",
+  error: "border-[#c2453a] bg-[#c2453a]/90 text-white",
+  info: "border-white/20 bg-[var(--ink-2)] text-white",
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {

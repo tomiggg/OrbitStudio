@@ -127,10 +127,10 @@ export function FileUploadPanel({
           handleFiles(e.dataTransfer.files);
         }}
         className={`flex flex-col items-center justify-center gap-2 border border-dashed px-4 py-6 text-center transition-colors duration-200 ${
-          dragging ? "border-[var(--teal)] bg-[var(--teal)]/10" : "border-[var(--teal)]/40"
+          dragging ? "border-[var(--sky)] bg-[var(--sky)]/10" : "border-[var(--sky)]/40"
         }`}
       >
-        <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--teal)]/70">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--sky)]/70">
           {dragging ? "Soltá para subir" : "Arrastrá un archivo o"}
         </p>
         {!dragging && (
@@ -151,7 +151,7 @@ export function FileUploadPanel({
         {uploading && (
           <div className="mt-1 h-[2px] w-full max-w-[200px] bg-white/10">
             <motion.div
-              className="h-full bg-[var(--teal)]"
+              className="h-full bg-[var(--sky)]"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.2, ease: EASE }}
@@ -159,7 +159,7 @@ export function FileUploadPanel({
           </div>
         )}
       </div>
-      {error && <p className="font-mono text-[10px] text-red-400">{error}</p>}
+      {error && <p className="font-mono text-[10px] text-[#c2453a]">{error}</p>}
       <ul className="flex flex-col gap-2">
         {files.length === 0 && (
           <li className="border border-dashed border-white/10 px-3 py-4 text-center font-mono text-[10px] uppercase tracking-widest text-white/30">
@@ -171,13 +171,13 @@ export function FileUploadPanel({
             key={file.id}
             className="flex items-center gap-3 border border-white/10 px-3 py-2"
           >
-            <span className="shrink-0 border border-[var(--teal)]/40 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-widest text-[var(--teal)]">
+            <span className="shrink-0 border border-[var(--sky)]/40 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-widest text-[var(--sky)]">
               {fileKind(file.name)}
             </span>
             <a
               href={getDownloadUrl(file.id)}
               download={file.name}
-              className="min-w-0 flex-1 truncate text-sm text-white hover:text-[var(--teal)]"
+              className="min-w-0 flex-1 truncate text-sm text-white hover:text-[var(--sky)]"
             >
               {file.name}
             </a>

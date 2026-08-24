@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { AdminButton } from "@/components/admin/ui/AdminPrimitives";
+import { jakarta } from "@/components/admin/fonts";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -43,9 +44,9 @@ export function ConfirmDialog({
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
             transition={{ duration: 0.25, ease: EASE }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm border border-[var(--teal)]/30 bg-[#0a3634] p-6"
+            className="w-full max-w-sm border border-[var(--sky)]/30 bg-[var(--ink-2)] p-6"
           >
-            <h2 className="font-[family-name:var(--font-title)] text-xl uppercase tracking-tight text-white">
+            <h2 className={`${jakarta.className} text-xl tracking-tight text-white`}>
               {title}
             </h2>
             {description && <p className="mt-2 text-sm text-white/60">{description}</p>}

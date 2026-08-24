@@ -18,6 +18,7 @@ import { FileUploadPanel } from "@/components/admin/FileUploadPanel";
 import { AdminCard, AdminLabel, AdminSkeleton } from "@/components/admin/ui/AdminPrimitives";
 import { ToastProvider, useToast } from "@/components/admin/Toaster";
 import { FadeIn } from "@/components/admin/FadeIn";
+import { jakarta } from "@/components/admin/fonts";
 import { Logo } from "@/components/ui/Logo";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -61,11 +62,11 @@ function PortalContent({
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-[var(--dark)] text-white">
-        <header className="border-b border-[var(--teal)]/20">
+      <div className="min-h-screen bg-[var(--ink)] text-white">
+        <header className="border-b border-[var(--sky)]/20">
           <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
             <Logo variant="wordmark" theme="dark" size={26} />
-            <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--teal)]">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--sky)]">
               Portal cliente
             </span>
           </div>
@@ -83,11 +84,11 @@ function PortalContent({
   }
 
   return (
-    <div className="min-h-screen bg-[var(--dark)] text-white">
-      <header className="border-b border-[var(--teal)]/20">
+    <div className="min-h-screen bg-[var(--ink)] text-white">
+      <header className="border-b border-[var(--sky)]/20">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
           <Logo variant="wordmark" theme="dark" size={26} />
-          <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--teal)]">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--sky)]">
             Portal cliente
           </span>
         </div>
@@ -96,10 +97,10 @@ function PortalContent({
       <main className="mx-auto flex max-w-3xl flex-col gap-6 px-5 py-8">
         <FadeIn>
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--teal)]">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--sky)]">
               {project.clientName}
             </p>
-            <h1 className="font-[family-name:var(--font-title)] text-3xl uppercase tracking-tight text-white">
+            <h1 className={`${jakarta.className} text-3xl tracking-tight text-white`}>
               {project.projectName}
             </h1>
           </div>
@@ -112,9 +113,9 @@ function PortalContent({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.3, ease: EASE }}
-              className="flex items-center justify-between gap-3 border border-[var(--teal)] bg-[var(--teal)]/10 px-4 py-3"
+              className="flex items-center justify-between gap-3 border border-[var(--sky)] bg-[var(--sky)]/10 px-4 py-3"
             >
-              <p className="font-mono text-[11px] uppercase tracking-widest text-[var(--teal)]">
+              <p className="font-mono text-[11px] uppercase tracking-widest text-[var(--sky)]">
                 Hay novedades desde tu última visita
               </p>
               <button

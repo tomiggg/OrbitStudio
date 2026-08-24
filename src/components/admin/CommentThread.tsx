@@ -83,12 +83,12 @@ export function CommentThread({
               transition={{ duration: 0.3, ease: EASE, delay: i === comments.length - 1 ? 0.05 : 0 }}
               className={`max-w-[85%] border px-3 py-2.5 ${
                 isMine
-                  ? "self-end border-[var(--teal)] bg-[var(--teal)]/10"
+                  ? "self-end border-[var(--sky)] bg-[var(--sky)]/10"
                   : "self-start border-white/15 bg-white/5"
               }`}
             >
               <div className="mb-1 flex items-center justify-between gap-4">
-                <span className="font-mono text-[9px] uppercase tracking-widest text-[var(--teal)]">
+                <span className="font-mono text-[9px] uppercase tracking-widest text-[var(--sky)]">
                   {comment.authorName}
                 </span>
                 <ClientDate
@@ -116,7 +116,7 @@ export function CommentThread({
             }
           }}
         />
-        {error && <p className="font-mono text-[10px] text-red-400">{error}</p>}
+        {error && <p className="font-mono text-[10px] text-[#c2453a]">{error}</p>}
         <AdminButton className="self-end" onClick={handleSend} disabled={!draft.trim() || sending}>
           {sending ? "Enviando..." : "Enviar"}
         </AdminButton>

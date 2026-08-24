@@ -21,6 +21,7 @@ import { PortalLinkCard } from "@/components/admin/PortalLinkCard";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { FadeIn } from "@/components/admin/FadeIn";
 import { useToast } from "@/components/admin/Toaster";
+import { jakarta } from "@/components/admin/fonts";
 import {
   AdminButton,
   AdminCard,
@@ -121,11 +122,11 @@ export function ProjectDetailView({
           <div>
             <Link
               href="/admin"
-              className="font-mono text-[10px] uppercase tracking-widest text-[var(--teal)] no-underline hover:text-white"
+              className="font-mono text-[10px] uppercase tracking-widest text-[var(--sky)] no-underline hover:text-white"
             >
               ← Todos los proyectos
             </Link>
-            <h1 className="mt-2 font-[family-name:var(--font-title)] text-3xl uppercase tracking-tight text-white">
+            <h1 className={`mt-2 ${jakarta.className} text-3xl tracking-tight text-white`}>
               {project.clientName}
             </h1>
             <p className="text-sm text-white/60">{project.projectName}</p>
