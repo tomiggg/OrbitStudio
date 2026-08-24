@@ -37,7 +37,7 @@ export function StatusStepper({
                   color: isDone || isCurrent ? "var(--ink)" : "rgba(158,199,212,0.4)",
                 }}
                 transition={{ duration: 0.35, ease: EASE }}
-                className={`flex h-8 w-8 shrink-0 items-center justify-center border font-mono text-[11px] ${
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border font-mono text-[11px] ${
                   interactive ? "cursor-pointer hover:brightness-110" : "cursor-default"
                 }`}
               >

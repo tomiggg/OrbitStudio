@@ -44,9 +44,12 @@ export function ConfirmDialog({
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
             transition={{ duration: 0.25, ease: EASE }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm border border-[var(--sky)]/30 bg-[var(--ink-2)] p-6"
+            className="w-full max-w-sm rounded-2xl border border-[var(--sky)]/20 bg-[var(--ink-2)] p-6"
           >
-            <h2 className={`${jakarta.className} text-xl tracking-tight text-white`}>
+            <h2
+              className={`${jakarta.className} text-xl tracking-tight text-white`}
+              style={{ textTransform: "none" }}
+            >
               {title}
             </h2>
             {description && <p className="mt-2 text-sm text-white/60">{description}</p>}

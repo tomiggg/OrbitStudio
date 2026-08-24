@@ -81,10 +81,10 @@ export function CommentThread({
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, ease: EASE, delay: i === comments.length - 1 ? 0.05 : 0 }}
-              className={`max-w-[85%] border px-3 py-2.5 ${
+              className={`max-w-[85%] rounded-2xl border px-3.5 py-2.5 ${
                 isMine
-                  ? "self-end border-[var(--sky)] bg-[var(--sky)]/10"
-                  : "self-start border-white/15 bg-white/5"
+                  ? "self-end rounded-tr-sm border-[var(--sky)]/40 bg-[var(--sky)]/10"
+                  : "self-start rounded-tl-sm border-white/10 bg-white/5"
               }`}
             >
               <div className="mb-1 flex items-center justify-between gap-4">

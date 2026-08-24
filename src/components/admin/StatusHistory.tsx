@@ -20,7 +20,7 @@ export function StatusHistory({ history }: { history: StatusChange[] }) {
       {ordered.map((entry, i) => (
         <li key={`${entry.status}-${entry.changedAt}`} className="flex items-start gap-3">
           <span
-            className={`mt-1.5 h-2 w-2 shrink-0 ${
+            className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
               i === 0 ? "bg-[var(--sky)]" : "bg-white/20"
             }`}
           />

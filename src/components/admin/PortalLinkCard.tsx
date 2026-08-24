@@ -31,7 +31,7 @@ export function PortalLinkCard({ token }: { token: string }) {
     <AdminCard className="flex flex-col items-start gap-4 p-5">
       <AdminLabel>Acceso del cliente</AdminLabel>
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-        <div className="border border-white bg-white p-2">
+        <div className="rounded-xl border border-white bg-white p-2">
           {origin && <QRCodeSVG value={url} size={128} />}
         </div>
         <div className="flex flex-col gap-2">

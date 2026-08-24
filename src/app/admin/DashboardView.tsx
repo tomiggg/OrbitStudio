@@ -11,6 +11,7 @@ import { useToast } from "@/components/admin/Toaster";
 import { jakarta } from "@/components/admin/fonts";
 import { PROJECT_STATUS_LABEL, type Project, type ProjectStatus } from "@/lib/admin/types";
 import {
+  AdminAvatar,
   AdminBadge,
   AdminButton,
   AdminCard,
@@ -61,7 +62,10 @@ export function DashboardView({ initialProjects }: { initialProjects: Project[] 
       <FadeIn>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className={`${jakarta.className} text-3xl tracking-tight text-white`}>
+            <h1
+              className={`${jakarta.className} text-3xl tracking-[-0.02em] text-white`}
+              style={{ textTransform: "none" }}
+            >
               Proyectos
             </h1>
             <p className="font-mono text-xs text-white/50">
@@ -106,10 +110,10 @@ export function DashboardView({ initialProjects }: { initialProjects: Project[] 
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`border px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest transition ${
+                className={`rounded-full border px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-widest transition ${
                   filter === f
                     ? "border-[var(--sky)] bg-[var(--sky)] text-[var(--ink)]"
-                    : "border-[var(--sky)]/30 text-[var(--sky)] hover:bg-[var(--sky)]/10"
+                    : "border-[var(--sky)]/25 text-[var(--sky)] hover:bg-[var(--sky)]/10"
                 }`}
               >
                 {f === "todos" ? "Todos" : PROJECT_STATUS_LABEL[f]}
@@ -131,21 +135,26 @@ export function DashboardView({ initialProjects }: { initialProjects: Project[] 
             href={`/admin/proyectos/${project.id}`}
             className="no-underline"
           >
-            <AdminCard className="flex h-full flex-col gap-3 p-4 transition hover:border-[var(--sky)]">
+            <AdminCard className="flex h-full flex-col gap-3 p-4 transition hover:border-[var(--sky)]/50">
               <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className={`flex items-center gap-2 truncate ${jakarta.className} text-lg tracking-tight text-white`}>
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="relative shrink-0">
+                    <AdminAvatar label={project.clientName} />
                     {hasUnreadForAdmin(project) && (
                       <span
-                        className="h-2 w-2 shrink-0 bg-[var(--sky)]"
+                        className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[var(--sky)] ring-2 ring-[var(--ink-2)]"
                         title="Actividad nueva del cliente"
                       />
                     )}
-                    <span className="truncate">{project.clientName}</span>
-                  </p>
-                  <p className="truncate text-sm text-white/60">
-                    {project.projectName}
-                  </p>
+                  </span>
+                  <div className="min-w-0">
+                    <p className={`truncate ${jakarta.className} normal-case text-lg tracking-tight text-white`}>
+                      {project.clientName}
+                    </p>
+                    <p className="truncate text-sm text-white/60">
+                      {project.projectName}
+                    </p>
+                  </div>
                 </div>
                 <AdminBadge>{PROJECT_STATUS_LABEL[project.status]}</AdminBadge>
               </div>

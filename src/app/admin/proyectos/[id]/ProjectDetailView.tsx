@@ -23,6 +23,7 @@ import { FadeIn } from "@/components/admin/FadeIn";
 import { useToast } from "@/components/admin/Toaster";
 import { jakarta } from "@/components/admin/fonts";
 import {
+  AdminAvatar,
   AdminButton,
   AdminCard,
   AdminLabel,
@@ -126,10 +127,18 @@ export function ProjectDetailView({
             >
               ← Todos los proyectos
             </Link>
-            <h1 className={`mt-2 ${jakarta.className} text-3xl tracking-tight text-white`}>
-              {project.clientName}
-            </h1>
-            <p className="text-sm text-white/60">{project.projectName}</p>
+            <div className="mt-2 flex items-center gap-3">
+              <AdminAvatar label={project.clientName} size={40} />
+              <div>
+                <h1
+                  className={`${jakarta.className} text-3xl tracking-[-0.02em] text-white`}
+                  style={{ textTransform: "none" }}
+                >
+                  {project.clientName}
+                </h1>
+                <p className="text-sm text-white/60">{project.projectName}</p>
+              </div>
+            </div>
           </div>
           <AdminButton variant="danger" onClick={() => setConfirmDelete(true)}>
             Eliminar proyecto

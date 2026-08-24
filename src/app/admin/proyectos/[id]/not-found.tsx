@@ -8,7 +8,10 @@ export default function AdminProjectNotFound() {
       <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--sky)]">
         404
       </p>
-      <h1 className={`${jakarta.className} text-3xl tracking-tight text-white`}>
+      <h1
+        className={`${jakarta.className} text-3xl tracking-[-0.02em] text-white`}
+        style={{ textTransform: "none" }}
+      >
         Proyecto no encontrado
       </h1>
       <p className="max-w-md text-sm text-white/60">

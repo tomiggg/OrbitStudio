@@ -126,8 +126,8 @@ export function FileUploadPanel({
           setDragging(false);
           handleFiles(e.dataTransfer.files);
         }}
-        className={`flex flex-col items-center justify-center gap-2 border border-dashed px-4 py-6 text-center transition-colors duration-200 ${
-          dragging ? "border-[var(--sky)] bg-[var(--sky)]/10" : "border-[var(--sky)]/40"
+        className={`flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-4 py-6 text-center transition-colors duration-200 ${
+          dragging ? "border-[var(--sky)] bg-[var(--sky)]/10" : "border-[var(--sky)]/30"
         }`}
       >
         <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--sky)]/70">
@@ -149,9 +149,9 @@ export function FileUploadPanel({
           onChange={(e) => handleFiles(e.target.files)}
         />
         {uploading && (
-          <div className="mt-1 h-[2px] w-full max-w-[200px] bg-white/10">
+          <div className="mt-1 h-[3px] w-full max-w-[200px] overflow-hidden rounded-full bg-white/10">
             <motion.div
-              className="h-full bg-[var(--sky)]"
+              className="h-full rounded-full bg-[var(--sky)]"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.2, ease: EASE }}
@@ -162,16 +162,16 @@ export function FileUploadPanel({
       {error && <p className="font-mono text-[10px] text-[#c2453a]">{error}</p>}
       <ul className="flex flex-col gap-2">
         {files.length === 0 && (
-          <li className="border border-dashed border-white/10 px-3 py-4 text-center font-mono text-[10px] uppercase tracking-widest text-white/30">
+          <li className="rounded-xl border border-dashed border-white/10 px-3 py-4 text-center font-mono text-[10px] uppercase tracking-widest text-white/30">
             Sin archivos adjuntos todavía
           </li>
         )}
         {files.map((file) => (
           <li
             key={file.id}
-            className="flex items-center gap-3 border border-white/10 px-3 py-2"
+            className="flex items-center gap-3 rounded-xl border border-white/10 px-3 py-2"
           >
-            <span className="shrink-0 border border-[var(--sky)]/40 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-widest text-[var(--sky)]">
+            <span className="shrink-0 rounded-full border border-[var(--sky)]/40 px-2 py-0.5 font-mono text-[8px] uppercase tracking-widest text-[var(--sky)]">
               {fileKind(file.name)}
             </span>
             <a

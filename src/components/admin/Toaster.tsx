@@ -39,7 +39,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.96 }}
               transition={{ duration: 0.25, ease: EASE }}
-              className={`pointer-events-auto max-w-xs border px-4 py-3 font-mono text-[11px] uppercase tracking-widest ${KIND_STYLES[t.kind]}`}
+              className={`pointer-events-auto max-w-xs rounded-xl border px-4 py-3 font-mono text-[11px] uppercase tracking-widest ${KIND_STYLES[t.kind]}`}
             >
               {t.message}
             </motion.div>
