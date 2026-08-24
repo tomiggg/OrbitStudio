@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useProjects } from "@/lib/admin/useProjects";
 import { createProjectApi } from "@/lib/admin/apiClient";
+import { hasUnreadForAdmin } from "@/lib/admin/activity";
 import { PROJECT_STATUS_LABEL, type Project, type ProjectStatus } from "@/lib/admin/types";
 import {
   AdminBadge,
@@ -48,6 +49,8 @@ export function DashboardView({ initialProjects }: { initialProjects: Project[] 
     })
     .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
 
+  const unreadCount = (projects ?? []).filter(hasUnreadForAdmin).length;
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -57,7 +60,11 @@ export function DashboardView({ initialProjects }: { initialProjects: Project[] 
           </h1>
           <p className="font-mono text-xs text-white/50">
             {projects
-              ? `${projects.length} proyecto${projects.length === 1 ? "" : "s"} en total`
+              ? `${projects.length} proyecto${projects.length === 1 ? "" : "s"} en total${
+                  unreadCount > 0
+                    ? ` · ${unreadCount} con actividad nueva del cliente`
+                    : ""
+                }`
               : "Cargando..."}
           </p>
         </div>
@@ -116,8 +123,14 @@ export function DashboardView({ initialProjects }: { initialProjects: Project[] 
             <AdminCard className="flex h-full flex-col gap-3 p-4 transition hover:border-[var(--teal)]">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="truncate font-[family-name:var(--font-title)] text-lg uppercase tracking-tight text-white">
-                    {project.clientName}
+                  <p className="flex items-center gap-2 truncate font-[family-name:var(--font-title)] text-lg uppercase tracking-tight text-white">
+                    {hasUnreadForAdmin(project) && (
+                      <span
+                        className="h-2 w-2 shrink-0 bg-[var(--teal)]"
+                        title="Actividad nueva del cliente"
+                      />
+                    )}
+                    <span className="truncate">{project.clientName}</span>
                   </p>
                   <p className="truncate text-sm text-white/60">
                     {project.projectName}

@@ -97,3 +97,11 @@ export function uploadClientFileApi(token: string, file: File): Promise<ProjectF
 export function fileDownloadUrl(projectId: string, fileId: string): string {
   return `/api/files/${projectId}/${fileId}`;
 }
+
+export function markSeenByAdminApi(id: string): Promise<{ ok: true }> {
+  return request(`/api/admin/projects/${id}/seen`, { method: "POST" });
+}
+
+export function markSeenByClientApi(token: string): Promise<{ ok: true }> {
+  return request(`/api/portal/projects/${token}/seen`, { method: "POST" });
+}

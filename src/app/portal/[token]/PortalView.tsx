@@ -1,10 +1,18 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import { useProjectByToken } from "@/lib/admin/useProjects";
-import { addClientCommentApi, fileDownloadUrl, uploadClientFileApi } from "@/lib/admin/apiClient";
+import {
+  addClientCommentApi,
+  fileDownloadUrl,
+  markSeenByClientApi,
+  uploadClientFileApi,
+} from "@/lib/admin/apiClient";
+import { hasUnreadForClient } from "@/lib/admin/activity";
 import type { PublicProject } from "@/lib/admin/types";
 import { StatusStepper } from "@/components/admin/StatusStepper";
+import { StatusHistory } from "@/components/admin/StatusHistory";
 import { CommentThread } from "@/components/admin/CommentThread";
 import { FileUploadPanel } from "@/components/admin/FileUploadPanel";
 import { AdminCard, AdminLabel } from "@/components/admin/ui/AdminPrimitives";
@@ -18,6 +26,15 @@ export function PortalView({
   initialProject: PublicProject;
 }) {
   const { data: project, notFound: isNotFound, refresh } = useProjectByToken(token, initialProject);
+  // Se calcula una sola vez a partir del snapshot inicial (antes de marcar
+  // como visto) — si se recalculara con datos ya refrescados, el banner
+  // desaparecería solo porque markSeenByClientApi ya actualizó lastSeen.
+  const [hadNews] = useState(() => hasUnreadForClient(initialProject));
+  const [dismissedNews, setDismissedNews] = useState(false);
+
+  useEffect(() => {
+    markSeenByClientApi(token).catch(() => {});
+  }, [token]);
 
   if (isNotFound) {
     notFound();
@@ -52,10 +69,31 @@ export function PortalView({
           </h1>
         </div>
 
+        {hadNews && !dismissedNews && (
+          <div className="flex items-center justify-between gap-3 border border-[var(--teal)] bg-[var(--teal)]/10 px-4 py-3">
+            <p className="font-mono text-[11px] uppercase tracking-widest text-[var(--teal)]">
+              Hay novedades desde tu última visita
+            </p>
+            <button
+              onClick={() => setDismissedNews(true)}
+              className="font-mono text-[10px] uppercase tracking-widest text-white/50 hover:text-white"
+            >
+              Cerrar
+            </button>
+          </div>
+        )}
+
         <AdminCard className="p-5">
           <AdminLabel>Estado actual</AdminLabel>
           <div className="mt-4">
             <StatusStepper status={project.status} />
+          </div>
+        </AdminCard>
+
+        <AdminCard className="p-5">
+          <AdminLabel>Historial de estado</AdminLabel>
+          <div className="mt-4">
+            <StatusHistory history={project.statusHistory} />
           </div>
         </AdminCard>
 

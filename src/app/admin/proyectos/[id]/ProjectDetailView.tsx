@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useProject } from "@/lib/admin/useProjects";
@@ -8,12 +8,14 @@ import {
   addAdminCommentApi,
   deleteProjectApi,
   fileDownloadUrl,
+  markSeenByAdminApi,
   updateNotesApi,
   updateStatusApi,
   uploadAdminFileApi,
 } from "@/lib/admin/apiClient";
 import type { Project, ProjectStatus } from "@/lib/admin/types";
 import { StatusStepper } from "@/components/admin/StatusStepper";
+import { StatusHistory } from "@/components/admin/StatusHistory";
 import { CommentThread } from "@/components/admin/CommentThread";
 import { FileUploadPanel } from "@/components/admin/FileUploadPanel";
 import { PortalLinkCard } from "@/components/admin/PortalLinkCard";
@@ -36,6 +38,10 @@ export function ProjectDetailView({
   const [notes, setNotes] = useState<string | null>(null);
   const [savingNotes, setSavingNotes] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    markSeenByAdminApi(id).catch(() => {});
+  }, [id]);
 
   if (isNotFound) {
     notFound();
@@ -93,12 +99,21 @@ export function ProjectDetailView({
         </AdminButton>
       </div>
 
-      <AdminCard className="p-5">
-        <AdminLabel>Estado del proyecto</AdminLabel>
-        <div className="mt-4">
-          <StatusStepper status={project.status} onChange={handleStatusChange} />
-        </div>
-      </AdminCard>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <AdminCard className="p-5">
+          <AdminLabel>Estado del proyecto</AdminLabel>
+          <div className="mt-4">
+            <StatusStepper status={project.status} onChange={handleStatusChange} />
+          </div>
+        </AdminCard>
+
+        <AdminCard className="p-5">
+          <AdminLabel>Historial de estado</AdminLabel>
+          <div className="mt-4">
+            <StatusHistory history={project.statusHistory} />
+          </div>
+        </AdminCard>
+      </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <PortalLinkCard token={project.token} />
