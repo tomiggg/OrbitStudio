@@ -6,6 +6,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { SERVICES } from "@/lib/services";
+import { track, ANALYTICS_EVENTS } from "@/lib/analytics/track";
 
 const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 const plusJakartaBody = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "400" });
@@ -46,6 +47,14 @@ type ServicesProps = { onOpenContact?: (serviceTitle?: string) => void };
 
 export function Services({ onOpenContact: _ }: ServicesProps = {}) {
   const [active, setActive] = useState(0);
+
+  function handleToggle(i: number, isActive: boolean) {
+    const next = isActive ? -1 : i;
+    setActive(next);
+    if (next !== -1) {
+      track(ANALYTICS_EVENTS.serviceExpand, { service: SERVICES[i].id });
+    }
+  }
 
   return (
     <section id="services" className="relative py-8 md:py-12" style={{ background: "#f0f0ee" }}>
@@ -96,8 +105,8 @@ export function Services({ onOpenContact: _ }: ServicesProps = {}) {
                     role="button"
                     tabIndex={0}
                     onMouseEnter={() => setActive(i)}
-                    onClick={() => setActive(isActive ? -1 : i)}
-                    onKeyDown={(e) => e.key === "Enter" && setActive(isActive ? -1 : i)}
+                    onClick={() => handleToggle(i, isActive)}
+                    onKeyDown={(e) => e.key === "Enter" && handleToggle(i, isActive)}
                     style={{
                       display: "flex",
                       alignItems: "center",

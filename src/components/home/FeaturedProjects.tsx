@@ -6,6 +6,7 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { SmokeCanvas } from "@/components/ui/SmokeCanvas";
+import { track, ANALYTICS_EVENTS } from "@/lib/analytics/track";
 
 const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 const plusJakartaBody = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "400" });
@@ -127,7 +128,12 @@ export function FeaturedProjects() {
               return (
                 <div
                   key={p.id}
-                  onClick={() => setActiveIndex(i)}
+                  onClick={() => {
+                    setActiveIndex(i);
+                    if (i !== activeIndex) {
+                      track(ANALYTICS_EVENTS.projectExpand, { project: p.id });
+                    }
+                  }}
                   className="rounded-[24px] overflow-hidden relative"
                   style={{
                     background: p.bg,
@@ -317,7 +323,10 @@ export function FeaturedProjects() {
                                   href={p.href}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    track(ANALYTICS_EVENTS.projectLinkClick, { project: p.id });
+                                  }}
                                   className={`${jetBrainsMono.className} inline-flex items-center gap-2 no-underline`}
                                   style={{
                                     fontSize: 10,

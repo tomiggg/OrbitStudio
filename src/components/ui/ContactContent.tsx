@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import { track, ANALYTICS_EVENTS } from "@/lib/analytics/track";
 
 const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 const plusJakartaBody = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "400" });
@@ -65,6 +66,12 @@ export function ContactContent({ value, onChange, onClose: _onClose, onSend, onS
   const [sendMethod, setSendMethod] = useState<SendMethod>("whatsapp");
 
   function handleSend() {
+    track(ANALYTICS_EVENTS.contactSubmit, {
+      method: sendMethod,
+      service: value.service || undefined,
+      timeline: value.timeline,
+      budget: value.budget,
+    });
     if (sendMethod === "email") onSendEmail(); else onSend();
   }
 

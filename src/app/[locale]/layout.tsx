@@ -6,6 +6,7 @@ import { isLocale } from "@/i18n/routing";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ContactProvider } from "@/components/contact/ContactProvider";
+import { PageViewTracker } from "@/components/analytics/PageViewTracker";
 
 export default async function LocaleLayout({
   children,
@@ -22,6 +23,7 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <ContactProvider>
+        <PageViewTracker />
         <Header />
         {children}
         <Footer />
