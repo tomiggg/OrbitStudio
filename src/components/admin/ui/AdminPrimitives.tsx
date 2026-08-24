@@ -82,3 +82,7 @@ export function AdminBadge({ children }: { children: ReactNode }) {
     </span>
   );
 }
+
+export function AdminSkeleton({ className = "" }: { className?: string }) {
+  return <div className={`animate-pulse bg-white/10 ${className}`} />;
+}

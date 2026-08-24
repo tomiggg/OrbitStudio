@@ -1,7 +1,6 @@
 import type {
   Project,
   ProjectComment,
-  ProjectFile,
   ProjectStatus,
   PublicProject,
 } from "./types";
@@ -80,18 +79,6 @@ export function addClientCommentApi(token: string, body: string): Promise<Projec
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ body }),
   });
-}
-
-export function uploadAdminFileApi(id: string, file: File): Promise<ProjectFile> {
-  const form = new FormData();
-  form.append("file", file);
-  return request(`/api/admin/projects/${id}/files`, { method: "POST", body: form });
-}
-
-export function uploadClientFileApi(token: string, file: File): Promise<ProjectFile> {
-  const form = new FormData();
-  form.append("file", file);
-  return request(`/api/portal/projects/${token}/files`, { method: "POST", body: form });
 }
 
 export function fileDownloadUrl(projectId: string, fileId: string): string {

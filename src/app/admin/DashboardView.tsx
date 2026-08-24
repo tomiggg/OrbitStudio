@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useProjects } from "@/lib/admin/useProjects";
 import { createProjectApi } from "@/lib/admin/apiClient";
 import { hasUnreadForAdmin } from "@/lib/admin/activity";
+import { ClientDate } from "@/components/admin/ClientDate";
 import { PROJECT_STATUS_LABEL, type Project, type ProjectStatus } from "@/lib/admin/types";
 import {
   AdminBadge,
@@ -141,7 +142,7 @@ export function DashboardView({ initialProjects }: { initialProjects: Project[] 
               <div className="mt-auto flex items-center justify-between border-t border-white/10 pt-3">
                 <AdminLabel>{project.comments.length} comentarios</AdminLabel>
                 <span className="font-mono text-[10px] text-white/40">
-                  Act. {formatDate(project.updatedAt)}
+                  Act. <ClientDate iso={project.updatedAt} format={formatDate} />
                 </span>
               </div>
             </AdminCard>

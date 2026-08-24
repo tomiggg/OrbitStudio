@@ -1,5 +1,6 @@
 import { PROJECT_STATUS_LABEL } from "@/lib/admin/types";
 import type { StatusChange } from "@/lib/admin/types";
+import { ClientDate } from "@/components/admin/ClientDate";
 
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString("es-AR", {
@@ -31,9 +32,11 @@ export function StatusHistory({ history }: { history: StatusChange[] }) {
             >
               {PROJECT_STATUS_LABEL[entry.status]}
             </span>
-            <span className="font-mono text-[9px] text-white/30">
-              {formatDateTime(entry.changedAt)}
-            </span>
+            <ClientDate
+              iso={entry.changedAt}
+              format={formatDateTime}
+              className="font-mono text-[9px] text-white/30"
+            />
           </div>
         </li>
       ))}

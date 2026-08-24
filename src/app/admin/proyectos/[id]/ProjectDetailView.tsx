@@ -11,7 +11,6 @@ import {
   markSeenByAdminApi,
   updateNotesApi,
   updateStatusApi,
-  uploadAdminFileApi,
 } from "@/lib/admin/apiClient";
 import type { Project, ProjectStatus } from "@/lib/admin/types";
 import { StatusStepper } from "@/components/admin/StatusStepper";
@@ -153,10 +152,8 @@ export function ProjectDetailView({
           <div className="mt-4">
             <FileUploadPanel
               files={project.files}
-              onUpload={async (file) => {
-                await uploadAdminFileApi(project!.id, file);
-                refresh();
-              }}
+              uploadUrl={`/api/admin/projects/${project.id}/files`}
+              onUploaded={refresh}
               getDownloadUrl={(fileId) => fileDownloadUrl(project!.id, fileId)}
             />
           </div>
