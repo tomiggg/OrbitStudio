@@ -24,17 +24,26 @@ La versión anterior de este documento describía una implementación 100%
 por completo. Resumen de lo que cambió, fase por fase (ver el historial de
 git para el detalle de cada commit):
 
-### 1. Capa de datos server-side (ya no localStorage)
+### 1. Capa de datos server-side — ahora Supabase (Postgres + Storage)
 
-- `src/lib/admin/repository.ts`: interfaz `ProjectsRepository` — este es el
-  **único punto de swap** para conectar un backend real (ver más abajo).
-- `src/lib/admin/repository.fileStore.ts`: implementación actual. Persiste
-  en `data/projects.json` + `data/uploads/<projectId>/<archivo>` (carpeta
-  `data/` gitignorada). Cada operación relee el archivo del disco — no hay
-  caché en memoria entre requests, a propósito: con Turbopack cada route
-  handler puede terminar en una instancia de módulo distinta, y un caché
-  in-process llevó a un bug real de inconsistencia entre `/admin` y
-  `/portal` durante el desarrollo.
+- `src/lib/admin/repository.ts`: interfaz `ProjectsRepository` — este sigue
+  siendo el **único punto de swap** para conectar un backend real.
+- `src/lib/admin/repository.supabase.ts`: implementación actual, sobre el
+  proyecto Supabase `tkbgblbxgoqawxtgsgrl`. Tablas `projects`,
+  `status_history`, `project_comments`, `project_files` (RLS habilitada,
+  **sin policies a propósito**: default-deny para `anon`/`authenticated`,
+  porque la autorización real la hacen los route handlers de Next, no la
+  base — ver comentario al inicio del archivo). Los archivos van al bucket
+  privado `project-files` de Supabase Storage. Requiere `SUPABASE_URL` y
+  `SUPABASE_SERVICE_ROLE_KEY` (o el `secret` key del nuevo sistema de API
+  keys de Supabase, que es su reemplazo) en el entorno — ver
+  `.env.example`. Sin esas variables, cualquier operación tira error al
+  primer intento de tocar la base.
+- `src/lib/admin/repository.fileStore.ts`: implementación anterior (mock en
+  disco, `data/projects.json` + `data/uploads/**`). Se dejó en el repo como
+  referencia de contrato (mismo patrón que documentaba este archivo antes
+  del swap) pero **ya no está conectada** — `getRepository()` no la
+  importa.
 - Expuesto vía Route Handlers: `src/app/api/admin/**` (protegidos por
   sesión) y `src/app/api/portal/**` (públicos, gateados por el token del
   proyecto) + `src/app/api/files/[projectId]/[fileId]` para descargar.
@@ -47,27 +56,24 @@ git para el detalle de cada commit):
   (`DashboardView`, `ProjectDetailView`, `PortalView`) para la parte
   interactiva — así no hay flash de "Cargando..." en la carga inicial.
 
-**Limitación conocida:** `data/` es un archivo/carpeta en el filesystem del
-proceso Node. Funciona de verdad en dev y en cualquier hosting con
-filesystem persistente (self-host, VPS, contenedor con volumen). **No
-persiste en hosting serverless sin volumen** (ej. Vercel por defecto: cada
-invocación puede correr en una instancia distinta con filesystem efímero).
-Para producción real hace falta el swap descrito abajo.
+Verificado end-to-end contra la base real (no solo build/lint): login,
+crear proyecto, comentario de admin y de cliente (vía `/api/portal`),
+cambio de estado con historial, subir archivo (Storage) y descargarlo
+byte-a-byte, proyección pública del portal (sin `notes` ni `storedName`),
+y `deleteProject` — confirmado que cascadea comentarios/archivos/historial
+en Postgres y borra el objeto del bucket.
 
-#### Cómo swapear a una base de datos real
+Si en algún momento hace falta swapear a otro backend, el patrón sigue
+siendo el mismo:
 
 1. Crear `src/lib/admin/repository.<tuBackend>.ts` que implemente
-   `ProjectsRepository` (mismo contrato que `repository.fileStore.ts` —
-   usalo como referencia de qué tiene que hacer cada método).
+   `ProjectsRepository` (usar `repository.supabase.ts` o
+   `repository.fileStore.ts` como referencia de qué tiene que hacer cada
+   método).
 2. En `src/lib/admin/repository.ts`, cambiar el `import` y el `return` de
    `getRepository()` para que apunte a la nueva implementación.
 3. Nada más cambia — Route Handlers, hooks, componentes y páginas ya están
-   escritos contra la interfaz, no contra `fileStore` directamente.
-
-Para archivos adjuntos, lo mismo aplica: hoy `addFile`/`getFileBuffer`
-escriben/leen del disco; una implementación real (S3, Supabase Storage)
-implementaría esos métodos guardando el blob ahí y devolviendo/leyendo por
-esa vía en vez de `node:fs`.
+   escritos contra la interfaz, no contra una implementación concreta.
 
 ### 2. Autenticación real del admin
 
@@ -148,12 +154,16 @@ npm install   # si hace falta (ver nota de node_modules abajo)
 npm run dev
 ```
 
+- Necesita `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` en `.env.local`
+  (ver `.env.example`) — sin eso, cualquier request que toque proyectos
+  tira error. Sacar la key del dashboard de Supabase del proyecto
+  `tkbgblbxgoqawxtgsgrl` (Settings → API Keys → Secret keys).
 - Admin: `http://localhost:3000/admin` → pide login. Password por defecto
   (si no seteaste `ADMIN_PASSWORD`): `shiftstudio2026`. Nombre: cualquiera.
-- Portal (3 proyectos semilla): `/portal/pb-inmobiliaria`,
-  `/portal/tu-utn`, `/portal/kioscos-del-sur`.
-- Los datos viven en `data/` (gitignorado) — borrar esa carpeta reinicia
-  todo a la semilla original.
+- Portal: no hay proyectos semilla — la base arranca vacía, hay que crear
+  un proyecto desde `/admin` para conseguir su token/link de portal.
+- Los datos viven en Supabase (Postgres + Storage), no en el filesystem
+  local — `data/` y su nota de gitignore quedaron obsoletas.
 
 **Nota de `node_modules`:** este repo guarda las dependencias en
 `node_modules.nosync/` con un symlink `node_modules → node_modules.nosync`
@@ -166,18 +176,17 @@ rm -rf node_modules.nosync && mv node_modules node_modules.nosync && ln -sf node
 
 ## Limitaciones conocidas / próximos pasos
 
-1. **Backend real para producción.** Es el único punto verdaderamente
-   pendiente para un deploy serverless — seguir la receta de swap de
-   arriba. El resto (auth, historial, notificaciones in-app, UI) ya está
-   resuelto sobre la interfaz correcta.
+1. ~~Backend real para producción.~~ Resuelto: `repository.supabase.ts`
+   sobre Postgres + Storage, ver arriba.
 2. **Notificaciones externas** (email/WhatsApp). Hoy "actividad nueva" solo
    se ve si alguien entra al panel/portal — no hay push ni email cuando el
    cliente comenta o el admin cambia el estado.
 3. **Multi-admin con permisos.** Cualquiera con la contraseña compartida
    entra como "admin" con nombre libre — no hay usuarios individuales con
    credenciales propias ni roles.
-4. **Archivos grandes / storage real.** 20MB por archivo, servidos desde
-   disco local — con el swap de backend, este es también el lugar para
-   mover a S3/Supabase Storage.
+4. **Deploy:** falta configurar `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`
+   (y `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET`) como env vars en el hosting
+   real (ej. Vercel) — hoy solo existen en `.env.local`, que no se
+   commitea.
 5. Considerar mover `/admin` y `/portal` a un subdominio o detrás de un
    flag para no mezclar analytics/SEO con el sitio de marketing.

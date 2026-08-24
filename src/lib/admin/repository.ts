@@ -1,4 +1,4 @@
-import { fileStoreRepository } from "./repository.fileStore";
+import { supabaseRepository } from "./repository.supabase";
 import type {
   AuthorRole,
   Project,
@@ -68,7 +68,8 @@ export function toPublicProject(project: Project): PublicProject {
 // Único punto de swap para conectar un backend real (Postgres/Supabase/etc):
 // implementar ProjectsRepository en un archivo nuevo (ver
 // repository.fileStore.ts como referencia de contrato) y devolver esa
-// instancia acá en vez de fileStoreRepository. El resto de la app no cambia.
+// instancia acá. Backend actual: Supabase (Postgres + Storage), ver
+// repository.supabase.ts.
 export function getRepository(): ProjectsRepository {
-  return fileStoreRepository;
+  return supabaseRepository;
 }
