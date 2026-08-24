@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import type {
   AuthorRole,
   Project,
@@ -108,21 +108,7 @@ function toProject(row: ProjectRow): Project {
   };
 }
 
-let client: SupabaseClient | undefined;
-function getClient(): SupabaseClient {
-  if (client) return client;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
-    throw new Error(
-      "Faltan SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY. Ver .env.example."
-    );
-  }
-  client = createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  return client;
-}
+const getClient = getSupabaseAdminClient;
 
 function nowIso() {
   return new Date().toISOString();

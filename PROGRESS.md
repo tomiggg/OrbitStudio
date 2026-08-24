@@ -12,10 +12,12 @@ con dos caras:
    ve el estado y el historial de su proyecto, comenta y sube/descarga
    archivos. Nunca ve las notas internas del admin.
 
-Diseño "Urban Engineering Core": border-radius 0 en todo, Anton para
-títulos, teal `#0ABAB5` sobre fondo `#072B2A`, monospace (JetBrains Mono)
-para labels/metadatos/estados. Reutiliza las fuentes ya cargadas
-globalmente (`--font-title`, `--font-body`) en `src/app/layout.tsx`.
+Diseño: Brand Kit v1 (el mismo del home) — ink/paper/cream, celeste
+`--sky` como acento, Plus Jakarta Sans para titulares y cuerpo
+(`src/components/admin/fonts.ts`), esquinas redondeadas, monospace
+reservado para labels/tags chicos. Ver `CLAUDE.md` para el detalle
+completo del sistema — no usa `--font-title`/`--font-body` del layout
+raíz (esos son del sitio de marketing, un sistema tipográfico distinto).
 
 ## Estado actual (sesión 2026-08-24)
 
@@ -174,6 +176,56 @@ una carpeta real, restaurá la convención:
 rm -rf node_modules.nosync && mv node_modules node_modules.nosync && ln -sf node_modules.nosync node_modules
 ```
 
+## Analítica propia del sitio de marketing (sesión 2026-08-24, cont.)
+
+A pedido explícito: nada de Google Analytics ni terceros — analítica
+100% propia, guardada en la misma Supabase, consultable desde
+`/admin/metricas`.
+
+- **Tabla:** `analytics_events` en Supabase (misma base que el panel).
+  RLS habilitada sin policies — mismo modelo de confianza que el resto
+  (ver `repository.supabase.ts`): la escritura/lectura pasa por
+  `getSupabaseAdminClient()` (`src/lib/supabaseAdmin.ts`, factorizado y
+  compartido con el repositorio del panel), nunca por una key expuesta al
+  cliente.
+- **Qué se guarda:** `session_id` (uuid anónimo en `localStorage`, sin
+  cruce con nada — no es PII), tipo de evento, path, referrer, UTMs,
+  país/ciudad (de headers `x-vercel-ip-country`/`x-vercel-ip-city` de
+  Vercel — **no pega a ningún servicio externo de geo-IP ni guarda la
+  IP**; en local/hosting no-Vercel esos campos quedan `null`),
+  dispositivo/navegador/SO (parseados del User-Agent con un parser propio
+  chico, sin dependencia nueva), y `metadata` jsonb por evento. Respeta
+  `navigator.doNotTrack`. Filtra bots por User-Agent antes de insertar.
+- **Eventos instrumentados** (sin tocar la lógica de los componentes,
+  solo se agregó una llamada a `track()` en cada punto de interacción ya
+  existente): `pageview` (por cambio de ruta, `PageViewTracker` montado en
+  `src/app/[locale]/layout.tsx`), `contact_open` (con `source`: `header`,
+  `services` o `final_cta`), `contact_submit` (método elegido, servicio,
+  timeline, presupuesto — centralizado en `ContactContent.handleSend`,
+  el único punto de envío real que comparten los dos flujos de contacto
+  del sitio), `service_expand`, `project_expand`, `project_link_click`.
+- **Endpoint:** `POST /api/track` (`runtime = "nodejs"`, corre fuera del
+  gate de `/admin` y del middleware de i18n — ver `src/middleware.ts`).
+  Nunca tira error visible al visitante: cualquier fallo devuelve 204
+  igual. Trunca/valida cada campo, allowlist de `event_type` en código
+  (no constraint de DB, para poder sumar eventos nuevos sin migración).
+- **Dashboard:** `/admin/metricas` (Server Component, mismo gate de
+  sesión que el resto de `/admin`). Agrega en JS sobre las filas del
+  rango elegido (7/30/90 días, límite de 20k filas) — no hay vistas ni
+  funciones SQL, no hace falta con el volumen de tráfico esperado. KPIs
+  (visitantes únicos, vistas, contactos iniciados/enviados, conversión),
+  un gráfico de tendencia de dos series (vistas + visitantes, un solo eje,
+  con crosshair y tooltip) y listas de barras (páginas, referrers, UTM
+  source, país, dispositivo, navegador, servicios/proyectos más
+  explorados) — construido siguiendo la skill de dataviz del repo:
+  un solo hue de acento (`--sky`) para magnitud, gris de-emphasis para la
+  serie secundaria, nada de paleta categórica porque ninguna vista la
+  necesita.
+- Verificado end-to-end: eventos reales generados desde Chrome llegan a
+  Supabase con los campos correctos (UTM, device/browser/OS, metadata) y
+  el dashboard los agrega bien: KPIs, gráfico con hover, y los 8 paneles
+  de barras. Datos de prueba borrados de la tabla antes de terminar.
+
 ## Limitaciones conocidas / próximos pasos
 
 1. ~~Backend real para producción.~~ Resuelto: `repository.supabase.ts`
@@ -190,3 +242,7 @@ rm -rf node_modules.nosync && mv node_modules node_modules.nosync && ln -sf node
    commitea.
 5. Considerar mover `/admin` y `/portal` a un subdominio o detrás de un
    flag para no mezclar analytics/SEO con el sitio de marketing.
+6. **País/ciudad del visitante** en `analytics_events` solo se completa en
+   Vercel (lee sus headers `x-vercel-ip-*`). En otro hosting quedaría
+   siempre `null` — para eso habría que sumar geo-IP local (ej.
+   `geoip-lite`) en `src/app/api/track/route.ts`.

@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useMemo, useState } from "react";
 import { ContactOverlay } from "@/components/ui/ContactOverlay";
 import { ContactContent, ContactFormState } from "@/components/ui/ContactContent";
+import { track, ANALYTICS_EVENTS } from "@/lib/analytics/track";
 
 type ContactCtx = {
   openContact: () => void;
@@ -33,6 +34,7 @@ export function ContactProvider({ children }: { children: React.ReactNode }) {
 
   function openContact() {
     setOpen(true);
+    track(ANALYTICS_EVENTS.contactOpen, { source: "header" });
   }
 
   function closeContact() {

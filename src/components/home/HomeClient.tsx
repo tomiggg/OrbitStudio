@@ -8,6 +8,7 @@ import { FeaturedProjects } from "@/components/home/FeaturedProjects";
 import { Process } from "@/components/home/Process";
 import { FinalCta } from "@/components/home/FinalCta";
 import { ContactModal } from "@/components/ui/ContactModal";
+import { track, ANALYTICS_EVENTS } from "@/lib/analytics/track";
 
 export default function HomeClient() {
   const [open, setOpen] = useState(false);
@@ -16,6 +17,10 @@ export default function HomeClient() {
   function openContact(serviceTitle?: string) {
     setPresetService(serviceTitle ?? null);
     setOpen(true);
+    track(ANALYTICS_EVENTS.contactOpen, {
+      source: serviceTitle ? "services" : "final_cta",
+      service: serviceTitle,
+    });
   }
 
   function closeContact() {
