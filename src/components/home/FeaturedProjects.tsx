@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono, Cormorant_Garamond } from "next/font/google";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { SmokeCanvas } from "@/components/ui/SmokeCanvas";
@@ -11,6 +12,7 @@ import { track, ANALYTICS_EVENTS } from "@/lib/analytics/track";
 const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "800" });
 const plusJakartaBody = Plus_Jakarta_Sans({ subsets: ["latin"], weight: "400" });
 const jetBrainsMono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"] });
+const cormorant = Cormorant_Garamond({ subsets: ["latin"], weight: ["500", "600"] });
 
 const ink = "#0d0d0d";
 const mute = "#7a7a7a";
@@ -18,26 +20,9 @@ const sky = "#9EC7D4";
 const paper = "#FAFCFC";
 const ease = [0.22, 1, 0.36, 1] as const;
 
+type Monogram = { letter: string; bg: string; color: string; border?: string };
+
 const PROJECTS_DATA = [
-  {
-    id: "proyecto-03",
-    name: "Próximamente",
-    tag: "EN CAMINO",
-    title: "",
-    desc: "",
-    href: "#",
-    bg: "#e8e8e3",
-    tc: ink,
-    iconBg: "#d4d4ce",
-    iconColor: "#a0a09a",
-    btnBg: "#d4d4ce",
-    btnColor: "#a0a09a",
-    linkBg: ink,
-    linkColor: "#e8e8e3",
-    icon: "?",
-    border: "none",
-    comingSoon: true,
-  },
   {
     id: "tu-utn",
     name: "Tu UTN",
@@ -54,6 +39,13 @@ const PROJECTS_DATA = [
     linkBg: ink,
     linkColor: paper,
     icon: "U",
+    logo: undefined as string | undefined,
+    monogram: {
+      letter: "U.",
+      bg: "#c7e0e6",
+      color: "#5fa3b8",
+      border: undefined,
+    } as Monogram | undefined,
     border: "1px solid #dcdcd6",
     comingSoon: false,
   },
@@ -73,7 +65,35 @@ const PROJECTS_DATA = [
     linkBg: sky,
     linkColor: ink,
     icon: "PB",
+    logo: "/logos/pb-inmobiliaria.jpg",
+    monogram: undefined as Monogram | undefined,
     border: "none",
+    comingSoon: false,
+  },
+  {
+    id: "kira",
+    name: "Kira",
+    tag: "SITIO WEB + CATÁLOGO",
+    title: "Fotos en Instagram → tienda propia.",
+    desc: "Catálogo de joyas de plata y accesorios con carrito de compra — el pedido se cierra directo por WhatsApp, sin fricción ni pasarelas de pago.",
+    href: "https://kira-ta66.vercel.app",
+    bg: paper,
+    tc: ink,
+    iconBg: ink,
+    iconColor: sky,
+    btnBg: ink,
+    btnColor: sky,
+    linkBg: ink,
+    linkColor: paper,
+    icon: "K",
+    logo: undefined as string | undefined,
+    monogram: {
+      letter: "K.",
+      bg: "#FFFCF1",
+      color: "#383230",
+      border: "1px solid #E4DED3",
+    } as Monogram | undefined,
+    border: "1px solid #dcdcd6",
     comingSoon: false,
   },
 ];
@@ -153,7 +173,7 @@ export function FeaturedProjects() {
                   >
                     <div className="flex items-center gap-4">
                       <div
-                        className={plusJakarta.className}
+                        className={p.monogram ? cormorant.className : plusJakarta.className}
                         style={{
                           width: 36,
                           height: 36,
@@ -161,14 +181,30 @@ export function FeaturedProjects() {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          fontSize: 13,
-                          fontWeight: 800,
+                          fontSize: p.monogram ? 16 : 13,
+                          fontWeight: p.monogram ? 600 : 800,
                           flexShrink: 0,
-                          background: p.iconBg,
-                          color: p.iconColor,
+                          background: p.logo ? "#fff" : p.monogram ? p.monogram.bg : p.iconBg,
+                          color: p.monogram ? p.monogram.color : p.iconColor,
+                          border: p.monogram?.border,
+                          boxSizing: "border-box",
+                          position: "relative",
+                          overflow: "hidden",
                         }}
                       >
-                        {p.icon}
+                        {p.logo ? (
+                          <Image
+                            src={p.logo}
+                            alt={`Logo de ${p.name}`}
+                            fill
+                            sizes="36px"
+                            style={{ objectFit: "cover" }}
+                          />
+                        ) : p.monogram ? (
+                          p.monogram.letter
+                        ) : (
+                          p.icon
+                        )}
                       </div>
                       <span
                         className={plusJakarta.className}
