@@ -76,7 +76,7 @@ const PROJECTS_DATA = [
     tag: "SITIO WEB + CATÁLOGO",
     title: "Fotos en Instagram → tienda propia.",
     desc: "Catálogo de joyas de plata y accesorios con carrito de compra — el pedido se cierra directo por WhatsApp, sin fricción ni pasarelas de pago.",
-    href: "https://kira-ta66.vercel.app",
+    href: "https://www.kira-jewels.com",
     bg: paper,
     tc: ink,
     iconBg: ink,
