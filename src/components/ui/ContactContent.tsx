@@ -124,7 +124,7 @@ export function ContactContent({ value, onChange, onClose: _onClose, onSend, onS
             value={value.service}
             onChange={(e) => onChange({ service: e.target.value })}
             className={plusJakartaBody.className}
-            placeholder="Web, branding, sistema a medida..."
+            placeholder="Web, identidad, sistema a medida..."
             style={inputStyle}
           />
         </FormRow>

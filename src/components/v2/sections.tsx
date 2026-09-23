@@ -39,7 +39,7 @@ function SecHead({ n, title, right }: { n: string; title: string; right: string 
 /* ───────────────────────── Manifiesto ───────────────────────── */
 
 const MANIFESTO =
-  "Somos un estudio de branding [0] y operaciones para pymes. Diseñamos la identidad de tu marca y construimos los sistemas [1] que la hacen funcionar. *Para que te veas como una empresa grande [2] y operes como una.*";
+  "Diseñamos sistemas de negocio: [0] identidad, operaciones y tecnología como una sola pieza. [1] *Para que te veas como una empresa grande [2] y operes como una.*";
 
 const MANIFESTO_TOKENS = (() => {
   let serif = false;
@@ -599,7 +599,7 @@ export function Marquee() {
       </VelocityRow>
       <VelocityRow base={2}>
         <span className="mq-set mq-small">
-          {["Branding", "Operaciones", "Pymes", "Córdoba, AR", "LATAM", "Est. 2026"].map((w, i) => (
+          {["Identidad", "Operaciones", "Pymes", "Córdoba, AR", "LATAM", "Est. 2026"].map((w, i) => (
             <span key={w} className="mq-it">
               <span className="mono">({String(i + 1).padStart(2, "0")})</span>
               <span>{w}</span>
@@ -711,7 +711,7 @@ export function Footer({ versionCHref }: { versionCHref: string }) {
         <div>
           <span className="mono">Estudio</span>
           <span>Shift Studio®</span>
-          <span className="mu">Branding + operaciones para pymes</span>
+          <span className="mu">Sistemas de negocio para pymes</span>
         </div>
         <div>
           <span className="mono">Navegación</span>

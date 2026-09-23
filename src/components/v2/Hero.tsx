@@ -138,7 +138,7 @@ export function Hero() {
             animate={{ opacity: ready ? 1 : 0 }}
             transition={{ duration: 1, delay: 0.7 }}
           >
-            Branding + operaciones
+            Identidad + sistemas
             <br />
             para pymes
           </motion.span>
@@ -183,17 +183,17 @@ export function Hero() {
         </motion.div>
 
         <motion.div className={`hero-stmt${stmtIn ? " on" : ""}`} style={{ opacity: stmtO, y: stmtY }}>
-          <span className="mono">(Shift Studio®) — Branding + Operaciones</span>
+          <span className="mono">(Shift Studio®) — Identidad + Sistemas</span>
           <MaskText
             as="p"
             className="hero-stmt-t"
-            text={"Diseñamos la identidad.\n*Construimos el sistema.*"}
+            text={"Tu negocio es un sistema.\n*Nosotros lo diseñamos.*"}
             animate={stmtIn}
             stagger={0.06}
           />
           <p className="hero-stmt-d">
-            Automatizamos <b>operaciones</b>, construimos <b>sistemas</b> y diseñamos la{" "}
-            <b>identidad</b> que te posiciona con <b>autoridad</b>.
+            <b>Identidad</b>, <b>operaciones</b> y <b>tecnología</b>, pensadas como{" "}
+            <b>una sola pieza</b> — no como servicios sueltos.
           </p>
           <Magnetic>
             <button className="btn" data-cur="Agendar" onClick={() => openContact()}>

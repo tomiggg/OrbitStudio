@@ -71,7 +71,7 @@ export function Loader() {
         >
           <div className="ld-top">
             <span className="mono">(Shift Studio®)</span>
-            <span className="mono hide-m">Branding + Operaciones</span>
+            <span className="mono hide-m">Identidad + Sistemas</span>
             <span className="mono hide-m">Córdoba, AR — 31°S 64°O</span>
             <span className="mono">Est. 2026</span>
           </div>

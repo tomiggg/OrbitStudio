@@ -118,7 +118,7 @@ html.v2-cur .v2 input,html.v2-cur .v2 textarea{cursor:text}
 .v2 .hero-stmt-d b{color:#ECEAE5;font-weight:500}
 
 /* ── manifiesto ── */
-.v2 .mf{position:relative;height:280vh}
+.v2 .mf{position:relative;height:230vh}
 .v2 .mf-st{position:sticky;top:0;height:100vh;height:100svh;display:flex;align-items:center;padding:0 var(--pad)}
 .v2 .mf-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;width:100%}
 .v2 .mf-side{display:flex;flex-direction:column;gap:8px;padding-top:.8em}
@@ -313,7 +313,7 @@ html.v2-cur .v2 input,html.v2-cur .v2 textarea{cursor:text}
   .v2 .hero-stmt-t{font-size:clamp(38px,10.5vw,64px)}
   .v2 .hero-stmt-d{font-size:15px}
 
-  .v2 .mf{height:230vh}
+  .v2 .mf{height:200vh}
   .v2 .mf-grid{grid-template-columns:1fr}
   .v2 .mf-side{flex-direction:row;justify-content:space-between;padding:0 0 14px;border-bottom:1px solid var(--ln);margin-bottom:10px}
   .v2 .mf-t{grid-column:1/-1;font-size:clamp(28px,7.8vw,46px)}
