@@ -5,7 +5,7 @@
   --bg:#0E0E0D;--bg2:#141413;--bg3:#1B1B19;--fg:#ECEAE5;--mu:#8C8A85;--mu2:#55544F;
   --ln:rgba(236,234,229,.12);--lnS:rgba(236,234,229,.24);--acc:#0ABAB5;
   --pad:clamp(20px,3.3vw,48px);--ease:cubic-bezier(.22,1,.36,1);
-  --sans:var(--font-geist),Geist,system-ui,sans-serif;
+  --sans:var(--font-geist-sans),Geist,system-ui,sans-serif;
   --serif:var(--font-serif),"Instrument Serif",Georgia,serif;
   --mono:var(--font-body),"JetBrains Mono",ui-monospace,monospace;
   background:var(--bg);color:var(--fg);font-family:var(--sans);

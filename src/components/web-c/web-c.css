@@ -233,5 +233,5 @@
 @media (max-width:560px){.wc .facts{grid-template-columns:1fr}.wc .facts>div{grid-template-columns:48px 1fr;column-gap:12px}.wc .facts>div>:not(.mono){grid-column:2}.wc .facts>div .mono{grid-row:1/span 2}}
 
 /* Overrides de integración con el resto de la app */
-.wc{--wc-sans:var(--font-geist),Geist,sans-serif;--wc-mono:var(--font-body),"JetBrains Mono",monospace;--gr:.07;min-height:100vh}
+.wc{--wc-sans:var(--font-geist-sans),Geist,sans-serif;--wc-mono:var(--font-body),"JetBrains Mono",monospace;--gr:.07;min-height:100vh}
 .wc h1,.wc h2,.wc h3,.wc h4{text-transform:none;font-family:inherit}
