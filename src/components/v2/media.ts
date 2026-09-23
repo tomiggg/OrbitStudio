@@ -41,7 +41,7 @@ type SetImages = {
 export const SETS: Record<ImageSet, SetImages> = {
   estudio: {
     services: [p(26), p(60), p(180)],
-    pills: [p(403), p(486), p(366)],
+    pills: [p(668), p(119), p(366)],
     slides: [p(0), p(445), p(20), p(36)],
   },
   arquitectura: {
