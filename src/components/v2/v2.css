@@ -93,8 +93,13 @@ html.v2-cur .v2 input,html.v2-cur .v2 textarea{cursor:text}
 /* ── hero ── */
 .v2 .hero{position:relative;height:270vh}
 .v2 .hero-st{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:var(--bg)}
-.v2 .hero-frame{position:absolute;inset:0;will-change:clip-path;background:#0A0A09}
-.v2 .hero-media{position:absolute;inset:0;will-change:transform}
+/* Ventana del hero: solo transform (ver Hero.tsx). El marco es --hr más grande
+   que el viewport por lado para que sus esquinas redondeadas queden afuera al
+   llegar a pantalla completa; el media lleva la contra-escala. */
+.v2 .hero-frame-in{position:absolute;inset:0}
+.v2 .hero-frame{position:absolute;inset:calc(-1 * var(--hr,40px));border-radius:var(--hr,40px);overflow:hidden;background:#0A0A09;transform:scale(var(--sx,.34),var(--sy,.44));transform-origin:50% 50%;will-change:transform}
+.v2 .hero-media{position:absolute;inset:0;transform:scale(calc(1.3 / var(--sx,.34)),calc(1.3 / var(--sy,.44)));transform-origin:50% 50%;will-change:transform}
+.v2 .hero-w,.v2 .hero-meta,.v2 .hero-stmt,.v2 .hero-veil{will-change:transform,opacity}
 .v2 .hm{position:absolute;inset:0}
 .v2 .hm video,.v2 .hm-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .v2 .hm-img{background:center/cover no-repeat;filter:grayscale(1) contrast(1.05)}

@@ -53,9 +53,14 @@ function Shell({
   const rootRef = useRef<HTMLDivElement>(null);
 
   // Smooth scroll + anclas internas.
+  // Lenis solo en desktop con mouse/trackpad. En touch no suaviza nada (syncTouch
+  // está apagado) pero igual registra touchstart/touchmove/touchend NO pasivos en
+  // window: eso obliga al navegador a esperar al hilo principal en cada touchmove
+  // y rompe el scroll nativo con inercia (los flicks cortos). En touch, scroll nativo.
   useEffect(() => {
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const l = reduce ? null : new Lenis({ lerp: 0.085, autoRaf: true });
+    const touch = !matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const l = reduce || touch ? null : new Lenis({ lerp: 0.085, autoRaf: true });
     setLenis(l);
     const onClick = (e: MouseEvent) => {
       const a = (e.target as HTMLElement).closest?.<HTMLAnchorElement>('a[href^="#"]');
@@ -75,10 +80,19 @@ function Shell({
     };
   }, [setLenis]);
 
+  // Bloqueo de scroll con menú/modal abiertos (Lenis en desktop, overflow en touch).
   useEffect(() => {
-    if (!lenis) return;
-    if (contact.open || menuOpen) lenis.stop();
-    else lenis.start();
+    const lock = contact.open || menuOpen;
+    if (lenis) {
+      if (lock) lenis.stop();
+      else lenis.start();
+      return;
+    }
+    const h = document.documentElement;
+    h.style.overflow = lock ? "hidden" : "";
+    return () => {
+      h.style.overflow = "";
+    };
   }, [lenis, contact.open, menuOpen]);
 
   // Fondo del documento (evita blanco en overscroll) y textura de grano.

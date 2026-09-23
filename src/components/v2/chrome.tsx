@@ -111,13 +111,23 @@ export function Header({ onMenu, menuOpen }: { onMenu: () => void; menuOpen: boo
   const { scrollY, scrollYProgress } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [solid, setSolid] = useState(false);
+  const flags = useRef({ hidden: false, solid: false });
   const [now, setNow] = useState("(00) Inicio");
   const [clock, setClock] = useState("--:--");
 
+  // Se llama en cada frame de scroll: solo toca el estado de React al cambiar.
   useMotionValueEvent(scrollY, "change", (v) => {
     const prev = scrollY.getPrevious() ?? 0;
-    setHidden(v > prev && v > 400 && !menuOpen);
-    setSolid(v > 60);
+    const h = v > prev && v > 400 && !menuOpen;
+    const s = v > 60;
+    if (h !== flags.current.hidden) {
+      flags.current.hidden = h;
+      setHidden(h);
+    }
+    if (s !== flags.current.solid) {
+      flags.current.solid = s;
+      setSolid(s);
+    }
   });
 
   useEffect(() => {

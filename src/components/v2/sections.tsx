@@ -262,7 +262,9 @@ export function Services() {
 
   useLayoutEffect(() => {
     const t = trackRef.current;
-    if (!t) return;
+    // En mobile el track es vertical: no hay recorrido horizontal que medir (y el
+    // resize que dispara la barra del navegador al scrollear no debe re-renderizar).
+    if (!t || mobile) return;
     const measure = () => setDist(Math.max(0, t.scrollWidth - window.innerWidth));
     measure();
     const ro = new ResizeObserver(measure);
@@ -274,10 +276,15 @@ export function Services() {
     };
   }, [mobile]);
 
+  const idxRef = useRef(0);
   useEffect(
     () =>
       p.on("change", (v) => {
-        setIdx(Math.min(2, Math.max(0, Math.floor(((v - 0.12) / 0.86) * 3 + 0.2))));
+        const next = Math.min(2, Math.max(0, Math.floor(((v - 0.12) / 0.86) * 3 + 0.2)));
+        if (next !== idxRef.current) {
+          idxRef.current = next;
+          setIdx(next);
+        }
       }),
     [p],
   );
