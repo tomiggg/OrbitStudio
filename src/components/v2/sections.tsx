@@ -136,7 +136,7 @@ const FACTS = [
   ["Criterio", "Cada decisión visual responde a un objetivo de negocio."],
   ["Sistema", "Automatizamos lo repetitivo para que tu equipo se enfoque en crecer."],
   ["Un solo equipo", "Marca, operación y web bajo el mismo criterio."],
-  ["Continuidad", "Tu sistema sigue evolucionando con vos: soporte, mejoras y nuevas funciones sin empezar de cero."],
+  ["Escala", "Tu sistema crece con tu negocio: más procesos, más equipo, más canales, sin volver a empezar."],
 ];
 
 export function Facts() {
