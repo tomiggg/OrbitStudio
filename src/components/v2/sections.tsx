@@ -695,7 +695,7 @@ export function Cta() {
 
 /* ───────────────────────── Footer ───────────────────────── */
 
-export function Footer({ versionCHref }: { versionCHref: string }) {
+export function Footer({ versionCHref }: { versionCHref?: string }) {
   const ref = useRef<HTMLElement>(null);
   const [copied, setCopied] = useState(false);
   const p = useSectionProgress(ref, ["start end", "end end"]);
@@ -736,9 +736,11 @@ export function Footer({ versionCHref }: { versionCHref: string }) {
           <a href={`mailto:${EMAIL}`}>
             <Roll>Email</Roll>
           </a>
-          <a href={versionCHref}>
-            <Roll>Versión C</Roll>
-          </a>
+          {versionCHref && (
+            <a href={versionCHref}>
+              <Roll>Versión C</Roll>
+            </a>
+          )}
         </div>
         <div>
           <span className="mono">Base</span>

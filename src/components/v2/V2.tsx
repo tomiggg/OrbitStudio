@@ -17,7 +17,8 @@ import "./v2.css";
 // ilumina, servicios en scroll horizontal, proyectos apilados, proceso con
 // línea de progreso y CTA con columnas en parallax.
 
-type Props = { fontClassName?: string; versionCHref: string };
+// Sin versionCHref (producción) no se muestran el panel de ajustes ni el link a la versión C.
+type Props = { fontClassName?: string; versionCHref?: string };
 
 export function V2(props: Props) {
   const [contact, setContact] = useState<{ open: boolean; preset: string | null }>({
@@ -137,7 +138,7 @@ function Shell({
         <Cta />
       </div>
       <Footer versionCHref={versionCHref} />
-      <SettingsPanel versionCHref={versionCHref} />
+      {versionCHref && <SettingsPanel versionCHref={versionCHref} />}
       <ContactModal open={contact.open} preset={contact.preset} onClose={closeContact} />
       <Cursor />
     </div>

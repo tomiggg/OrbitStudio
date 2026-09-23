@@ -12,7 +12,8 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "Shift Studio",
-  description: "Agencia digital orientada a resultados.",
+  description:
+    "Estudio de sistemas de negocio para pymes: identidad, operaciones y tecnología pensadas como una sola pieza.",
   icons: {
     icon: [{ url: "/favicon.svg?v=2", type: "image/svg+xml" }],
   },
