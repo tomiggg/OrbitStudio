@@ -34,7 +34,7 @@ const u = (name: string) => `/v2/img/s-${name}.webp`;
  * Cada lugar de la página tiene un concepto fijo, y cada set lo resuelve con
  * una sola dirección de arte:
  *   - Estudio: estudio de software (wireframes, anotaciones en iPad, código,
- *     dashboards, equipo). Mac presente pero no dominante.
+ *     equipo, reuniones). Mac presente pero no dominante.
  *   - Arquitectura: solo arquitectura moderna.
  *   - Materia: solo texturas y patrones abstractos.
  */
@@ -51,7 +51,7 @@ type SetImages = {
 export const SETS: Record<ImageSet, SetImages> = {
   estudio: {
     services: [u("identidad"), u("sistemas"), u("web")],
-    pills: [u("dashboard"), u("equipo"), u("sala")],
+    pills: [u("escritorio"), u("equipo"), u("reunion")],
     slides: [u("ipad"), u("wireframe"), u("pizarra"), u("producto")],
   },
   arquitectura: {
