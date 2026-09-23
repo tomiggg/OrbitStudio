@@ -4,16 +4,15 @@ import {
   AnimatePresence,
   animate,
   motion,
-  useMotionValue,
   useMotionValueEvent,
   useScroll,
-  useSpring,
 } from "framer-motion";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics/track";
 import { useV2 } from "./context";
 import { HERO_MODES, IMAGE_SETS } from "./media";
 import { EASE, Roll } from "./primitives";
+import { useMedia } from "./useMedia";
 
 export const EMAIL = "shiftstudio.work@gmail.com";
 export const WHATSAPP = "5493512261334";
@@ -163,7 +162,7 @@ export function Header({ onMenu, menuOpen }: { onMenu: () => void; menuOpen: boo
       animate={{ y: ready && !hidden ? "0%" : "-100%" }}
       transition={{ duration: 0.7, ease: EASE }}
     >
-      <a className="wm" href="#top" data-cur="Inicio">
+      <a className="wm" href="#top">
         shift studio<sup>®</sup>
       </a>
       <span className="mono hd-now hide-m">
@@ -189,7 +188,7 @@ export function Header({ onMenu, menuOpen }: { onMenu: () => void; menuOpen: boo
       </nav>
       <div className="hd-r">
         <span className="mono hide-m">CBA {clock}</span>
-        <button className="pill hide-m" data-cur="Escribinos" onClick={() => openContact()}>
+        <button className="pill hide-m" onClick={() => openContact()}>
           <Roll>Contacto</Roll>
           <span className="pill-ar">↗</span>
         </button>
@@ -255,42 +254,58 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
 
 /* ───────────────────────── Cursor ───────────────────────── */
 
+// Solo en dispositivos con mouse/trackpad: en touch no se monta.
 export function Cursor() {
-  const x = useMotionValue(-100);
-  const y = useMotionValue(-100);
-  const sx = useSpring(x, { stiffness: 500, damping: 40, mass: 0.35 });
-  const sy = useSpring(y, { stiffness: 500, damping: 40, mass: 0.35 });
-  const [label, setLabel] = useState<string | null>(null);
-  const [on, setOn] = useState(false);
+  const fine = useMedia("(hover: hover) and (pointer: fine)");
+  return fine ? <CursorDot /> : null;
+}
+
+// Sin React en el camino caliente: la posición se escribe directo como
+// transform en cada pointermove (el navegador ya los entrega uno por frame),
+// sin spring ni lerp. El estado "grande" con etiqueta solo cambia al entrar o
+// salir de un [data-cur], y se anima con scale en un nodo interno para que la
+// transición no arrastre también la posición.
+function CursorDot() {
+  const ref = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    if (matchMedia("(pointer: coarse)").matches) return;
-    document.documentElement.classList.add("v2-cur");
-    const move = (e: MouseEvent) => {
-      x.set(e.clientX);
-      y.set(e.clientY);
-      setOn(true);
-      const t = (e.target as HTMLElement).closest?.<HTMLElement>("[data-cur]");
-      setLabel(t ? t.dataset.cur || "" : null);
+    const el = ref.current;
+    const label = labelRef.current;
+    if (!el || !label) return;
+    const html = document.documentElement;
+    html.classList.add("v2-cur");
+    let target: HTMLElement | null = null;
+
+    const move = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return;
+      el.style.transform = `translate3d(${e.clientX}px,${e.clientY}px,0)`;
+      el.classList.add("on");
+      const t = (e.target as Element | null)?.closest?.<HTMLElement>("[data-cur]") ?? null;
+      if (t !== target) {
+        target = t;
+        if (t) label.textContent = t.dataset.cur ?? "";
+        el.classList.toggle("big", !!t);
+      }
     };
-    const leave = () => setOn(false);
-    addEventListener("mousemove", move, { passive: true });
-    document.addEventListener("mouseleave", leave);
+    const out = (e: PointerEvent) => {
+      if (!e.relatedTarget) el.classList.remove("on");
+    };
+    addEventListener("pointermove", move, { passive: true });
+    document.addEventListener("pointerout", out, { passive: true });
     return () => {
-      document.documentElement.classList.remove("v2-cur");
-      removeEventListener("mousemove", move);
-      document.removeEventListener("mouseleave", leave);
+      html.classList.remove("v2-cur");
+      removeEventListener("pointermove", move);
+      document.removeEventListener("pointerout", out);
     };
-  }, [x, y]);
+  }, []);
 
   return (
-    <motion.div
-      className={`cur${label !== null ? " big" : ""}${on ? " on" : ""}`}
-      style={{ x: sx, y: sy }}
-      aria-hidden="true"
-    >
-      <span>{label}</span>
-    </motion.div>
+    <div ref={ref} className="cur" aria-hidden="true">
+      <span className="cur-in">
+        <span ref={labelRef} />
+      </span>
+    </div>
   );
 }
 

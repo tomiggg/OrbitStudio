@@ -83,12 +83,12 @@ html.v2-cur .v2 input,html.v2-cur .v2 textarea{cursor:text}
 .v2 .mnav-ft .mono{display:flex;justify-content:space-between}
 
 /* ── cursor ── */
-.v2 .cur{position:fixed;left:0;top:0;z-index:150;pointer-events:none;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:#ECEAE5;mix-blend-mode:difference;display:grid;place-items:center;opacity:0;transition:width .4s var(--ease),height .4s var(--ease),margin .4s var(--ease),opacity .25s}
+.v2 .cur{position:fixed;left:0;top:0;z-index:150;pointer-events:none;width:0;height:0;mix-blend-mode:difference;opacity:0;transition:opacity .25s;will-change:transform}
 .v2 .cur.on{opacity:1}
-.v2 .cur.big{width:86px;height:86px;margin:-43px 0 0 -43px}
-.v2 .cur span{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#0E0E0D;opacity:0;white-space:nowrap;transition:opacity .2s}
-.v2 .cur.big span{opacity:1}
-@media (pointer:coarse){.v2 .cur{display:none}}
+.v2 .cur-in{position:absolute;left:-43px;top:-43px;width:86px;height:86px;border-radius:50%;background:#ECEAE5;display:grid;place-items:center;transform:scale(.116);transition:transform .45s var(--ease)}
+.v2 .cur.big .cur-in{transform:scale(1)}
+.v2 .cur-in span{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#0E0E0D;opacity:0;white-space:nowrap;transition:opacity .2s}
+.v2 .cur.big .cur-in span{opacity:1;transition-delay:.08s}
 
 /* ── hero ── */
 .v2 .hero{position:relative;height:270vh}
