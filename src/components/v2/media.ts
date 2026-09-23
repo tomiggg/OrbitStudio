@@ -63,7 +63,7 @@ export function ctaColumns(set: ImageSet): string[][] {
   return [
     [all[0], all[4], all[8], all[1]],
     [all[5], all[9], all[2], all[6]],
-    [all[3], all[7], all[10], all[0]],
+    [all[3], all[7], all[8], all[0]],
     [all[6], all[1], all[9], all[4]],
   ];
 }
