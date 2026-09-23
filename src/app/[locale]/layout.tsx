@@ -3,8 +3,6 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { isLocale } from "@/i18n/routing";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { ContactProvider } from "@/components/contact/ContactProvider";
 import { PageViewTracker } from "@/components/analytics/PageViewTracker";
 
@@ -24,9 +22,7 @@ export default async function LocaleLayout({
     <NextIntlClientProvider locale={locale} messages={messages}>
       <ContactProvider>
         <PageViewTracker />
-        <Header />
         {children}
-        <Footer />
       </ContactProvider>
     </NextIntlClientProvider>
   );
