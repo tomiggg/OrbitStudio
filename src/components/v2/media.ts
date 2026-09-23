@@ -29,41 +29,48 @@ export const IMAGE_SETS: { id: ImageSet; label: string }[] = [
 
 const p = (id: number) => `/v2/img/p${id}.webp`;
 
+/*
+ * Cada lugar de la página tiene un concepto fijo, y cada set lo resuelve con
+ * una sola dirección de arte:
+ *   - Estudio: oficio y trabajo real (tipografía, equipos, espacios, manos).
+ *   - Arquitectura: solo arquitectura moderna.
+ *   - Materia: solo texturas y patrones abstractos.
+ */
 type SetImages = {
-  /** Identidad, Sistemas, Web */
-  services: [string, string, string];
-  /** Píldoras dentro del manifiesto */
-  pills: [string, string, string];
-  /** Slideshow del hero */
+  /** Tarjetas de servicios: Identidad (carácter/marca), Sistemas (estructura/orden), Web (lo digital). */
+  services: [identidad: string, sistemas: string, web: string];
+  /** Píldoras del manifiesto: "sistemas de negocio:" (partes organizadas),
+   *  "una sola pieza." (el todo integrado), "empresa grande" (escala). */
+  pills: [sistema: string, pieza: string, escala: string];
+  /** Slideshow del hero: el estudio en contexto. */
   slides: string[];
 };
 
 export const SETS: Record<ImageSet, SetImages> = {
   estudio: {
-    services: [p(26), p(60), p(180)],
-    pills: [p(668), p(119), p(366)],
-    slides: [p(0), p(445), p(20), p(36)],
+    services: [p(526), p(1033), p(341)],
+    pills: [p(800), p(7), p(378)],
+    slides: [p(192), p(464), p(528), p(373)],
   },
   arquitectura: {
-    services: [p(953), p(1048), p(1031)],
-    pills: [p(939), p(1081), p(616)],
-    slides: [p(1076), p(546), p(737), p(299)],
+    services: [p(939), p(887), p(948)],
+    pills: [p(1048), p(942), p(1076)],
+    slides: [p(1031), p(953), p(949), p(618)],
   },
   materia: {
-    services: [p(912), p(634), p(974)],
-    pills: [p(766), p(1041), p(984)],
-    slides: [p(685), p(900), p(693), p(474)],
+    services: [p(893), p(955), p(352)],
+    pills: [p(960), p(1041), p(924)],
+    slides: [p(912), p(1053), p(1058), p(940)],
   },
 };
 
-/** Imágenes para las columnas en parallax del CTA (mezcla del set activo). */
+/**
+ * Columnas en parallax del CTA: las 10 imágenes del set en una grilla 4×4.
+ * El índice (k·3) mod 10 recorre las 10 antes de repetir, así ninguna se
+ * repite dentro de una columna ni al lado de sí misma.
+ */
 export function ctaColumns(set: ImageSet): string[][] {
   const s = SETS[set];
   const all = [...s.slides, ...s.services, ...s.pills];
-  return [
-    [all[0], all[4], all[8], all[1]],
-    [all[5], all[9], all[2], all[6]],
-    [all[3], all[7], all[8], all[0]],
-    [all[6], all[1], all[9], all[4]],
-  ];
+  return [0, 1, 2, 3].map((c) => [0, 1, 2, 3].map((r) => all[((r * 4 + c) * 3) % all.length]));
 }
