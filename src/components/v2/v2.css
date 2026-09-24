@@ -193,6 +193,8 @@ html.v2-cur .v2 input,html.v2-cur .v2 textarea{cursor:text}
 .v2 .pj-bar .mono{position:absolute;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:.06em;text-transform:none}
 .v2 .pj-img{flex:1;background:center top/cover no-repeat;filter:grayscale(1) contrast(1.02);transform:scale(1.01);transform-origin:50% 0;transition:filter .9s var(--ease),transform 1.4s var(--ease)}
 .v2 .pj-card:hover .pj-img{filter:none;transform:scale(1.05)}
+.v2 .pj-soon{text-align:left}
+.v2 .pj-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--mu2)}
 .v2 .pj-dim{position:absolute;inset:0;background:#000;pointer-events:none;border-radius:inherit}
 
 /* ── proceso ── */
