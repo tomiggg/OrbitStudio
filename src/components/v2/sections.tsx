@@ -344,24 +344,16 @@ export function Services() {
 
 /* ───────────────────────── Proyectos ───────────────────────── */
 
+// Los proyectos con `archived` quedan guardados pero no se muestran.
 const PROJECTS = [
   {
-    name: "PB Inmobiliaria",
-    href: "https://www.pbinmobiliaria.com.ar/",
-    domain: "pbinmobiliaria.com.ar",
-    img: "/projects/pb.png",
-    lead: "Web + panel de propiedades.",
-    rest: "Catálogo que el equipo actualiza solo, sin depender de nadie.",
-    disc: "Sitio web + admin",
-  },
-  {
-    name: "Tu UTN",
-    href: "https://tu-utn.vercel.app/",
-    domain: "tu-utn.vercel.app",
-    img: "/projects/tuutn.png",
-    lead: "Caos de datos → control total.",
-    rest: "Un sistema académico hecho simple para el día a día.",
-    disc: "Optimización de procesos",
+    name: "inmobi.app",
+    href: "https://pb-inmobiliaria-contratos.vercel.app/",
+    domain: "pb-inmobiliaria-contratos.vercel.app",
+    img: "/v2/img/inmobi.webp",
+    lead: "WhatsApp y planillas → un solo panel.",
+    rest: "Reclamos, prestadores, pagos e impuestos de cada propiedad, con todo el equipo viendo lo mismo.",
+    disc: "Sistema de gestión",
   },
   {
     name: "Kira",
@@ -372,7 +364,29 @@ const PROJECTS = [
     rest: "Catálogo online con pedido directo por WhatsApp.",
     disc: "Sitio web + catálogo",
   },
+  {
+    name: "PB Inmobiliaria",
+    href: "https://www.pbinmobiliaria.com.ar/",
+    domain: "pbinmobiliaria.com.ar",
+    img: "/projects/pb.png",
+    lead: "Web + panel de propiedades.",
+    rest: "Catálogo que el equipo actualiza solo, sin depender de nadie.",
+    disc: "Sitio web + admin",
+    archived: true,
+  },
+  {
+    name: "Tu UTN",
+    href: "https://tu-utn.vercel.app/",
+    domain: "tu-utn.vercel.app",
+    img: "/projects/tuutn.png",
+    lead: "Caos de datos → control total.",
+    rest: "Un sistema académico hecho simple para el día a día.",
+    disc: "Optimización de procesos",
+    archived: true,
+  },
 ];
+
+const VISIBLE = PROJECTS.filter((pj) => !pj.archived);
 
 function ProjectCard({
   pj,
@@ -429,16 +443,60 @@ function ProjectCard({
   );
 }
 
+// Última placa del stack: lugar vacío para el próximo cliente. Queda al
+// fondo de la pila, así que no necesita escala ni oscurecido.
+function SoonCard({ i }: { i: number }) {
+  const { openContact } = useV2();
+  return (
+    <div className="pj-w" style={{ top: i * 28 }}>
+      <button className="pj-card pj-soon" data-cur="Contanos" onClick={() => openContact()}>
+        <div className="pj-info">
+          <div className="pj-top">
+            <span className="mono">({String(i + 1).padStart(2, "0")})</span>
+            <span className="mono">Próximamente</span>
+          </div>
+          <div>
+            <h3 className="pj-name">El tuyo.</h3>
+            <p className="pj-d">
+              <b>Este lugar está libre.</b> Contanos cómo trabaja hoy tu negocio y lo diseñamos.
+            </p>
+          </div>
+          <span className="pill pj-link">
+            <Roll>Contanos tu proyecto</Roll>
+            <span className="pill-ar">↗</span>
+          </span>
+        </div>
+        <div className="pj-shot">
+          <div className="pj-bar">
+            <i />
+            <i />
+            <i />
+            <span className="mono">tu-proyecto.com</span>
+          </div>
+          <div className="pj-empty">
+            <span className="mono">(Próximamente)</span>
+          </div>
+        </div>
+      </button>
+    </div>
+  );
+}
+
 export function Projects() {
   const ref = useRef<HTMLDivElement>(null);
   const p = useSectionProgress(ref, ["start start", "end end"]);
   return (
     <section className="pj" id="proyectos" data-label="(03) Proyectos">
-      <SecHead n="(03) Proyectos" title="Casos *seleccionados.*" right="(03) proyectos en producción" />
+      <SecHead
+        n="(03) Proyectos"
+        title="Casos *seleccionados.*"
+        right={`(${String(VISIBLE.length).padStart(2, "0")}) proyectos en producción`}
+      />
       <div ref={ref} className="pj-stack">
-        {PROJECTS.map((pj, i) => (
-          <ProjectCard key={pj.name} pj={pj} i={i} n={PROJECTS.length} p={p} />
+        {VISIBLE.map((pj, i) => (
+          <ProjectCard key={pj.name} pj={pj} i={i} n={VISIBLE.length + 1} p={p} />
         ))}
+        <SoonCard i={VISIBLE.length} />
       </div>
     </section>
   );
