@@ -6,6 +6,7 @@ import {
   useAnimationFrame,
   useInView,
   useMotionValue,
+  useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
@@ -17,7 +18,7 @@ import { track, ANALYTICS_EVENTS } from "@/lib/analytics/track";
 import { useV2 } from "./context";
 import { EMAIL, NAV, WHATSAPP } from "./chrome";
 import { SETS, ctaColumns } from "./media";
-import { EASE, Magnetic, MaskText, Reveal, Roll, Rule } from "./primitives";
+import { DUR, EASE, EASE_IN, Magnetic, MaskText, Reveal, Roll, Rule } from "./primitives";
 import { useIsMobile, useSectionProgress } from "./useMedia";
 
 /* ───────────────────── Encabezado de sección ───────────────────── */
@@ -585,8 +586,8 @@ export function Process() {
                   key={active}
                   initial={{ y: "100%" }}
                   animate={{ y: "0%" }}
-                  exit={{ y: "-100%" }}
-                  transition={{ duration: 0.7, ease: EASE }}
+                  exit={{ y: "-100%", transition: { duration: 0.45, ease: EASE_IN } }}
+                  transition={{ duration: DUR.slow, ease: EASE }}
                 >
                   {String(active + 1).padStart(2, "0")}
                 </motion.span>
@@ -627,7 +628,9 @@ function VelocityRow({ children, base }: { children: React.ReactNode; base: numb
   const skew = useTransform(vel, [-3000, 3000], [7, -7], { clamp: true });
   const x = useTransform(bx, (v) => `${wrap(-50, 0, v)}%`);
   const dir = useRef(1);
+  const reduce = useReducedMotion();
   useAnimationFrame((_, d) => {
+    if (reduce) return;
     const f = factor.get();
     if (f < 0) dir.current = -1;
     else if (f > 0) dir.current = 1;

@@ -9,7 +9,25 @@ import {
 } from "framer-motion";
 import { Fragment, useRef, type ElementType, type ReactNode } from "react";
 
+/*
+ * Identidad de movimiento (personalidad "Premium": controlada, sin rebote).
+ * Tres constantes para toda la página:
+ *   - Curvas: EASE (entradas, desacelera — la curva firma), EASE_IN (salidas,
+ *     acelera) y EASE_IO (movimiento en pantalla / cortinas).
+ *   - Duraciones: DUR.quick / base / slow / reveal.
+ *   - Entrada: subir desde una máscara o 24px + opacidad. Nunca solo opacidad.
+ * Las salidas duran ~70% de su entrada. Los escalonados no pasan de ~0.5s en
+ * total (STAGGER_BUDGET). Mismos valores en v2.css como --ease / --ease-in / --ease-io.
+ */
 export const EASE = [0.22, 1, 0.36, 1] as const;
+export const EASE_IN = [0.64, 0, 0.78, 0] as const;
+export const EASE_IO = [0.76, 0, 0.24, 1] as const;
+export const DUR = { quick: 0.35, base: 0.6, slow: 0.9, reveal: 1.1 } as const;
+export const STAGGER_BUDGET = 0.5;
+
+/** Paso de escalonado que respeta el presupuesto total para `count` elementos. */
+export const stagger = (count: number, step: number, budget = STAGGER_BUDGET) =>
+  count > 1 ? Math.min(step, budget / (count - 1)) : 0;
 
 /**
  * Texto que entra palabra por palabra desde una máscara.
@@ -20,7 +38,7 @@ export function MaskText({
   as: Tag = "h2",
   className,
   delay = 0,
-  stagger = 0.045,
+  stagger: step = 0.045,
   animate,
 }: {
   text: string;
@@ -37,6 +55,8 @@ export function MaskText({
   const inView = useInView(ref, { once: true, margin: "0px 0px -8% 0px" });
   const shown = animate ?? inView;
   const parts = text.split(/(\*[^*]+\*)/g).filter(Boolean);
+  // Títulos largos: el escalonado se comprime para no pasar del presupuesto.
+  const each = stagger(text.replace(/\*/g, "").split(/\s+/).filter(Boolean).length, step);
   let i = 0;
   const lines = text.split("\n").length > 1;
   const word = (w: string, serif: boolean, key: string) => {
@@ -45,9 +65,9 @@ export function MaskText({
       <span className="mk" key={key}>
         <motion.span
           className={serif ? "sf" : undefined}
-          initial={{ y: "110%" }}
-          animate={{ y: shown ? "0%" : "110%" }}
-          transition={{ duration: 1, ease: EASE, delay: delay + idx * stagger }}
+          initial={{ y: "110%", rotate: 3 }}
+          animate={shown ? { y: "0%", rotate: 0 } : { y: "110%", rotate: 3 }}
+          transition={{ duration: DUR.slow, ease: EASE, delay: delay + idx * each }}
         >
           {w}
         </motion.span>
@@ -75,7 +95,7 @@ export function MaskText({
 export function Reveal({
   children,
   delay = 0,
-  y = 28,
+  y = 24,
   className,
   ...rest
 }: { children: ReactNode; delay?: number; y?: number } & HTMLMotionProps<"div">) {
@@ -85,7 +105,7 @@ export function Reveal({
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-      transition={{ duration: 1.1, ease: EASE, delay }}
+      transition={{ duration: DUR.slow, ease: EASE, delay }}
       {...rest}
     >
       {children}
@@ -101,7 +121,7 @@ export function Rule({ delay = 0 }: { delay?: number }) {
       initial={{ scaleX: 0 }}
       whileInView={{ scaleX: 1 }}
       viewport={{ once: true }}
-      transition={{ duration: 1.4, ease: EASE, delay }}
+      transition={{ duration: DUR.reveal, ease: EASE, delay }}
     />
   );
 }
