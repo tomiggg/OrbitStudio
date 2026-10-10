@@ -1,318 +1,262 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionValueEvent, useTransform } from "framer-motion";
-import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import {
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  useTransform,
+  type MotionValue,
+} from "framer-motion";
+import { useRef, useState } from "react";
 import { useV2 } from "./context";
-import { HERO_PHOTO, HERO_VIDEOS, SETS, type HeroMode } from "./media";
-import { DUR, EASE, Magnetic, MaskText, stagger } from "./primitives";
-import { useIsMobile, useSectionProgress } from "./useMedia";
-
-function Video({ src, poster }: { src: string; poster: string }) {
-  const ref = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    const v = ref.current;
-    if (!v) return;
-    v.muted = true;
-    v.play().catch(() => {});
-  }, [src]);
-  return (
-    <video ref={ref} src={src} poster={poster} autoPlay muted loop playsInline preload="auto" />
-  );
-}
-
-function Slides({ slides }: { slides: string[] }) {
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setI((x) => (x + 1) % slides.length), 4200);
-    return () => clearInterval(id);
-  }, [slides.length]);
-  return (
-    <>
-      <AnimatePresence initial={false}>
-        <motion.div
-          key={slides[i % slides.length]}
-          className="hm-img kb"
-          style={{ backgroundImage: `url(${slides[i % slides.length]})` }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1.4, ease: "easeInOut" }}
-        />
-      </AnimatePresence>
-      <span className="hm-count mono">
-        ({String((i % slides.length) + 1).padStart(2, "0")}/{String(slides.length).padStart(2, "0")})
-      </span>
-    </>
-  );
-}
-
-export function HeroMedia({ mode, slides }: { mode: HeroMode; slides: string[] }) {
-  return (
-    <AnimatePresence initial={false}>
-      <motion.div
-        key={mode + (mode === "slides" ? slides[0] : "")}
-        className="hm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.9, ease: "easeInOut" }}
-      >
-        {mode === "foto" ? (
-          <div className="hm-img kb" style={{ backgroundImage: `url(${HERO_PHOTO})` }} />
-        ) : mode === "slides" ? (
-          <Slides slides={slides} />
-        ) : (
-          <Video {...HERO_VIDEOS[mode]} />
-        )}
-      </motion.div>
-    </AnimatePresence>
-  );
-}
+import { Module, Raw, type PieceId } from "./modules";
+import { EASE, Magnetic } from "./primitives";
+import { useIsMobile, useMedia, useSectionProgress } from "./useMedia";
 
 /*
- * Animación de scroll del hero.
+ * Hero — el momento firma del sitio: del caos al sistema.
  *
- * La "ventana" que se abre a pantalla completa se hace SOLO con transform:
- * el marco (.hero-frame, un poco más grande que el viewport para que sus
- * esquinas redondeadas queden afuera al final) arranca escalado a (sx, sy) y
- * el media adentro lleva la contra-escala (zoom / escala del marco), así el
- * video no se deforma. Nada de clip-path, que en Chrome repinta el layer del
- * video en cada frame.
+ * Arranca con el desorden real de una pyme (WhatsApps, planillas rotas,
+ * post-its, facturas que vencen) desparramado por la pantalla. Al scrollear,
+ * cada pieza viaja a su lugar en una grilla y cambia de cara: el artefacto
+ * crudo se apaga y aparece su módulo limpio. Al final los ocho módulos quedan
+ * dentro de un mismo marco — "una sola pieza" — y el titular cambia de
+ * "funciona a pulmón" a "lo convertimos en un sistema".
  *
- * Donde el navegador soporta scroll-driven animations (Chrome 115+, Safari 26+)
- * todo corre como animación CSS atada a un view-timeline: la ejecuta el
- * compositor, sincronizada con el scroll real aunque el hilo principal esté
- * ocupado (Lenis en desktop, inercia del touch en mobile). En el resto
- * (Firefox) se usa el mismo modelo calculado con framer-motion.
+ * Es la única animación protagonista de la página; el resto acompaña.
+ * Todo es transform/opacity atado al scroll (lo maneja la persona, se puede
+ * frenar y volver). Con reduced-motion se muestra el estado final, sin pin.
  */
 
-const EXPAND = 0.55; // fracción del recorrido del hero en la que la ventana llega a pantalla completa
-const M0 = 1.3; // zoom inicial del media (parallax)
-const STOPS = 8;
+type Piece = {
+  id: PieceId;
+  /** Desplazamiento del caos respecto de su celda: [x vw, y vh, rotación°]. */
+  d: [number, number, number];
+  /** Igual, en mobile. null = la pieza no se muestra en mobile. */
+  m: [number, number, number] | null;
+};
 
-function buildHeroCss() {
-  const pct = (t: number) => `${+(t * 100).toFixed(2)}%`;
-  const frame: string[] = [];
-  const media: string[] = [];
-  for (let k = 0; k <= STOPS; k++) {
-    const t = k / STOPS;
-    const fx = `(var(--sx) + (1 - var(--sx)) * ${t})`;
-    const fy = `(var(--sy) + (1 - var(--sy)) * ${t})`;
-    const m = +(M0 - (M0 - 1) * t).toFixed(4);
-    frame.push(`${pct(t)}{transform:scale(calc${fx},calc${fy})}`);
-    media.push(`${pct(t)}{transform:scale(calc(${m} / ${fx}),calc(${m} / ${fy}))}`);
-  }
-  const r = (a: number, b: number) => `contain ${pct(a)} contain ${pct(b)}`;
-  const fade = r(0.2 * EXPAND, 0.75 * EXPAND);
-  return `
-@keyframes v2-frame{${frame.join("")}}
-@keyframes v2-media{${media.join("")}}
-@keyframes v2-w1{to{transform:translateX(-38vw)}}
-@keyframes v2-w2{to{transform:translateX(38vw)}}
-@keyframes v2-out{from{opacity:1}to{opacity:0}}
-@keyframes v2-veil{from{opacity:.1}to{opacity:.62}}
-@keyframes v2-in{from{opacity:0}to{opacity:1}}
-@keyframes v2-up{from{transform:translateY(50px)}to{transform:none}}
-@supports (animation-timeline: view()){
-.v2 .hero.sda{view-timeline:--hero block}
-.v2 .hero.sda .hero-frame{animation:v2-frame linear both;animation-timeline:--hero;animation-range:${r(0, EXPAND)}}
-.v2 .hero.sda .hero-media{animation:v2-media linear both;animation-timeline:--hero;animation-range:${r(0, EXPAND)}}
-.v2 .hero.sda .hero-veil{animation:v2-veil linear both;animation-timeline:--hero;animation-range:${r(0, EXPAND)}}
-.v2 .hero.sda .w1{animation:v2-w1 linear both,v2-out linear both;animation-timeline:--hero,--hero;animation-range:${r(0, EXPAND)},${fade}}
-.v2 .hero.sda .w2{animation:v2-w2 linear both,v2-out linear both;animation-timeline:--hero,--hero;animation-range:${r(0, EXPAND)},${fade}}
-.v2 .hero.sda .hero-meta{animation:v2-out linear both;animation-timeline:--hero;animation-range:${r(0, 0.12)}}
-.v2 .hero.sda .hero-stmt{animation:v2-in linear both,v2-up linear both;animation-timeline:--hero,--hero;animation-range:${r(0.5, 0.66)},${r(0.5, 0.8)}}
-}`;
-}
-const HERO_CSS = buildHeroCss();
+// Grilla final: 4×2 en desktop, 3×2 en mobile (orden del DOM).
+const PIECES: Piece[] = [
+  { id: "pedidos", d: [-12, 34, -8], m: [47, -23, -8] },
+  { id: "stock", d: [5.5, -14, 5], m: [-29, -19, 6] },
+  { id: "tareas", d: [9, 32, 10], m: [-8, -3, 10] },
+  { id: "facturas", d: [-25.5, 14, -4], m: null },
+  { id: "catalogo", d: [-24, 16, 6], m: [25, -21, 7] },
+  { id: "marca", d: [23.5, -34, -10], m: [31, -1, -9] },
+  { id: "agenda", d: [-27, -20, 3], m: null },
+  { id: "cobros", d: [-13.5, 20, 8], m: [-56, -3, 5] },
+];
 
-const noopSubscribe = () => () => {};
-function useScrollDrivenSupport() {
-  return useSyncExternalStore(
-    noopSubscribe,
-    () => typeof CSS !== "undefined" && CSS.supports("animation-timeline: view()"),
-    () => false,
+// En pantalla: suave en ambos extremos (sale despacio del caos y aterriza).
+const easeIO = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+function PieceView({
+  piece,
+  k,
+  p,
+  mobile,
+  ready,
+}: {
+  piece: Piece;
+  k: number;
+  p: MotionValue<number>;
+  mobile: boolean;
+  ready: boolean;
+}) {
+  const off = (mobile ? piece.m : piece.d) ?? [0, 0, 0];
+  // Cada pieza arranca un poco después que la anterior: el orden se va armando.
+  const a = 0.06 + k * 0.03;
+  const b = a + 0.4;
+  const t = useTransform(p, [a, b], [0, 1], { ease: easeIO });
+  const x = useTransform(t, (v) => `${(off[0] * (1 - v)).toFixed(3)}vw`);
+  const y = useTransform(t, (v) => `${(off[1] * (1 - v)).toFixed(3)}vh`);
+  const rotate = useTransform(t, (v) => off[2] * (1 - v));
+  // Cambio de cara al aterrizar: el crudo se apaga un poco antes de que
+  // aparezca el módulo, con escalas opuestas para que no se lea como un fundido plano.
+  const rawO = useTransform(p, [b - 0.13, b - 0.04], [1, 0]);
+  const rawS = useTransform(p, [b - 0.13, b - 0.04], [1, 0.9]);
+  const modO = useTransform(p, [b - 0.09, b], [0, 1]);
+  const modS = useTransform(p, [b - 0.09, b], [0.94, 1]);
+
+  return (
+    <motion.div
+      className={`pc pc-${piece.id}${piece.m ? "" : " hide-m"}`}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={ready ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+      transition={{ duration: 0.8, ease: EASE, delay: 0.3 + k * 0.05 }}
+    >
+      <motion.div className="pc-in" style={{ x, y, rotate }}>
+        <motion.div className="pc-raw" style={{ opacity: rawO, scale: rawS }}>
+          <Raw id={piece.id} />
+        </motion.div>
+        <motion.div className="pc-mod" style={{ opacity: modO, scale: modS }}>
+          <Module id={piece.id} />
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 }
 
-const W1 = "shift";
-const W2 = "studio";
+function Line({
+  children,
+  scrollY,
+  delay,
+  ready,
+}: {
+  children: string;
+  scrollY: MotionValue<string>;
+  /** Con delay, la línea además entra desde su máscara cuando termina la intro. */
+  delay?: number;
+  ready: boolean;
+}) {
+  const inner = (
+    <motion.span className="hl" style={{ y: scrollY }}>
+      {children}
+    </motion.span>
+  );
+  return (
+    <span className="mk hl-mk">
+      {delay === undefined ? (
+        inner
+      ) : (
+        <motion.span
+          className="hl"
+          initial={{ y: "110%" }}
+          animate={{ y: ready ? "0%" : "110%" }}
+          transition={{ duration: 1, ease: EASE, delay }}
+        >
+          {inner}
+        </motion.span>
+      )}
+    </span>
+  );
+}
 
 export function Hero() {
-  const { settings, ready, openContact } = useV2();
+  const { ready, openContact } = useV2();
   const ref = useRef<HTMLElement>(null);
-  const stRef = useRef<HTMLDivElement>(null);
   const mobile = useIsMobile();
-  const sda = useScrollDrivenSupport();
-  const p = useSectionProgress(ref, ["start start", "end end"]);
+  // useMedia (y no useReducedMotion): en el server da false y se corrige al
+  // hidratar, sin que el HTML del server y el primer render del cliente difieran.
+  const reduce = useMedia("(prefers-reduced-motion: reduce)");
+  const live = useSectionProgress(ref, ["start start", "end end"]);
+  const done = useMotionValue(1);
+  const p = reduce ? done : live;
 
-  // Geometría de la ventana inicial → --sx/--sy/--hr (sin estado de React).
-  const geo = useRef({ sx: 0.34, sy: 0.44 });
-  useLayoutEffect(() => {
-    const hero = ref.current;
-    const st = stRef.current;
-    if (!hero || !st) return;
-    const apply = () => {
-      const W = st.clientWidth;
-      const H = st.clientHeight;
-      const R = mobile ? 28 : 40;
-      const [ww, wh] = mobile ? [0.86 * W, 0.38 * H] : [0.36 * W, 0.46 * H];
-      const sx = ww / (W + 2 * R);
-      const sy = wh / (H + 2 * R);
-      geo.current = { sx, sy };
-      hero.style.setProperty("--hr", `${R}px`);
-      hero.style.setProperty("--sx", sx.toFixed(5));
-      hero.style.setProperty("--sy", sy.toFixed(5));
-    };
-    apply();
-    const ro = new ResizeObserver(apply);
-    ro.observe(st);
-    return () => ro.disconnect();
-  }, [mobile]);
+  const aY = useTransform(p, [0.36, 0.48], ["0%", "-112%"]);
+  const bY = useTransform(p, [0.44, 0.58], ["112%", "0%"]);
+  const subO = useTransform(p, [0.58, 0.7], [0, 1]);
+  const subY = useTransform(p, [0.58, 0.72], [18, 0]);
+  const sysO = useTransform(p, [0.6, 0.74], [0, 1]);
+  const sysS = useTransform(p, [0.6, 0.76], [0.97, 1]);
+  const cueO = useTransform(p, [0.64, 0.72], [1, 0]);
+  const order = useTransform(p, [0.04, 0.7], [0, 1]);
 
-  // Fallback JS (sin scroll-driven animations): mismo modelo, calculado por frame.
-  const e = useTransform(p, (v) => Math.min(1, Math.max(0, v / EXPAND)));
-  const frameAt = (s: number, t: number) => s + (1 - s) * t;
-  const fX = useTransform(e, (t) => frameAt(geo.current.sx, t));
-  const fY = useTransform(e, (t) => frameAt(geo.current.sy, t));
-  const mX = useTransform(e, (t) => (M0 - (M0 - 1) * t) / frameAt(geo.current.sx, t));
-  const mY = useTransform(e, (t) => (M0 - (M0 - 1) * t) / frameAt(geo.current.sy, t));
-  const leftX = useTransform(e, [0, 1], ["0vw", "-38vw"]);
-  const rightX = useTransform(e, [0, 1], ["0vw", "38vw"]);
-  const wordsO = useTransform(e, [0.2, 0.75], [1, 0]);
-  const veilO = useTransform(e, [0, 1], [0.1, 0.62]);
-  const metaO = useTransform(p, [0, 0.12], [1, 0]);
-  const stmtO = useTransform(p, [0.5, 0.66], [0, 1]);
-  const stmtY = useTransform(p, [0.5, 0.8], [50, 0]);
-
-  // El reveal del statement es un disparo único: solo cambia estado al cruzar el umbral.
-  const [stmtIn, setStmtIn] = useState(false);
-  const stmtRef = useRef(false);
+  // Los botones solo reciben clics cuando ya se ven.
+  const [live2, setLive2] = useState(false);
+  const flag = useRef(false);
   useMotionValueEvent(p, "change", (v) => {
-    const next = v > 0.52;
-    if (next !== stmtRef.current) {
-      stmtRef.current = next;
-      setStmtIn(next);
+    const next = v > 0.6;
+    if (next !== flag.current) {
+      flag.current = next;
+      setLive2(next);
     }
   });
-
-  const js = !sda;
-  const metaIn = (i: number) => ({
-    initial: { opacity: 0, y: 14 },
-    animate: ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 },
-    transition: { duration: DUR.slow, ease: EASE, delay: 0.6 + i * 0.07 },
-  });
-
-  /*
-   * Entrada (arranca con las cortinas de la intro a medio abrir):
-   *   0.10s  la ventana emerge: escala 0.9 → 1 (tensión → apertura)
-   *   0.20s  "shift" sube letra por letra; 0.34s "studio" (mismo origen: desde abajo)
-   *   0.60s  rótulos (capa secundaria), 0.75s header, 1.1s indicador de scroll (ambiente)
-   */
-  const chars = (w: string, base: number) =>
-    w.split("").map((ch, i) => (
-      <span className="mk" key={i}>
-        <motion.span
-          initial={{ y: "105%", rotate: 4 }}
-          animate={ready ? { y: "0%", rotate: 0 } : { y: "105%", rotate: 4 }}
-          transition={{ duration: 1.05, ease: EASE, delay: base + i * stagger(w.length, 0.045) }}
-        >
-          {ch}
-        </motion.span>
-      </span>
-    ));
+  const ctaOn = reduce || live2;
 
   return (
-    <section ref={ref} className={`hero${sda ? " sda" : ""}`} id="top" data-label="(00) Inicio">
-      <style>{HERO_CSS}</style>
-      <div ref={stRef} className="hero-st">
-        <motion.div
-          className="hero-frame-in"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={ready ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-          transition={{
-            scale: { duration: 1.3, ease: EASE, delay: 0.1 },
-            opacity: { duration: DUR.base, ease: EASE, delay: 0.1 },
-          }}
-        >
-          <motion.div className="hero-frame" style={js ? { scaleX: fX, scaleY: fY } : undefined}>
-            <motion.div className="hero-media" style={js ? { scaleX: mX, scaleY: mY } : undefined}>
-              <HeroMedia mode={settings.hero} slides={SETS[settings.set].slides} />
-            </motion.div>
-            <motion.div className="hero-veil" style={js ? { opacity: veilO } : undefined} />
-          </motion.div>
-        </motion.div>
-
-        <motion.div className="hero-meta" style={js ? { opacity: metaO } : undefined}>
-          <motion.span className="mono" {...metaIn(0)}>
-            Identidad + sistemas
-            <br />
-            para pymes
-          </motion.span>
-          <motion.span className="mono hide-m" {...metaIn(1)}>
-            Identidad
-            <br />
-            Sistemas · Web
-          </motion.span>
-          <motion.span className="mono hide-m" {...metaIn(2)}>
-            Córdoba, AR
-            <br />
-            31°S 64°O
-          </motion.span>
-          <motion.span className="mono r" {...metaIn(3)}>
-            ©2026
-            <br />
-            <span className="hero-cue">
-              Scroll
-              <i aria-hidden="true" />
-            </span>
-          </motion.span>
-        </motion.div>
-
-        <motion.h1
-          className="hero-w w1"
-          style={js ? { x: leftX, opacity: wordsO } : undefined}
-          aria-label="shift studio"
-        >
-          <span aria-hidden="true">{chars(W1, 0.2)}</span>
-        </motion.h1>
-        <motion.div
-          className="hero-w w2"
-          style={js ? { x: rightX, opacity: wordsO } : undefined}
-          aria-hidden="true"
-        >
-          {chars(W2, 0.34)}
-          <motion.sup
+    <section
+      ref={ref}
+      className={`hero${reduce ? " still" : ""}`}
+      id="top"
+      data-label="Inicio"
+      data-theme="paper"
+    >
+      <div className="hero-st">
+        <div className="hero-copy">
+          <motion.p
+            className="hero-kick"
             initial={{ opacity: 0, y: 10 }}
             animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-            transition={{ duration: DUR.base, ease: EASE, delay: 0.85 }}
+            transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}
           >
-            ®
-          </motion.sup>
-        </motion.div>
+            Estudio de sistemas para pymes, en Córdoba
+          </motion.p>
+          <h1 className="hero-h" aria-label="Tu negocio funciona a pulmón. Lo convertimos en un sistema.">
+            <span className="hero-h-a" aria-hidden="true">
+              <Line scrollY={aY} delay={0.2} ready={ready}>
+                Tu negocio
+              </Line>
+              <Line scrollY={aY} delay={0.28} ready={ready}>
+                funciona
+              </Line>
+              <Line scrollY={aY} delay={0.36} ready={ready}>
+                a pulmón.
+              </Line>
+            </span>
+            <span className="hero-h-b" aria-hidden="true">
+              <Line scrollY={bY} ready={ready}>
+                Lo convertimos
+              </Line>
+              <Line scrollY={bY} ready={ready}>
+                en un sistema.
+              </Line>
+            </span>
+          </h1>
+          <motion.div
+            className="hero-sub"
+            style={{ opacity: subO, y: subY, pointerEvents: ctaOn ? "auto" : "none" }}
+            aria-hidden={!ctaOn}
+          >
+            <p>
+              Marca, operación y web diseñadas como una sola pieza, para negocios que crecieron más
+              rápido que sus herramientas.
+            </p>
+            <div className="hero-ctas">
+              <Magnetic>
+                <button className="btn" data-cur="Agendar" onClick={() => openContact()} tabIndex={ctaOn ? 0 : -1}>
+                  Agendar diagnóstico
+                </button>
+              </Magnetic>
+              <a className="btn o" href="#proyectos" tabIndex={ctaOn ? 0 : -1}>
+                Ver casos
+              </a>
+            </div>
+          </motion.div>
+        </div>
 
-        <motion.div
-          className={`hero-stmt${stmtIn ? " on" : ""}`}
-          style={js ? { opacity: stmtO, y: stmtY } : undefined}
-        >
-          <span className="mono">(Shift Studio®) — Identidad + Sistemas</span>
-          <MaskText
-            as="p"
-            className="hero-stmt-t"
-            text={"Tu negocio es un sistema.\n*Nosotros lo diseñamos.*"}
-            animate={stmtIn}
-            stagger={0.06}
-          />
-          <p className="hero-stmt-d">
-            <b>Identidad</b>, <b>operaciones</b> y <b>tecnología</b>, pensadas como{" "}
-            <b>una sola pieza</b> — no como servicios sueltos.
-          </p>
-          <Magnetic>
-            <button className="btn" data-cur="Agendar" onClick={() => openContact()}>
-              Agendar diagnóstico →
-            </button>
-          </Magnetic>
-        </motion.div>
+        <div className="hero-stage" aria-hidden="true">
+          <motion.div className="sys" style={{ opacity: sysO, scale: sysS }}>
+            <span className="sys-bar">
+              <i />
+              <i />
+              <i />
+              <span>tu-negocio.app</span>
+            </span>
+          </motion.div>
+          <div className="sys-grid">
+            {PIECES.map((piece, k) => (
+              <PieceView key={piece.id} piece={piece} k={k} p={p} mobile={mobile} ready={ready} />
+            ))}
+          </div>
+        </div>
+
+        {!reduce && (
+          <motion.div
+            className="hero-cue"
+            style={{ opacity: cueO }}
+            initial={{ y: 10 }}
+            animate={{ y: ready ? 0 : 10 }}
+            transition={{ duration: 0.8, ease: EASE, delay: 0.8 }}
+            aria-hidden="true"
+          >
+            <span>Scrolleá para ordenar</span>
+            <span className="hero-cue-bar">
+              <motion.i style={{ scaleX: order }} />
+            </span>
+          </motion.div>
+        )}
       </div>
     </section>
   );

@@ -9,7 +9,6 @@ import {
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics/track";
 import { useV2 } from "./context";
-import { HERO_MODES, IMAGE_SETS } from "./media";
 import { DUR, EASE, EASE_IN, EASE_IO, Roll, stagger } from "./primitives";
 import { useMedia } from "./useMedia";
 
@@ -26,7 +25,7 @@ export const NAV = [
 /* ───────────────────────── Intro ───────────────────────── */
 
 const SEEN_KEY = "ss_v2_seen";
-const DISCIPLINES = ["Identidad", "Sistemas", "Web"];
+const DISCIPLINES = ["Marca", "Sistemas", "Web"];
 const TICKS = [0.55, 1.0, 1.45]; // s: entrada de cada disciplina
 const MIN_INTRO = 2.05; // s: tiempo mínimo en pantalla (el ticker completa su vuelta)
 const MAX_WAIT = 3.2; // s: tope esperando a las fuentes
@@ -114,10 +113,10 @@ export function Loader() {
       />
 
       <div className="ld-top">
-        {["(Shift Studio®)", "Sistemas de negocio", "Córdoba, AR — 31°S 64°O", "Est. 2026"].map((t, i) => (
+        {["Shift Studio", "Sistemas de negocio", "Córdoba, Argentina", "2026"].map((t, i) => (
           <span className={`mk${i === 1 || i === 2 ? " hide-m" : ""}`} key={t}>
             <motion.span
-              className="mono"
+              className="ld-l"
               initial={{ y: "110%" }}
               animate={out ? exitUp : { y: "0%" }}
               transition={{ duration: DUR.base, ease: EASE, delay: 0.15 + i * 0.06 }}
@@ -173,8 +172,8 @@ export function Loader() {
             )}
           </AnimatePresence>
         </span>
-        <span className="mono ld-n">
-          {disc >= 0 ? String(disc + 1).padStart(2, "0") : "00"} / {String(DISCIPLINES.length).padStart(2, "0")}
+        <span className="ld-n">
+          {disc >= 0 ? disc + 1 : 0} de {DISCIPLINES.length}
         </span>
       </motion.div>
     </div>
@@ -188,12 +187,12 @@ export function Header({ onMenu, menuOpen }: { onMenu: () => void; menuOpen: boo
   const { scrollY, scrollYProgress } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [solid, setSolid] = useState(false);
-  // La primera entrada llega después del wordmark del hero (sigue a la intro).
+  // La primera entrada llega después del titular del hero (sigue a la intro).
   const [entered, setEntered] = useState(false);
   const flags = useRef({ hidden: false, solid: false });
-  const [now, setNow] = useState("(00) Inicio");
   const [active, setActive] = useState("top");
-  const [clock, setClock] = useState("--:--");
+  // Tema de la sección que está debajo del header: papel o tinta.
+  const [theme, setTheme] = useState("paper");
 
   // Se llama en cada frame de scroll: solo toca el estado de React al cambiar.
   useMotionValueEvent(scrollY, "change", (v) => {
@@ -215,33 +214,31 @@ export function Header({ onMenu, menuOpen }: { onMenu: () => void; menuOpen: boo
     const io = new IntersectionObserver(
       (es) =>
         es.forEach((e) => {
-          if (!e.isIntersecting) return;
-          const el = e.target as HTMLElement;
-          setNow(el.dataset.label || "");
-          setActive(el.id);
+          if (e.isIntersecting) setActive((e.target as HTMLElement).id);
         }),
       { rootMargin: "-45% 0px -50% 0px" },
     );
-    secs.forEach((s) => io.observe(s));
-    const tick = () =>
-      setClock(
-        new Date().toLocaleTimeString("es-AR", {
-          hour: "2-digit",
-          minute: "2-digit",
-          timeZone: "America/Argentina/Cordoba",
+    secs.forEach((el) => io.observe(el));
+    // Franja fina arriba de todo, donde vive el header.
+    const themed = [...document.querySelectorAll<HTMLElement>("[data-theme]")];
+    const io2 = new IntersectionObserver(
+      (es) =>
+        es.forEach((e) => {
+          if (e.isIntersecting) setTheme((e.target as HTMLElement).dataset.theme || "paper");
         }),
-      );
-    tick();
-    const id = setInterval(tick, 30000);
+      { rootMargin: "0px 0px -94% 0px" },
+    );
+    themed.forEach((el) => io2.observe(el));
     return () => {
       io.disconnect();
-      clearInterval(id);
+      io2.disconnect();
     };
   }, []);
 
   return (
     <motion.header
       className={`hd${solid ? " solid" : ""}`}
+      data-t={menuOpen ? "paper" : theme}
       initial={{ y: "-100%" }}
       animate={{ y: ready && !hidden ? "0%" : "-100%" }}
       transition={
@@ -254,20 +251,6 @@ export function Header({ onMenu, menuOpen }: { onMenu: () => void; menuOpen: boo
       <a className="wm" href="#top">
         shift studio<sup>®</sup>
       </a>
-      <span className="mono hd-now hide-m">
-        <span className="dot" />
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.span
-            key={now}
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -10, opacity: 0 }}
-            transition={{ duration: 0.35, ease: EASE }}
-          >
-            {now}
-          </motion.span>
-        </AnimatePresence>
-      </span>
       <nav className="hide-m">
         {NAV.map(([id, name]) => (
           <a key={id} href={`#${id}`} className={active === id ? "on" : undefined}>
@@ -280,10 +263,8 @@ export function Header({ onMenu, menuOpen }: { onMenu: () => void; menuOpen: boo
         ))}
       </nav>
       <div className="hd-r">
-        <span className="mono hide-m">CBA {clock}</span>
-        <button className="pill hide-m" onClick={() => openContact()}>
-          <Roll>Contacto</Roll>
-          <span className="pill-ar">↗</span>
+        <button className="btn sm hide-m" onClick={() => openContact()}>
+          Agendar diagnóstico
         </button>
         <button className="mbtn show-m" aria-expanded={menuOpen} onClick={onMenu}>
           {menuOpen ? "Cerrar" : "Menú"}
@@ -320,7 +301,6 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
                     {name}
                   </motion.a>
                 </span>
-                <span className="mono">{String(i + 1).padStart(2, "0")}</span>
               </div>
             ))}
           </div>
@@ -337,11 +317,11 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
                 openContact();
               }}
             >
-              Agendar diagnóstico →
+              Agendar diagnóstico
             </button>
-            <div className="mono">
+            <div className="mnav-meta">
               <span>{EMAIL}</span>
-              <span>CBA, AR</span>
+              <span>Córdoba, AR</span>
             </div>
           </motion.div>
         </motion.div>
@@ -422,7 +402,7 @@ function Seg<T extends string>({
 }) {
   return (
     <div className="seg">
-      <span className="mono">{label}</span>
+      <span className="seg-l">{label}</span>
       <div className="seg-opts">
         {options.map((o) => (
           <button
@@ -475,28 +455,16 @@ export function SettingsPanel({ versionCHref }: { versionCHref: string }) {
           >
             <div className="stg-hd">
               <span>Ajustes de vista</span>
-              <span className="mono">Solo preview</span>
+              <span className="stg-sub">Solo preview</span>
             </div>
             <Seg
-              label="Hero"
-              value={settings.hero}
-              options={HERO_MODES}
-              onChange={(hero) => update({ hero })}
-            />
-            <Seg
-              label="Imágenes"
-              value={settings.set}
-              options={IMAGE_SETS}
-              onChange={(set) => update({ set })}
-            />
-            <Seg
               label="Acento"
-              value={settings.accent ? "teal" : "neutro"}
+              value={settings.accent ? "celeste" : "neutro"}
               options={[
-                { id: "teal", label: "Teal" },
+                { id: "celeste", label: "Celeste" },
                 { id: "neutro", label: "Neutro" },
               ]}
-              onChange={(v) => update({ accent: v === "teal" })}
+              onChange={(v) => update({ accent: v === "celeste" })}
             />
             <Seg
               label="Grano"
@@ -520,7 +488,7 @@ export function SettingsPanel({ versionCHref }: { versionCHref: string }) {
           <i />
           <i />
         </span>
-        <span className="mono">{open ? "Cerrar" : "Ajustes"}</span>
+        <span>{open ? "Cerrar" : "Ajustes"}</span>
       </button>
     </motion.div>
   );
@@ -528,7 +496,13 @@ export function SettingsPanel({ versionCHref }: { versionCHref: string }) {
 
 /* ───────────────────────── Contacto ───────────────────────── */
 
+// Los valores coinciden con los presets que manda cada servicio (Services → openContact).
 const CHIPS = ["Identidad & Autoridad", "Sistemas & Automatización", "Web de Alta Conversión", "No sé todavía"];
+const CHIP_LABEL: Record<string, string> = {
+  "Identidad & Autoridad": "Marca",
+  "Sistemas & Automatización": "Sistemas",
+  "Web de Alta Conversión": "Web",
+};
 
 export function ContactModal({
   open,
@@ -604,10 +578,10 @@ export function ContactModal({
               <h3>
                 Contanos
                 <br />
-                <span className="sf">tu proyecto.</span>
+                tu proyecto.
               </h3>
-              <button className="mono" onClick={onClose}>
-                (Cerrar)
+              <button className="md-x" onClick={onClose}>
+                Cerrar
               </button>
             </motion.div>
             {sent ? (
@@ -618,7 +592,7 @@ export function ContactModal({
                 transition={{ duration: 0.5, ease: EASE }}
               >
                 <b>Recibido.</b>
-                <span className="mono">Te respondemos en el día</span>
+                <span>Te respondemos en el día.</span>
               </motion.div>
             ) : (
               <motion.form
@@ -628,7 +602,7 @@ export function ContactModal({
                 transition={{ duration: DUR.base, ease: EASE, delay: 0.22 }}
               >
                 <label>
-                  <span className="mono">Nombre</span>
+                  <span className="md-l">Nombre</span>
                   <input
                     ref={firstRef}
                     required
@@ -638,7 +612,7 @@ export function ContactModal({
                   />
                 </label>
                 <label>
-                  <span className="mono">Email o WhatsApp</span>
+                  <span className="md-l">Email o WhatsApp</span>
                   <input
                     required
                     placeholder="hola@tuempresa.com"
@@ -647,7 +621,7 @@ export function ContactModal({
                   />
                 </label>
                 <div className="md-chips">
-                  <span className="mono">¿Qué necesitás?</span>
+                  <span className="md-l">¿Qué necesitás?</span>
                   <div className="chips">
                     {CHIPS.map((c) => (
                       <button
@@ -658,13 +632,13 @@ export function ContactModal({
                           setChips((cs) => (cs.includes(c) ? cs.filter((x) => x !== c) : [...cs, c]))
                         }
                       >
-                        {c}
+                        {CHIP_LABEL[c] ?? c}
                       </button>
                     ))}
                   </div>
                 </div>
                 <label>
-                  <span className="mono">Mensaje</span>
+                  <span className="md-l">Mensaje</span>
                   <textarea
                     rows={3}
                     placeholder="Contanos brevemente cómo trabajan hoy"
@@ -673,7 +647,7 @@ export function ContactModal({
                   />
                 </label>
                 <button className="btn md-send" type="submit">
-                  Enviar por WhatsApp →
+                  Enviar por WhatsApp
                 </button>
               </motion.form>
             )}
