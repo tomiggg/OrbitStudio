@@ -1,11 +1,18 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionValueEvent, useTransform } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useV2 } from "./context";
 import { HERO_PHOTO, HERO_VIDEOS, SETS, type HeroMode } from "./media";
 import { DUR, EASE, Magnetic, MaskText, stagger } from "./primitives";
-import { useIsMobile, useSectionProgress } from "./useMedia";
+import { useIsMobile, useMedia, useSectionProgress } from "./useMedia";
 
 function Video({ src, poster }: { src: string; poster: string }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -197,6 +204,28 @@ export function Hero() {
   });
 
   const js = !sda;
+
+  /*
+   * Profundidad con el mouse (solo desktop con mouse/trackpad): la ventana de
+   * video flota unos px hacia el cursor con un resorte blando, sin rebote.
+   * Amplitud chica (±14px / ±9px): se siente, no se nota. Va en el wrapper de
+   * entrada, así no pisa las transformaciones atadas al scroll.
+   */
+  const fine = useMedia("(hover: hover) and (pointer: fine)");
+  const reduceMotion = useMedia("(prefers-reduced-motion: reduce)");
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const fx = useSpring(px, { stiffness: 70, damping: 20, mass: 0.6 });
+  const fy = useSpring(py, { stiffness: 70, damping: 20, mass: 0.6 });
+  useEffect(() => {
+    if (!fine || reduceMotion) return;
+    const move = (e: PointerEvent) => {
+      px.set((e.clientX / innerWidth - 0.5) * 28);
+      py.set((e.clientY / innerHeight - 0.5) * 18);
+    };
+    addEventListener("pointermove", move, { passive: true });
+    return () => removeEventListener("pointermove", move);
+  }, [fine, reduceMotion, px, py]);
   const metaIn = (i: number) => ({
     initial: { opacity: 0, y: 14 },
     animate: ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 },
@@ -228,6 +257,7 @@ export function Hero() {
       <div ref={stRef} className="hero-st">
         <motion.div
           className="hero-frame-in"
+          style={{ x: fx, y: fy }}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={ready ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
           transition={{

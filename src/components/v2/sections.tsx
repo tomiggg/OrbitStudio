@@ -395,6 +395,7 @@ const PROJECTS = [
     href: "https://fila0.app",
     domain: "fila0.app",
     img: "/v2/img/fila0.webp",
+    full: { src: "/v2/img/fila0-full.webp", ar: 1200 / 3000 },
     lead: "Fila en la barra → pedido desde el celular.",
     rest: "Producto propio para boliches, bares y eventos: el cliente escanea un QR, pide y paga; la barra solo prepara.",
     disc: "Producto · Pedidos sin fila",
@@ -404,6 +405,7 @@ const PROJECTS = [
     href: "https://pb-inmobiliaria-contratos.vercel.app/",
     domain: "pb-inmobiliaria-contratos.vercel.app",
     img: "/v2/img/inmobi.webp",
+    full: { src: "/v2/img/inmobi-full.webp", ar: 1200 / 2842 },
     lead: "WhatsApp y planillas → un solo panel.",
     rest: "Reclamos, prestadores, pagos e impuestos de cada propiedad, con todo el equipo viendo lo mismo.",
     disc: "Sistema de gestión",
@@ -413,6 +415,7 @@ const PROJECTS = [
     href: "https://www.kira-jewels.com",
     domain: "kira-jewels.com",
     img: "/v2/img/kira.webp",
+    full: { src: "/v2/img/kira-full.webp", ar: 1200 / 3000 },
     lead: "Instagram → tienda propia.",
     rest: "Catálogo online con pedido directo por WhatsApp.",
     disc: "Sitio web + catálogo",
@@ -440,6 +443,39 @@ const PROJECTS = [
 ];
 
 const VISIBLE = PROJECTS.filter((pj) => !pj.archived);
+
+/*
+ * Captura de página completa que, al pasar el mouse por la tarjeta, se
+ * desplaza hasta el final: el caso se recorre como un sitio real. El
+ * recorrido (alto de la imagen − alto visible) se mide con ResizeObserver y
+ * se pasa por --travel; el movimiento lo hace CSS (transición interrumpible:
+ * si el mouse sale a mitad, vuelve desde donde está).
+ */
+function ScrollShot({ src, ar }: { src: string; ar: number }) {
+  const wrap = useRef<HTMLDivElement>(null);
+  const long = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const w = wrap.current;
+    const l = long.current;
+    if (!w || !l) return;
+    const set = () => {
+      const travel = Math.max(0, l.offsetHeight - w.clientHeight);
+      w.style.setProperty("--travel", `${travel}px`);
+      // Más recorrido, más tiempo: ~1.6s cada 1000px, entre 2.5s y 6s.
+      w.style.setProperty("--scroll-d", `${Math.min(6, Math.max(2.5, travel / 620)).toFixed(2)}s`);
+    };
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(w);
+    ro.observe(l);
+    return () => ro.disconnect();
+  }, []);
+  return (
+    <div ref={wrap} className="pj-scroll">
+      <div ref={long} className="pj-long" style={{ backgroundImage: `url(${src})`, aspectRatio: String(ar) }} />
+    </div>
+  );
+}
 
 function ProjectCard({
   pj,
@@ -490,7 +526,11 @@ function ProjectCard({
             <span className="mono">{pj.domain}</span>
           </div>
           <motion.div className="pj-img-w" {...dezoom}>
-            <div className="pj-img" style={{ backgroundImage: `url(${pj.img})` }} />
+            {"full" in pj && pj.full ? (
+              <ScrollShot src={pj.full.src} ar={pj.full.ar} />
+            ) : (
+              <div className="pj-img" style={{ backgroundImage: `url(${pj.img})` }} />
+            )}
           </motion.div>
         </motion.div>
         <motion.span className="pj-dim" style={{ opacity: dim }} />
