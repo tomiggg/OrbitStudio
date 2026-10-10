@@ -2,15 +2,17 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type Lenis from "lenis";
+import type { HeroMode, ImageSet } from "./media";
 
 export type Settings = {
+  hero: HeroMode;
+  set: ImageSet;
   accent: boolean;
   grain: boolean;
 };
 
-const DEFAULTS: Settings = { accent: true, grain: true };
-// v3: cambió la forma de los ajustes (sin modos de hero ni sets de fotos).
-const STORAGE_KEY = "ss_v2_settings_v3";
+const DEFAULTS: Settings = { hero: "tinta", set: "estudio", accent: true, grain: true };
+const STORAGE_KEY = "ss_v2_settings";
 
 type Ctx = {
   settings: Settings;

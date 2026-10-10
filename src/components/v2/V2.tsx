@@ -7,14 +7,15 @@ import { track, ANALYTICS_EVENTS } from "@/lib/analytics/track";
 import { ContactModal, Cursor, Header, Loader, MobileMenu, SettingsPanel } from "./chrome";
 import { V2Provider, useV2 } from "./context";
 import { Hero } from "./Hero";
-import { Cta, Footer, Manifesto, Process, Projects, Services } from "./sections";
+import { Cta, Facts, Footer, Manifesto, Marquee, Process, Projects, Services } from "./sections";
 import "lenis/dist/lenis.css";
 import "./v2.css";
 
-// Home V2, dirección "del caos al sistema": un hero donde el desorden de una
-// pyme se ordena en módulos al scrollear (la única animación protagonista),
-// y después secciones que alternan papel y tinta — manifiesto que se ilumina,
-// servicios en índice, casos apilados, proceso con línea de progreso y cierre.
+// Versión V2 del home (rama dev2). Misma base estética que la versión C
+// (grises oscuros, Geist + mono, filas editoriales) llevada a una página
+// con scroll narrativo: hero con ventana que se expande, manifiesto que se
+// ilumina, servicios en scroll horizontal, proyectos apilados, proceso con
+// línea de progreso y CTA con columnas en parallax.
 
 // Sin versionCHref (producción) no se muestran el panel de ajustes ni el link a la versión C.
 type Props = { fontClassName?: string; versionCHref?: string };
@@ -99,7 +100,7 @@ function Shell({
   useEffect(() => {
     const h = document.documentElement;
     const prev = h.style.background;
-    h.style.background = "#F2F3F1";
+    h.style.background = "#0E0E0D";
     const c = document.createElement("canvas");
     c.width = c.height = 200;
     const x = c.getContext("2d");
@@ -129,9 +130,11 @@ function Shell({
       <div className="v2-main">
         <Hero />
         <Manifesto />
+        <Facts />
         <Services />
         <Projects />
         <Process />
+        <Marquee />
         <Cta />
       </div>
       <Footer versionCHref={versionCHref} />
