@@ -192,6 +192,7 @@ export function Header({ onMenu, menuOpen }: { onMenu: () => void; menuOpen: boo
   const [entered, setEntered] = useState(false);
   const flags = useRef({ hidden: false, solid: false });
   const [now, setNow] = useState("(00) Inicio");
+  const [active, setActive] = useState("top");
   const [clock, setClock] = useState("--:--");
 
   // Se llama en cada frame de scroll: solo toca el estado de React al cambiar.
@@ -214,7 +215,10 @@ export function Header({ onMenu, menuOpen }: { onMenu: () => void; menuOpen: boo
     const io = new IntersectionObserver(
       (es) =>
         es.forEach((e) => {
-          if (e.isIntersecting) setNow((e.target as HTMLElement).dataset.label || "");
+          if (!e.isIntersecting) return;
+          const el = e.target as HTMLElement;
+          setNow(el.dataset.label || "");
+          setActive(el.id);
         }),
       { rootMargin: "-45% 0px -50% 0px" },
     );
@@ -266,8 +270,12 @@ export function Header({ onMenu, menuOpen }: { onMenu: () => void; menuOpen: boo
       </span>
       <nav className="hide-m">
         {NAV.map(([id, name]) => (
-          <a key={id} href={`#${id}`}>
+          <a key={id} href={`#${id}`} className={active === id ? "on" : undefined}>
             <Roll>{name}</Roll>
+            {/* Indicador compartido: se desliza de un link al otro (layoutId). */}
+            {active === id && (
+              <motion.span className="hd-ind" layoutId="hd-ind" transition={{ duration: 0.5, ease: EASE }} />
+            )}
           </a>
         ))}
       </nav>
