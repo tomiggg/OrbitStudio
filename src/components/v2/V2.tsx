@@ -96,6 +96,27 @@ function Shell({
     };
   }, [lenis, contact.open, menuOpen]);
 
+  /*
+   * "Shift" de tono: cuando una sección con data-tone="light" cruza una línea
+   * al 35% de la altura (donde suele estar lo que se lee), toda la página se invierte a la paleta hueso/tinta (la
+   * misma paleta de siempre, dada vuelta). El cambio es un atributo en la raíz;
+   * los colores son custom properties registradas con @property, así que la
+   * transición la hace CSS para todo a la vez (ver v2.css).
+   */
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const io = new IntersectionObserver(
+      (es) =>
+        es.forEach((e) => {
+          if (e.isIntersecting) root.dataset.tone = (e.target as HTMLElement).dataset.tone ?? "dark";
+        }),
+      { rootMargin: "-35% 0px -64% 0px" },
+    );
+    root.querySelectorAll("section, footer").forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   // Fondo del documento (evita blanco en overscroll) y textura de grano.
   useEffect(() => {
     const h = document.documentElement;

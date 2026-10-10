@@ -104,7 +104,7 @@ export function Manifesto() {
   const span = 0.8;
 
   return (
-    <section ref={ref} className="mf" id="estudio" data-label="(01) Estudio">
+    <section ref={ref} className="mf" id="estudio" data-label="(01) Estudio" data-tone="light">
       <div className="mf-st">
         <div className="mf-grid">
           <div className="mf-side">
@@ -143,7 +143,7 @@ const FACTS = [
 
 export function Facts() {
   return (
-    <section className="facts">
+    <section className="facts" data-tone="light">
       {FACTS.map(([t, d], i) => (
         <div key={t} className="fact">
           {/* La línea se dibuja primero; el contenido la sigue (follow-through). */}
@@ -797,7 +797,7 @@ export function Process() {
   const listRef = useRef<HTMLDivElement>(null);
   const scrollYProgress = useSectionProgress(listRef, ["start 55%", "end 55%"]);
   return (
-    <section className="pr" id="proceso" data-label="(04) Proceso">
+    <section className="pr" id="proceso" data-label="(04) Proceso" data-tone="light">
       <SecHead n="(04) Proceso" title="Cuatro fases, *un método.*" right="6–10 semanas" />
       <div className="pr-grid">
         <div className="pr-side">

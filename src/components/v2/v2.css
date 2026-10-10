@@ -1,6 +1,17 @@
 /* Shift Studio — versión V2 (rama dev2).
    Scope .v2 para no chocar con globals.css ni con la versión C (.wc). */
 
+/* Colores registrados: así un cambio de tono (data-tone en la raíz) se anima
+   como transición de color para toda la página a la vez. */
+@property --bg{syntax:"<color>";inherits:true;initial-value:#0E0E0D}
+@property --bg2{syntax:"<color>";inherits:true;initial-value:#141413}
+@property --bg3{syntax:"<color>";inherits:true;initial-value:#1B1B19}
+@property --fg{syntax:"<color>";inherits:true;initial-value:#ECEAE5}
+@property --mu{syntax:"<color>";inherits:true;initial-value:#8C8A85}
+@property --mu2{syntax:"<color>";inherits:true;initial-value:#55544F}
+@property --ln{syntax:"<color>";inherits:true;initial-value:rgba(236,234,229,.12)}
+@property --lnS{syntax:"<color>";inherits:true;initial-value:rgba(236,234,229,.24)}
+
 .v2{
   --bg:#0E0E0D;--bg2:#141413;--bg3:#1B1B19;--fg:#ECEAE5;--mu:#8C8A85;--mu2:#55544F;
   --ln:rgba(236,234,229,.12);--lnS:rgba(236,234,229,.24);--acc:#0ABAB5;
@@ -12,6 +23,12 @@
   --mono:var(--font-body),"JetBrains Mono",ui-monospace,monospace;
   background:var(--bg);color:var(--fg);font-family:var(--sans);
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;min-height:100vh;
+  transition:--bg .7s var(--ease-io),--bg2 .7s var(--ease-io),--bg3 .7s var(--ease-io),--fg .7s var(--ease-io),--mu .7s var(--ease-io),--mu2 .7s var(--ease-io),--ln .7s var(--ease-io),--lnS .7s var(--ease-io);
+}
+/* Tono claro: la paleta de siempre, invertida (hueso de fondo, tinta de texto). */
+.v2[data-tone="light"]{
+  --bg:#ECEAE5;--bg2:#E3E1DB;--bg3:#D8D5CE;--fg:#0E0E0D;--mu:#5F5D58;--mu2:#9A978F;
+  --ln:rgba(14,14,13,.12);--lnS:rgba(14,14,13,.26);
 }
 .v2.noacc{--acc:var(--fg)}
 .v2 *,.v2 *::before,.v2 *::after{box-sizing:border-box}
@@ -148,7 +165,7 @@ html.v2-cur .v2 input,html.v2-cur .v2 textarea{cursor:text}
 .v2 .mf-t .sf{letter-spacing:-.025em}
 .v2 .mf-pill{display:inline-block;height:.8em;vertical-align:-.06em;border-radius:999px;overflow:hidden;position:relative;margin-right:.25em;background:var(--bg3)}
 .v2 .mf-pill>span{position:absolute;inset:0;background:center/cover no-repeat;filter:grayscale(1)}
-.v2 .mf-prog{position:absolute;left:var(--pad);right:var(--pad);bottom:32px;height:1px;background:rgba(236,234,229,.45);transform-origin:0 50%}
+.v2 .mf-prog{position:absolute;left:var(--pad);right:var(--pad);bottom:32px;height:1px;background:color-mix(in srgb,var(--fg) 45%,transparent);transform-origin:0 50%}
 
 /* ── facts ── */
 .v2 .facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;padding:clamp(24px,4vw,60px) var(--pad) clamp(120px,14vw,200px)}
@@ -327,7 +344,8 @@ html.v2-cur .v2 input,html.v2-cur .v2 textarea{cursor:text}
 .v2 .ft-fb{display:flex;justify-content:space-between;gap:16px;margin-top:22px;border-top:1px solid var(--ln);padding-top:18px}
 
 /* ── ajustes ── */
-.v2 .stg{position:fixed;left:var(--pad);bottom:20px;z-index:70;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+/* El panel de ajustes es siempre oscuro: no sigue el tono de la página. */
+.v2 .stg{--bg:#0E0E0D;--fg:#ECEAE5;--mu:#8C8A85;--ln:rgba(236,234,229,.12);--lnS:rgba(236,234,229,.24);color:var(--fg);position:fixed;left:var(--pad);bottom:20px;z-index:70;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
 .v2 .stg-btn{display:inline-flex;align-items:center;gap:10px;height:38px;padding:0 16px 0 13px;border-radius:999px;background:#161615;border:1px solid var(--lnS);transition:border-color .3s,scale .25s var(--ease)}
 .v2 .stg-btn:hover{border-color:var(--fg)}
 .v2 .stg-btn .mono{color:var(--fg)}
