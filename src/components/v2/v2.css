@@ -37,7 +37,7 @@
 .v2 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
 .v2 ::selection{background:var(--acc);color:#0E0E0D}
 .v2 :focus-visible{outline:1px solid var(--acc);outline-offset:4px}
-.v2::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:90;opacity:.075;background-image:var(--grimg);background-size:200px 200px}
+.v2::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:90;opacity:.0675;background-image:var(--grimg);background-size:200px 200px}
 .v2.nogr::after{display:none}
 html.v2-cur .v2,html.v2-cur .v2 *{cursor:none}
 html.v2-cur .v2 input,html.v2-cur .v2 textarea{cursor:text}
