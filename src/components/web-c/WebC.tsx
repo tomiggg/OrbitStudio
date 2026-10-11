@@ -463,7 +463,7 @@ export function WebC({ fontClassName }: { fontClassName?: string }) {
           <span className="tag0">
             Branding + operaciones
             <br />
-            para pymes
+            para negocios
           </span>
           <span className="now mono">
             <span className="dot" />
@@ -584,7 +584,7 @@ export function WebC({ fontClassName }: { fontClassName?: string }) {
           <div className="g4 rv">
             <span className="mono">Sobre nosotros</span>
             <p className="lead">
-              Somos un estudio de branding y operaciones para pymes. Diseñamos la identidad de tu
+              Somos un estudio de branding y operaciones para negocios. Diseñamos la identidad de tu
               marca y construimos los sistemas que la hacen funcionar.{" "}
               <em>Para que te veas como una empresa grande y operes como una.</em>
             </p>
@@ -760,7 +760,7 @@ export function WebC({ fontClassName }: { fontClassName?: string }) {
           <div className="rows">
             <div className="rw">
               <span className="big">¿Listo para</span>
-              <span className="mono">Pymes · LATAM</span>
+              <span className="mono">Negocios · LATAM</span>
             </div>
             <div className="rw">
               <span className="big">construir?</span>
@@ -769,7 +769,7 @@ export function WebC({ fontClassName }: { fontClassName?: string }) {
           </div>
           <div className="bot g4">
             <p>
-              Contanos cómo trabaja tu pyme hoy. En 30 minutos te decimos <b>qué ordenar primero</b>.
+              Contanos cómo trabaja tu negocio hoy. En 30 minutos te decimos <b>qué ordenar primero</b>.
             </p>
             <div>
               <a

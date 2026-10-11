@@ -11,7 +11,7 @@ export type Settings = {
   grain: boolean;
 };
 
-const DEFAULTS: Settings = { hero: "tinta", set: "estudio", accent: true, grain: true };
+const DEFAULTS: Settings = { hero: "fluido", set: "estudio", accent: true, grain: true };
 const STORAGE_KEY = "ss_v2_settings";
 
 type Ctx = {
@@ -36,9 +36,12 @@ export function useV2() {
 export function V2Provider({
   children,
   openContact,
+  persist,
 }: {
   children: ReactNode;
   openContact: (service?: string) => void;
+  /** Solo con el panel de ajustes (local/preview); en producción siempre DEFAULTS. */
+  persist: boolean;
 }) {
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const [ready, setReady] = useState(false);
@@ -46,12 +49,13 @@ export function V2Provider({
 
   // Preferencias guardadas (solo conveniencia por visitante).
   useEffect(() => {
+    if (!persist) return;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       if (raw) setSettings({ ...DEFAULTS, ...JSON.parse(raw) });
     } catch {}
-  }, []);
+  }, [persist]);
 
   function update(patch: Partial<Settings>) {
     setSettings((s) => {

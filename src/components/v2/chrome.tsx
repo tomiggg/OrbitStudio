@@ -2,7 +2,6 @@
 
 import {
   AnimatePresence,
-  animate,
   motion,
   useMotionValueEvent,
   useScroll,
@@ -10,8 +9,8 @@ import {
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics/track";
 import { useV2 } from "./context";
-import { HERO_MODES, IMAGE_SETS } from "./media";
-import { EASE, Roll } from "./primitives";
+import { HERO_MODES, IMAGE_SETS, LIVE_MODES } from "./media";
+import { DUR, EASE, EASE_IN, EASE_IO, Roll, stagger } from "./primitives";
 import { useMedia } from "./useMedia";
 
 export const EMAIL = "shiftstudio.work@gmail.com";
@@ -24,82 +23,161 @@ export const NAV = [
   ["proceso", "Proceso"],
 ] as const;
 
-/* ───────────────────────── Loader ───────────────────────── */
+/* ───────────────────────── Intro ───────────────────────── */
 
 const SEEN_KEY = "ss_v2_seen";
+const DISCIPLINES = ["Identidad", "Sistemas", "Web"];
+const TICKS = [0.55, 1.0, 1.45]; // s: entrada de cada disciplina
+const MIN_INTRO = 2.05; // s: tiempo mínimo en pantalla (el ticker completa su vuelta)
+const MAX_WAIT = 3.2; // s: tope esperando a las fuentes
+const OPEN_DELAY = 0.22; // s: las cortinas arrancan cuando el contenido ya está saliendo
+const WORDMARK = "shift studio";
 
+/*
+ * Intro en tres actos (setup → acción → resolución):
+ *   1. Setup: una línea se dibuja desde el centro y suben los rótulos.
+ *   2. Acción: el wordmark sube desde su máscara y debajo pasan las tres
+ *      disciplinas del estudio — contenido real en vez de un % de carga falso.
+ *   3. Resolución: el contenido sale hacia arriba (ease-in, más corto que su
+ *      entrada) y la pantalla se abre en dos cortinas desde la línea. El hero
+ *      empieza a entrar con las cortinas a medio abrir, sin corte en negro.
+ * Espera a las fuentes (con tope) para que el wordmark no cambie de tipografía
+ * en medio de la animación. Una vez por sesión; con reduced-motion no se muestra.
+ * Todo con transform/opacity: nada que repinte o recalcule layout por frame.
+ */
 export function Loader() {
   const { setReady } = useV2();
-  const [show, setShow] = useState(true);
-  const [n, setN] = useState(0);
+  const [phase, setPhase] = useState<"in" | "out" | "done">("in");
+  const [disc, setDisc] = useState(-1);
 
   useEffect(() => {
     let skip = matchMedia("(prefers-reduced-motion: reduce)").matches;
     try {
       skip = skip || sessionStorage.getItem(SEEN_KEY) === "1";
-      sessionStorage.setItem(SEEN_KEY, "1");
     } catch {}
     if (skip) {
       const id = requestAnimationFrame(() => {
-        setShow(false);
+        setPhase("done");
         setReady(true);
       });
       return () => cancelAnimationFrame(id);
     }
-    const ctl = animate(0, 100, {
-      duration: 1.9,
-      ease: [0.65, 0, 0.35, 1],
-      onUpdate: (v) => setN(Math.round(v)),
-      onComplete: () => {
-        setReady(true);
-        setShow(false);
-      },
+    const timers = TICKS.map((s, i) => setTimeout(() => setDisc(i), s * 1000));
+    const t0 = performance.now();
+    let alive = true;
+    const fonts = document.fonts?.ready ?? Promise.resolve();
+    Promise.race([fonts, new Promise((r) => setTimeout(r, MAX_WAIT * 1000))]).then(() => {
+      if (!alive) return;
+      const wait = Math.max(0, MIN_INTRO * 1000 - (performance.now() - t0));
+      timers.push(
+        setTimeout(() => {
+          // Se marca vista recién al salir: si se marcara al montar, el doble
+          // montaje de StrictMode (dev) la saltearía siempre.
+          try {
+            sessionStorage.setItem(SEEN_KEY, "1");
+          } catch {}
+          setPhase("out");
+        }, wait),
+        setTimeout(() => setReady(true), wait + OPEN_DELAY * 1000),
+      );
     });
-    return () => ctl.stop();
+    return () => {
+      alive = false;
+      timers.forEach(clearTimeout);
+    };
   }, [setReady]);
 
+  if (phase === "done") return null;
+  const out = phase === "out";
+  // Salidas: ease-in y ~70% de la duración de su entrada.
+  const exitUp = { y: "-110%", transition: { duration: 0.45, ease: EASE_IN } };
+
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          className="ld"
-          aria-hidden="true"
-          initial={{ y: 0 }}
-          exit={{ y: "-100%", borderBottomLeftRadius: "40% 12vh", borderBottomRightRadius: "40% 12vh" }}
-          transition={{ duration: 1.1, ease: [0.76, 0, 0.24, 1] }}
+    <div className="ld" aria-hidden="true">
+      <motion.div
+        className="ld-half t"
+        animate={{ y: out ? "-100%" : "0%" }}
+        transition={{ duration: 1.05, ease: EASE_IO, delay: OPEN_DELAY }}
+      />
+      <motion.div
+        className="ld-half b"
+        animate={{ y: out ? "100%" : "0%" }}
+        transition={{ duration: 1.05, ease: EASE_IO, delay: OPEN_DELAY }}
+        onAnimationComplete={() => out && setPhase("done")}
+      />
+
+      <motion.span
+        className="ld-line"
+        initial={{ scaleX: 0 }}
+        animate={out ? { scaleX: 0, opacity: 0 } : { scaleX: 1, opacity: 1 }}
+        transition={out ? { duration: 0.4, ease: EASE_IN } : { duration: DUR.slow, ease: EASE, delay: 0.05 }}
+      />
+
+      <div className="ld-top">
+        {["(Shift Studio®)", "Sistemas de negocio", "Córdoba, AR — 31°S 64°O", "Est. 2026"].map((t, i) => (
+          <span className={`mk${i === 1 || i === 2 ? " hide-m" : ""}`} key={t}>
+            <motion.span
+              className="mono"
+              initial={{ y: "110%" }}
+              animate={out ? exitUp : { y: "0%" }}
+              transition={{ duration: DUR.base, ease: EASE, delay: 0.15 + i * 0.06 }}
+            >
+              {t}
+            </motion.span>
+          </span>
+        ))}
+      </div>
+
+      <span className="ld-wm">
+        {WORDMARK.split("").map((ch, i) => (
+          <span className="mk" key={i}>
+            <motion.span
+              initial={{ y: "110%", rotate: 3 }}
+              animate={
+                out
+                  ? { y: "-110%", transition: { duration: 0.45, ease: EASE_IN, delay: i * 0.012 } }
+                  : { y: "0%", rotate: 0 }
+              }
+              transition={{ duration: DUR.slow, ease: EASE, delay: 0.3 + i * stagger(WORDMARK.length, 0.035) }}
+            >
+              {ch === " " ? "\u00a0" : ch}
+            </motion.span>
+          </span>
+        ))}
+        <motion.sup
+          initial={{ opacity: 0, y: 8 }}
+          animate={out ? { opacity: 0, transition: { duration: 0.2 } } : { opacity: 1, y: 0 }}
+          transition={{ duration: DUR.base, ease: EASE, delay: 0.85 }}
         >
-          <div className="ld-top">
-            <span className="mono">(Shift Studio®)</span>
-            <span className="mono hide-m">Identidad + Sistemas</span>
-            <span className="mono hide-m">Córdoba, AR — 31°S 64°O</span>
-            <span className="mono">Est. 2026</span>
-          </div>
-          <div className="ld-bar">
-            <motion.span style={{ scaleX: n / 100 }} />
-          </div>
-          <div className="ld-bot">
-            <span className="ld-wm">
-              {"shift studio".split("").map((ch, i) => (
-                <span className="mk" key={i}>
-                  <motion.span
-                    initial={{ y: "110%" }}
-                    animate={{ y: "0%" }}
-                    transition={{ duration: 1, ease: EASE, delay: 0.1 + i * 0.035 }}
-                  >
-                    {ch === " " ? " " : ch}
-                  </motion.span>
-                </span>
-              ))}
-              <sup>®</sup>
-            </span>
-            <span className="ld-n">
-              {String(n).padStart(3, "0")}
-              <small>%</small>
-            </span>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          ®
+        </motion.sup>
+      </span>
+
+      <motion.div
+        className="ld-sub"
+        animate={out ? { opacity: 0, y: -10 } : { opacity: 1, y: 0 }}
+        transition={{ duration: out ? 0.3 : DUR.base, ease: out ? EASE_IN : EASE }}
+      >
+        <span className="ld-tk">
+          <AnimatePresence mode="popLayout" initial={false}>
+            {disc >= 0 && (
+              <motion.span
+                key={disc}
+                initial={{ y: "110%" }}
+                animate={{ y: "0%" }}
+                exit={{ y: "-110%", transition: { duration: 0.3, ease: EASE_IN } }}
+                transition={{ duration: 0.45, ease: EASE }}
+              >
+                {DISCIPLINES[disc]}
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </span>
+        <span className="mono ld-n">
+          {disc >= 0 ? String(disc + 1).padStart(2, "0") : "00"} / {String(DISCIPLINES.length).padStart(2, "0")}
+        </span>
+      </motion.div>
+    </div>
   );
 }
 
@@ -110,8 +188,11 @@ export function Header({ onMenu, menuOpen }: { onMenu: () => void; menuOpen: boo
   const { scrollY, scrollYProgress } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [solid, setSolid] = useState(false);
+  // La primera entrada llega después del wordmark del hero (sigue a la intro).
+  const [entered, setEntered] = useState(false);
   const flags = useRef({ hidden: false, solid: false });
   const [now, setNow] = useState("(00) Inicio");
+  const [active, setActive] = useState("top");
   const [clock, setClock] = useState("--:--");
 
   // Se llama en cada frame de scroll: solo toca el estado de React al cambiar.
@@ -134,7 +215,10 @@ export function Header({ onMenu, menuOpen }: { onMenu: () => void; menuOpen: boo
     const io = new IntersectionObserver(
       (es) =>
         es.forEach((e) => {
-          if (e.isIntersecting) setNow((e.target as HTMLElement).dataset.label || "");
+          if (!e.isIntersecting) return;
+          const el = e.target as HTMLElement;
+          setNow(el.dataset.label || "");
+          setActive(el.id);
         }),
       { rootMargin: "-45% 0px -50% 0px" },
     );
@@ -160,7 +244,12 @@ export function Header({ onMenu, menuOpen }: { onMenu: () => void; menuOpen: boo
       className={`hd${solid ? " solid" : ""}`}
       initial={{ y: "-100%" }}
       animate={{ y: ready && !hidden ? "0%" : "-100%" }}
-      transition={{ duration: 0.7, ease: EASE }}
+      transition={
+        hidden
+          ? { duration: DUR.quick, ease: EASE_IN }
+          : { duration: DUR.base, ease: EASE, delay: entered ? 0 : 0.75 }
+      }
+      onAnimationComplete={() => ready && !entered && setEntered(true)}
     >
       <a className="wm" href="#top">
         shift studio<sup>®</sup>
@@ -181,8 +270,12 @@ export function Header({ onMenu, menuOpen }: { onMenu: () => void; menuOpen: boo
       </span>
       <nav className="hide-m">
         {NAV.map(([id, name]) => (
-          <a key={id} href={`#${id}`}>
+          <a key={id} href={`#${id}`} className={active === id ? "on" : undefined}>
             <Roll>{name}</Roll>
+            {/* Indicador compartido: se desliza de un link al otro (layoutId). */}
+            {active === id && (
+              <motion.span className="hd-ind" layoutId="hd-ind" transition={{ duration: 0.5, ease: EASE }} />
+            )}
           </a>
         ))}
       </nav>
@@ -210,8 +303,8 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
           className="mnav"
           initial={{ clipPath: "inset(0 0 100% 0)" }}
           animate={{ clipPath: "inset(0 0 0% 0)" }}
-          exit={{ clipPath: "inset(0 0 100% 0)" }}
-          transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+          exit={{ clipPath: "inset(0 0 100% 0)", transition: { duration: 0.5, ease: EASE_IO } }}
+          transition={{ duration: 0.7, ease: EASE_IO }}
         >
           <div>
             {NAV.map(([id, name], i) => (
@@ -220,9 +313,9 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
                   <motion.a
                     href={`#${id}`}
                     onClick={onClose}
-                    initial={{ y: "110%" }}
-                    animate={{ y: "0%" }}
-                    transition={{ duration: 0.8, ease: EASE, delay: 0.25 + i * 0.06 }}
+                    initial={{ y: "110%", rotate: 3 }}
+                    animate={{ y: "0%", rotate: 0 }}
+                    transition={{ duration: DUR.slow, ease: EASE, delay: 0.25 + i * 0.06 }}
                   >
                     {name}
                   </motion.a>
@@ -231,7 +324,12 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
               </div>
             ))}
           </div>
-          <div className="mnav-ft">
+          <motion.div
+            className="mnav-ft"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: DUR.base, ease: EASE, delay: 0.5 }}
+          >
             <button
               className="btn"
               onClick={() => {
@@ -245,7 +343,7 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
               <span>{EMAIL}</span>
               <span>CBA, AR</span>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
@@ -364,7 +462,7 @@ export function SettingsPanel({ versionCHref }: { versionCHref: string }) {
       className="stg"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : 20 }}
-      transition={{ duration: 0.8, ease: EASE, delay: 0.8 }}
+      transition={{ duration: DUR.base, ease: EASE, delay: 1.1 }}
     >
       <AnimatePresence>
         {open && (
@@ -372,17 +470,23 @@ export function SettingsPanel({ versionCHref }: { versionCHref: string }) {
             className="stg-card"
             initial={{ opacity: 0, y: 12, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.97 }}
-            transition={{ duration: 0.35, ease: EASE }}
+            exit={{ opacity: 0, y: 8, scale: 0.98, transition: { duration: 0.22, ease: EASE_IN } }}
+            transition={{ duration: DUR.quick, ease: EASE }}
           >
             <div className="stg-hd">
               <span>Ajustes de vista</span>
               <span className="mono">Solo preview</span>
             </div>
             <Seg
-              label="Hero"
+              label="Hero · video"
               value={settings.hero}
               options={HERO_MODES}
+              onChange={(hero) => update({ hero })}
+            />
+            <Seg
+              label="Hero · en vivo"
+              value={settings.hero}
+              options={LIVE_MODES}
               onChange={(hero) => update({ hero })}
             />
             <Seg
@@ -484,20 +588,25 @@ export function ContactModal({
           onClick={(e) => e.target === e.currentTarget && onClose()}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.35 }}
+          exit={{ opacity: 0, transition: { duration: 0.25, ease: EASE_IN, delay: 0.05 } }}
+          transition={{ duration: 0.25, ease: EASE }}
         >
           <motion.div
             className="md"
             role="dialog"
             aria-modal="true"
             aria-label="Contacto"
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 40, opacity: 0 }}
-            transition={{ duration: 0.55, ease: EASE }}
+            initial={{ y: 28, scale: 0.97, opacity: 0 }}
+            animate={{ y: 0, scale: 1, opacity: 1 }}
+            exit={{ y: 20, scale: 0.98, opacity: 0, transition: { duration: 0.25, ease: EASE_IN } }}
+            transition={{ duration: 0.5, ease: EASE, delay: 0.05 }}
           >
-            <div className="md-tp">
+            <motion.div
+              className="md-tp"
+              initial={{ y: 12, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: DUR.base, ease: EASE, delay: 0.15 }}
+            >
               <h3>
                 Contanos
                 <br />
@@ -506,14 +615,24 @@ export function ContactModal({
               <button className="mono" onClick={onClose}>
                 (Cerrar)
               </button>
-            </div>
+            </motion.div>
             {sent ? (
-              <div className="md-ok">
+              <motion.div
+                className="md-ok"
+                initial={{ y: 16, scale: 0.98, opacity: 0 }}
+                animate={{ y: 0, scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5, ease: EASE }}
+              >
                 <b>Recibido.</b>
                 <span className="mono">Te respondemos en el día</span>
-              </div>
+              </motion.div>
             ) : (
-              <form onSubmit={onSubmit}>
+              <motion.form
+                onSubmit={onSubmit}
+                initial={{ y: 12, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: DUR.base, ease: EASE, delay: 0.22 }}
+              >
                 <label>
                   <span className="mono">Nombre</span>
                   <input
@@ -562,7 +681,7 @@ export function ContactModal({
                 <button className="btn md-send" type="submit">
                   Enviar por WhatsApp →
                 </button>
-              </form>
+              </motion.form>
             )}
           </motion.div>
         </motion.div>

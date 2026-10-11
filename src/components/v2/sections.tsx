@@ -2,10 +2,12 @@
 
 import {
   AnimatePresence,
+  animate,
   motion,
   useAnimationFrame,
   useInView,
   useMotionValue,
+  useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
@@ -17,7 +19,7 @@ import { track, ANALYTICS_EVENTS } from "@/lib/analytics/track";
 import { useV2 } from "./context";
 import { EMAIL, NAV, WHATSAPP } from "./chrome";
 import { SETS, ctaColumns } from "./media";
-import { EASE, Magnetic, MaskText, Reveal, Roll, Rule } from "./primitives";
+import { DUR, EASE, EASE_IN, EASE_IO, Magnetic, MaskText, Reveal, Roll, Rule } from "./primitives";
 import { useIsMobile, useSectionProgress } from "./useMedia";
 
 /* ───────────────────── Encabezado de sección ───────────────────── */
@@ -102,7 +104,7 @@ export function Manifesto() {
   const span = 0.8;
 
   return (
-    <section ref={ref} className="mf" id="estudio" data-label="(01) Estudio">
+    <section ref={ref} className="mf" id="estudio" data-label="(01) Estudio" data-tone="light">
       <div className="mf-st">
         <div className="mf-grid">
           <div className="mf-side">
@@ -141,14 +143,17 @@ const FACTS = [
 
 export function Facts() {
   return (
-    <section className="facts">
+    <section className="facts" data-tone="light">
       {FACTS.map(([t, d], i) => (
-        <Reveal key={t} className="fact" delay={i * 0.08}>
+        <div key={t} className="fact">
+          {/* La línea se dibuja primero; el contenido la sigue (follow-through). */}
           <Rule delay={i * 0.08} />
-          <span className="mono">— {String(i + 1).padStart(2, "0")}</span>
-          <h3>{t}</h3>
-          <p>{d}</p>
-        </Reveal>
+          <Reveal className="fact-in" delay={0.15 + i * 0.08} y={18}>
+            <span className="fact-n sf">{String(i + 1).padStart(2, "0")}</span>
+            <h3>{t}</h3>
+            <p>{d}</p>
+          </Reveal>
+        </div>
       ))}
     </section>
   );
@@ -195,6 +200,39 @@ const SERVICES = [
   },
 ];
 
+/*
+ * Reveal de imagen: el marco se abre como una cortina desde abajo (clip-path)
+ * mientras la foto adentro se des-zoomea (1.22 → 1). Dos capas con curvas
+ * distintas — la cortina "en pantalla", la foto desacelerando — para que no
+ * se lea como un solo movimiento plano. Una vez por elemento.
+ * Lo dispara la tarjeta (REVEAL_ON) y baja a los hijos por variants: un
+ * elemento con clip-path inset(100%) tiene área visible cero y el
+ * IntersectionObserver nunca lo da por visto.
+ */
+const REVEAL_ON = {
+  initial: "hidden",
+  whileInView: "shown",
+  viewport: { once: true, amount: 0.25 },
+} as const;
+const curtain = {
+  variants: {
+    hidden: { clipPath: "inset(100% 0% 0% 0% round 14px)" },
+    shown: { clipPath: "inset(0% 0% 0% 0% round 14px)", transition: { duration: DUR.reveal, ease: EASE_IO } },
+  },
+};
+const dezoom = {
+  variants: {
+    hidden: { scale: 1.22 },
+    shown: { scale: 1, transition: { duration: 1.6, ease: EASE } },
+  },
+};
+const numUp = {
+  variants: {
+    hidden: { y: "100%" },
+    shown: { y: "0%", transition: { duration: DUR.slow, ease: EASE, delay: 0.45 } },
+  },
+};
+
 function ServiceCard({
   s,
   i,
@@ -209,21 +247,27 @@ function ServiceCard({
   const { openContact } = useV2();
   const ix = useTransform(p, [0, 1], ["-7%", "7%"]);
   return (
-    <article className="sv-card" data-cur="Servicio">
-      <div className="sv-img">
-        <AnimatePresence initial={false}>
-          <motion.span
-            key={img}
-            className="sv-img-in"
-            style={{ backgroundImage: `url(${img})`, x: ix }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
-          />
-        </AnimatePresence>
-        <span className="sv-num">{String(i + 1).padStart(2, "0")}</span>
-      </div>
+    <motion.article className="sv-card" data-cur="Servicio" {...REVEAL_ON}>
+      <motion.div className="sv-img" {...curtain}>
+        <motion.div className="sv-img-z" {...dezoom}>
+          <AnimatePresence initial={false}>
+            <motion.span
+              key={img}
+              className="sv-img-in"
+              style={{ backgroundImage: `url(${img})`, x: ix }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+            />
+          </AnimatePresence>
+        </motion.div>
+        <span className="mk sv-num">
+          <motion.span {...numUp}>
+            {String(i + 1).padStart(2, "0")}
+          </motion.span>
+        </span>
+      </motion.div>
       <div className="sv-body">
         <div className="sv-top">
           <span className="mono">Disciplina {String(i + 1).padStart(2, "0")}</span>
@@ -246,7 +290,7 @@ function ServiceCard({
           <Roll>Consultar</Roll> →
         </button>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -347,10 +391,21 @@ export function Services() {
 // Los proyectos con `archived` quedan guardados pero no se muestran.
 const PROJECTS = [
   {
+    name: "Fila0",
+    href: "https://fila0.app",
+    domain: "fila0.app",
+    img: "/v2/img/fila0.webp",
+    full: { src: "/v2/img/fila0-full.webp", ar: 1200 / 3000 },
+    lead: "Fila en la barra → pedido desde el celular.",
+    rest: "Producto propio para boliches, bares y eventos: el cliente escanea un QR, pide y paga; la barra solo prepara.",
+    disc: "Producto · Pedidos sin fila",
+  },
+  {
     name: "inmobi.app",
     href: "https://pb-inmobiliaria-contratos.vercel.app/",
     domain: "pb-inmobiliaria-contratos.vercel.app",
     img: "/v2/img/inmobi.webp",
+    full: { src: "/v2/img/inmobi-full.webp", ar: 1200 / 2842 },
     lead: "WhatsApp y planillas → un solo panel.",
     rest: "Reclamos, prestadores, pagos e impuestos de cada propiedad, con todo el equipo viendo lo mismo.",
     disc: "Sistema de gestión",
@@ -360,6 +415,7 @@ const PROJECTS = [
     href: "https://www.kira-jewels.com",
     domain: "kira-jewels.com",
     img: "/v2/img/kira.webp",
+    full: { src: "/v2/img/kira-full.webp", ar: 1200 / 3000 },
     lead: "Instagram → tienda propia.",
     rest: "Catálogo online con pedido directo por WhatsApp.",
     disc: "Sitio web + catálogo",
@@ -388,6 +444,39 @@ const PROJECTS = [
 
 const VISIBLE = PROJECTS.filter((pj) => !pj.archived);
 
+/*
+ * Captura de página completa que, al pasar el mouse por la tarjeta, se
+ * desplaza hasta el final: el caso se recorre como un sitio real. El
+ * recorrido (alto de la imagen − alto visible) se mide con ResizeObserver y
+ * se pasa por --travel; el movimiento lo hace CSS (transición interrumpible:
+ * si el mouse sale a mitad, vuelve desde donde está).
+ */
+function ScrollShot({ src, ar }: { src: string; ar: number }) {
+  const wrap = useRef<HTMLDivElement>(null);
+  const long = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const w = wrap.current;
+    const l = long.current;
+    if (!w || !l) return;
+    const set = () => {
+      const travel = Math.max(0, l.offsetHeight - w.clientHeight);
+      w.style.setProperty("--travel", `${travel}px`);
+      // Más recorrido, más tiempo: ~1.6s cada 1000px, entre 2.5s y 6s.
+      w.style.setProperty("--scroll-d", `${Math.min(6, Math.max(2.5, travel / 620)).toFixed(2)}s`);
+    };
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(w);
+    ro.observe(l);
+    return () => ro.disconnect();
+  }, []);
+  return (
+    <div ref={wrap} className="pj-scroll">
+      <div ref={long} className="pj-long" style={{ backgroundImage: `url(${src})`, aspectRatio: String(ar) }} />
+    </div>
+  );
+}
+
 function ProjectCard({
   pj,
   i,
@@ -410,6 +499,7 @@ function ProjectCard({
         rel="noopener"
         data-cur="Ver sitio"
         style={{ scale }}
+        {...REVEAL_ON}
         onClick={() => track(ANALYTICS_EVENTS.projectLinkClick, { project: pj.name })}
       >
         <div className="pj-info">
@@ -428,22 +518,157 @@ function ProjectCard({
             <span className="pill-ar">↗</span>
           </span>
         </div>
-        <div className="pj-shot">
+        <motion.div className="pj-shot" {...curtain}>
           <div className="pj-bar">
             <i />
             <i />
             <i />
             <span className="mono">{pj.domain}</span>
           </div>
-          <div className="pj-img" style={{ backgroundImage: `url(${pj.img})` }} />
-        </div>
+          <motion.div className="pj-img-w" {...dezoom}>
+            {"full" in pj && pj.full ? (
+              <ScrollShot src={pj.full.src} ar={pj.full.ar} />
+            ) : (
+              <div className="pj-img" style={{ backgroundImage: `url(${pj.img})` }} />
+            )}
+          </motion.div>
+        </motion.div>
         <motion.span className="pj-dim" style={{ opacity: dim }} />
       </motion.a>
     </div>
   );
 }
 
-// Última placa del stack: lugar vacío para el próximo cliente. Queda al
+/*
+ * "Tu proyecto": en vez de una captura vacía, un sitio que se diseña solo al
+ * entrar en pantalla. Coreografía (una vez):
+ *   0.00  grilla de columnas (ambiente)
+ *   0.15  nav: logo, links, botón
+ *   0.35  titular en dos líneas que se trazan; 0.6 bajada; 0.75 CTA
+ *   0.55  panel con barras que crecen en ola
+ *   1.00  tarjetas inferiores, escalonadas
+ *   1.30  un cursor llega en arco al CTA y lo presiona → se pinta con el acento
+ * Todo transform/opacity; con reduced-motion queda el estado final sin cursor.
+ */
+const BARS = [38, 54, 46, 70, 88, 62, 76];
+
+function Blueprint() {
+  const ref = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLSpanElement>(null);
+  const curRef = useRef<HTMLSpanElement>(null);
+  const on = useInView(ref, { once: true, amount: 0.45 });
+  const reduce = useReducedMotion();
+  const [clicked, setClicked] = useState(false);
+
+  useEffect(() => {
+    const root = ref.current;
+    const cta = ctaRef.current;
+    const cur = curRef.current;
+    if (!on || reduce || !root || !cta || !cur) return;
+    const r = root.getBoundingClientRect();
+    const c = cta.getBoundingClientRect();
+    const tx = c.left - r.left + c.width * 0.6;
+    const ty = c.top - r.top + c.height * 0.55;
+    // x e y con curvas distintas: el cursor sube primero y después se desliza,
+    // así el recorrido es un arco y no una diagonal recta.
+    const move = animate(
+      cur,
+      { x: [r.width * 0.86, tx], y: [r.height * 0.92, ty], opacity: [0, 1] },
+      {
+        duration: 1.15,
+        delay: 1.3,
+        x: { duration: 1.15, delay: 1.3, ease: [0.55, 0, 0.25, 1] },
+        y: { duration: 1.15, delay: 1.3, ease: [0.15, 0.7, 0.3, 1] },
+        opacity: { duration: 0.3, delay: 1.3 },
+      },
+    );
+    let alive = true;
+    move.then(() => {
+      if (!alive) return;
+      setClicked(true);
+      animate(cur, { scale: [1, 0.82, 1] }, { duration: 0.32, ease: EASE });
+      animate(cur, { opacity: 0 }, { duration: 0.5, delay: 1.4, ease: EASE_IN });
+    });
+    return () => {
+      alive = false;
+      move.stop();
+    };
+  }, [on, reduce]);
+
+  const rise = (delay: number) => ({
+    initial: { opacity: 0, y: 14 },
+    animate: on ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 },
+    transition: { duration: DUR.slow, ease: EASE, delay },
+  });
+  const line = (delay: number) => ({
+    initial: { scaleX: 0 },
+    animate: { scaleX: on ? 1 : 0 },
+    transition: { duration: DUR.slow, ease: EASE, delay },
+  });
+  const grow = (delay: number) => ({
+    initial: { scaleY: 0 },
+    animate: { scaleY: on ? 1 : 0 },
+    transition: { duration: 0.8, ease: EASE, delay },
+  });
+
+  return (
+    <div ref={ref} className={`bp${clicked ? " clicked" : ""}`} aria-hidden="true">
+      <motion.div
+        className="bp-grid"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: on ? 1 : 0 }}
+        transition={{ duration: 1.2, ease: EASE }}
+      >
+        {[0, 1, 2, 3, 4, 5].map((k) => (
+          <i key={k} />
+        ))}
+      </motion.div>
+      <div className="bp-nav">
+        <motion.i className="bp-logo" {...rise(0.15)} />
+        <span className="bp-links">
+          {[0, 1, 2].map((k) => (
+            <motion.i key={k} {...line(0.2 + k * 0.05)} />
+          ))}
+        </span>
+        <motion.i className="bp-pill" {...rise(0.35)} />
+      </div>
+      <div className="bp-main">
+        <div className="bp-copy">
+          <motion.i className="bp-h" style={{ width: "88%" }} {...line(0.35)} />
+          <motion.i className="bp-h" style={{ width: "62%" }} {...line(0.45)} />
+          <motion.i className="bp-t" style={{ width: "76%" }} {...line(0.6)} />
+          <motion.i className="bp-t" style={{ width: "52%" }} {...line(0.66)} />
+          <motion.span ref={ctaRef} className="bp-cta" {...rise(0.75)}>
+            Empezar
+          </motion.span>
+        </div>
+        <motion.div className="bp-panel" {...rise(0.55)}>
+          <span className="bp-panel-top">
+            <i />
+            <i />
+          </span>
+          <span className="bp-bars">
+            {BARS.map((h, k) => (
+              <motion.i key={k} style={{ height: `${h}%` }} {...grow(0.8 + k * 0.05)} />
+            ))}
+          </span>
+        </motion.div>
+      </div>
+      <div className="bp-cards">
+        {[0, 1, 2].map((k) => (
+          <motion.i key={k} {...rise(1 + k * 0.08)} />
+        ))}
+      </div>
+      <span ref={curRef} className="bp-cursor">
+        <svg viewBox="0 0 16 16" width="16" height="16">
+          <path d="M2 1.5 13.5 7.2 8.3 8.6 6 13.8Z" fill="currentColor" stroke="#0E0E0D" strokeWidth="1" />
+        </svg>
+      </span>
+    </div>
+  );
+}
+
+// Última placa del stack: lugar libre para el próximo cliente. Queda al
 // fondo de la pila, así que no necesita escala ni oscurecido.
 function SoonCard({ i }: { i: number }) {
   const { openContact } = useV2();
@@ -473,9 +698,7 @@ function SoonCard({ i }: { i: number }) {
             <i />
             <span className="mono">tu-proyecto.com</span>
           </div>
-          <div className="pj-empty">
-            <span className="mono">(Próximamente)</span>
-          </div>
+          <Blueprint />
         </div>
       </button>
     </div>
@@ -574,7 +797,7 @@ export function Process() {
   const listRef = useRef<HTMLDivElement>(null);
   const scrollYProgress = useSectionProgress(listRef, ["start 55%", "end 55%"]);
   return (
-    <section className="pr" id="proceso" data-label="(04) Proceso">
+    <section className="pr" id="proceso" data-label="(04) Proceso" data-tone="light">
       <SecHead n="(04) Proceso" title="Cuatro fases, *un método.*" right="6–10 semanas" />
       <div className="pr-grid">
         <div className="pr-side">
@@ -585,8 +808,8 @@ export function Process() {
                   key={active}
                   initial={{ y: "100%" }}
                   animate={{ y: "0%" }}
-                  exit={{ y: "-100%" }}
-                  transition={{ duration: 0.7, ease: EASE }}
+                  exit={{ y: "-100%", transition: { duration: 0.45, ease: EASE_IN } }}
+                  transition={{ duration: DUR.slow, ease: EASE }}
                 >
                   {String(active + 1).padStart(2, "0")}
                 </motion.span>
@@ -627,7 +850,9 @@ function VelocityRow({ children, base }: { children: React.ReactNode; base: numb
   const skew = useTransform(vel, [-3000, 3000], [7, -7], { clamp: true });
   const x = useTransform(bx, (v) => `${wrap(-50, 0, v)}%`);
   const dir = useRef(1);
+  const reduce = useReducedMotion();
   useAnimationFrame((_, d) => {
+    if (reduce) return;
     const f = factor.get();
     if (f < 0) dir.current = -1;
     else if (f > 0) dir.current = 1;
@@ -664,7 +889,7 @@ export function Marquee() {
       </VelocityRow>
       <VelocityRow base={2}>
         <span className="mq-set mq-small">
-          {["Identidad", "Operaciones", "Pymes", "Córdoba, AR", "LATAM", "Est. 2026"].map((w, i) => (
+          {["Identidad", "Operaciones", "Negocios", "Córdoba, AR", "LATAM", "Est. 2026"].map((w, i) => (
             <span key={w} className="mq-it">
               <span className="mono">({String(i + 1).padStart(2, "0")})</span>
               <span>{w}</span>
@@ -732,7 +957,7 @@ export function Cta() {
         <MaskText as="h2" className="cta-t" text={"¿Listo para\n*construir?*"} stagger={0.08} />
         <div className="cta-bot">
           <p>
-            Contanos cómo trabaja tu pyme hoy. En 30 minutos te decimos <b>qué ordenar primero</b>.
+            Contanos cómo trabaja tu negocio hoy. En 30 minutos te decimos <b>qué ordenar primero</b>.
           </p>
           <div className="cta-btns">
             <a className="btn o" href={`https://wa.me/${WHATSAPP}`} target="_blank" rel="noreferrer">
@@ -753,11 +978,25 @@ export function Cta() {
 
 /* ───────────────────────── Footer ───────────────────────── */
 
+/*
+ * Cierre: el wordmark gigante sube letra por letra en ola a medida que se
+ * llega al final. Atado al scroll (lo maneja el usuario), con ease-out por
+ * letra para que cada una "aterrice" en vez de frenar en seco.
+ */
+const WM = "shift\u00a0studio".split("");
+const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+function WmLetter({ ch, k, p }: { ch: string; k: number; p: MotionValue<number> }) {
+  const a = 0.2 + (k / WM.length) * 0.32;
+  const y = useTransform(p, [a, a + 0.48], ["105%", "0%"], { ease: easeOut });
+  return <motion.span style={{ y }}>{ch}</motion.span>;
+}
+
 export function Footer({ versionCHref }: { versionCHref?: string }) {
   const ref = useRef<HTMLElement>(null);
   const [copied, setCopied] = useState(false);
   const p = useSectionProgress(ref, ["start end", "end end"]);
-  const y = useTransform(p, [0.2, 1], ["70%", "0%"]);
+  const supO = useTransform(p, [0.85, 1], [0, 1]);
   return (
     <footer ref={ref} className="ft">
       <button
@@ -776,7 +1015,7 @@ export function Footer({ versionCHref }: { versionCHref?: string }) {
         <div>
           <span className="mono">Estudio</span>
           <span>Shift Studio®</span>
-          <span className="mu">Sistemas de negocio para pymes</span>
+          <span className="mu">Sistemas para negocios</span>
         </div>
         <div>
           <span className="mono">Navegación</span>
@@ -807,9 +1046,12 @@ export function Footer({ versionCHref }: { versionCHref?: string }) {
         </div>
       </div>
       <div className="ft-wm" aria-hidden="true">
-        <motion.span style={{ y }}>
-          shift studio<sup>®</sup>
-        </motion.span>
+        <span className="ft-wm-in">
+          {WM.map((ch, k) => (
+            <WmLetter key={k} ch={ch} k={k} p={p} />
+          ))}
+          <motion.sup style={{ opacity: supO }}>®</motion.sup>
+        </span>
       </div>
       <div className="ft-fb mono">
         <span>© 2026 Shift Studio</span>

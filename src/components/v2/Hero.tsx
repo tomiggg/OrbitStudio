@@ -1,11 +1,19 @@
 "use client";
 
-import { AnimatePresence, motion, useMotionValueEvent, useTransform } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useV2 } from "./context";
-import { HERO_PHOTO, HERO_VIDEOS, SETS, type HeroMode } from "./media";
-import { EASE, Magnetic, MaskText } from "./primitives";
-import { useIsMobile, useSectionProgress } from "./useMedia";
+import { HeroCanvas } from "./HeroCanvas";
+import { HERO_PHOTO, HERO_VIDEOS, SETS, isLive, type HeroMode } from "./media";
+import { DUR, EASE, Magnetic, MaskText, stagger } from "./primitives";
+import { useIsMobile, useMedia, useSectionProgress } from "./useMedia";
 
 function Video({ src, poster }: { src: string; poster: string }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -46,7 +54,7 @@ function Slides({ slides }: { slides: string[] }) {
   );
 }
 
-export function HeroMedia({ mode, slides }: { mode: HeroMode; slides: string[] }) {
+export function HeroMedia({ mode, slides, accent }: { mode: HeroMode; slides: string[]; accent: boolean }) {
   return (
     <AnimatePresence initial={false}>
       <motion.div
@@ -57,7 +65,9 @@ export function HeroMedia({ mode, slides }: { mode: HeroMode; slides: string[] }
         exit={{ opacity: 0 }}
         transition={{ duration: 0.9, ease: "easeInOut" }}
       >
-        {mode === "foto" ? (
+        {isLive(mode) ? (
+          <HeroCanvas mode={mode} accent={accent} />
+        ) : mode === "foto" ? (
           <div className="hm-img kb" style={{ backgroundImage: `url(${HERO_PHOTO})` }} />
         ) : mode === "slides" ? (
           <Slides slides={slides} />
@@ -198,13 +208,50 @@ export function Hero() {
 
   const js = !sda;
 
+  /*
+   * Profundidad con el mouse (solo desktop con mouse/trackpad): la ventana de
+   * video flota unos px hacia el cursor con un resorte blando, sin rebote.
+   * Amplitud chica (±14px / ±9px): se siente, no se nota. Va en el wrapper de
+   * entrada, así no pisa las transformaciones atadas al scroll.
+   */
+  const fine = useMedia("(hover: hover) and (pointer: fine)");
+  const reduceMotion = useMedia("(prefers-reduced-motion: reduce)");
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const fx = useSpring(px, { stiffness: 70, damping: 20, mass: 0.6 });
+  const fy = useSpring(py, { stiffness: 70, damping: 20, mass: 0.6 });
+  useEffect(() => {
+    if (!fine || reduceMotion) return;
+    const move = (e: PointerEvent) => {
+      px.set((e.clientX / innerWidth - 0.5) * 28);
+      py.set((e.clientY / innerHeight - 0.5) * 18);
+    };
+    addEventListener("pointermove", move, { passive: true });
+    return () => removeEventListener("pointermove", move);
+  }, [fine, reduceMotion, px, py]);
+  // Los rótulos se revelan desde una máscara (clip-path) en vez de un fundido:
+  // mismo gesto que las letras y, como nunca están en opacity 0, cuentan para
+  // el LCP desde el primer pintado (detrás de la intro) y no recién al final.
+  const HID = "inset(0% 0% 100% 0%)";
+  const metaIn = (i: number) => ({
+    initial: { clipPath: HID, y: 14 },
+    animate: ready ? { clipPath: "inset(0% 0% 0% 0%)", y: 0 } : { clipPath: HID, y: 14 },
+    transition: { duration: DUR.slow, ease: EASE, delay: 0.6 + i * 0.07 },
+  });
+
+  /*
+   * Entrada (arranca con las cortinas de la intro a medio abrir):
+   *   0.10s  la ventana emerge: escala 0.9 → 1 (tensión → apertura)
+   *   0.20s  "shift" sube letra por letra; 0.34s "studio" (mismo origen: desde abajo)
+   *   0.60s  rótulos (capa secundaria), 0.75s header, 1.1s indicador de scroll (ambiente)
+   */
   const chars = (w: string, base: number) =>
     w.split("").map((ch, i) => (
       <span className="mk" key={i}>
         <motion.span
-          initial={{ y: "105%" }}
-          animate={{ y: ready ? "0%" : "105%" }}
-          transition={{ duration: 1.2, ease: EASE, delay: base + i * 0.05 }}
+          initial={{ y: "105%", rotate: 4 }}
+          animate={ready ? { y: "0%", rotate: 0 } : { y: "105%", rotate: 4 }}
+          transition={{ duration: 1.05, ease: EASE, delay: base + i * stagger(w.length, 0.045) }}
         >
           {ch}
         </motion.span>
@@ -217,58 +264,45 @@ export function Hero() {
       <div ref={stRef} className="hero-st">
         <motion.div
           className="hero-frame-in"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: ready ? 1 : 0 }}
-          transition={{ duration: 1.2, ease: EASE, delay: 0.15 }}
+          style={{ x: fx, y: fy }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={ready ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+          transition={{
+            scale: { duration: 1.3, ease: EASE, delay: 0.1 },
+            opacity: { duration: DUR.base, ease: EASE, delay: 0.1 },
+          }}
         >
           <motion.div className="hero-frame" style={js ? { scaleX: fX, scaleY: fY } : undefined}>
             <motion.div className="hero-media" style={js ? { scaleX: mX, scaleY: mY } : undefined}>
-              <HeroMedia mode={settings.hero} slides={SETS[settings.set].slides} />
+              <HeroMedia mode={settings.hero} slides={SETS[settings.set].slides} accent={settings.accent} />
             </motion.div>
             <motion.div className="hero-veil" style={js ? { opacity: veilO } : undefined} />
           </motion.div>
         </motion.div>
 
         <motion.div className="hero-meta" style={js ? { opacity: metaO } : undefined}>
-          <motion.span
-            className="mono"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: ready ? 1 : 0 }}
-            transition={{ duration: 1, delay: 0.7 }}
-          >
+          <motion.span className="mono" {...metaIn(0)}>
             Identidad + sistemas
             <br />
-            para pymes
+            para negocios
           </motion.span>
-          <motion.span
-            className="mono hide-m"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: ready ? 1 : 0 }}
-            transition={{ duration: 1, delay: 0.8 }}
-          >
+          <motion.span className="mono hide-m" {...metaIn(1)}>
             Identidad
             <br />
             Sistemas · Web
           </motion.span>
-          <motion.span
-            className="mono hide-m"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: ready ? 1 : 0 }}
-            transition={{ duration: 1, delay: 0.9 }}
-          >
+          <motion.span className="mono hide-m" {...metaIn(2)}>
             Córdoba, AR
             <br />
             31°S 64°O
           </motion.span>
-          <motion.span
-            className="mono r"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: ready ? 1 : 0 }}
-            transition={{ duration: 1, delay: 1 }}
-          >
+          <motion.span className="mono r" {...metaIn(3)}>
             ©2026
             <br />
-            (Scroll ↓)
+            <span className="hero-cue">
+              Scroll
+              <i aria-hidden="true" />
+            </span>
           </motion.span>
         </motion.div>
 
@@ -277,15 +311,21 @@ export function Hero() {
           style={js ? { x: leftX, opacity: wordsO } : undefined}
           aria-label="shift studio"
         >
-          <span aria-hidden="true">{chars(W1, 0.1)}</span>
+          <span aria-hidden="true">{chars(W1, 0.2)}</span>
         </motion.h1>
         <motion.div
           className="hero-w w2"
           style={js ? { x: rightX, opacity: wordsO } : undefined}
           aria-hidden="true"
         >
-          {chars(W2, 0.3)}
-          <sup>®</sup>
+          {chars(W2, 0.34)}
+          <motion.sup
+            initial={{ opacity: 0, y: 10 }}
+            animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+            transition={{ duration: DUR.base, ease: EASE, delay: 0.85 }}
+          >
+            ®
+          </motion.sup>
         </motion.div>
 
         <motion.div

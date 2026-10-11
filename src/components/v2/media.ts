@@ -2,8 +2,19 @@
 // libre) pasadas a escala de grises; los videos son los clips de tinta/humo
 // que ya estaban en /public, recortados y re-encodeados en /public/v2/video.
 
-export type HeroMode = "tinta" | "humo" | "bloom" | "foto" | "slides";
+/** Fondos generativos (WebGL, en vivo): ver HeroCanvas. */
+export type LiveMode = "fluido" | "topo" | "puntos" | "lineas";
+export type HeroMode = "tinta" | "humo" | "bloom" | "foto" | "slides" | LiveMode;
 export type ImageSet = "estudio" | "arquitectura" | "materia";
+
+export const LIVE_MODES: { id: LiveMode; label: string }[] = [
+  { id: "fluido", label: "Fluido" },
+  { id: "topo", label: "Topo" },
+  { id: "puntos", label: "Puntos" },
+  { id: "lineas", label: "Líneas" },
+];
+
+export const isLive = (m: HeroMode): m is LiveMode => LIVE_MODES.some((l) => l.id === m);
 
 export const HERO_MODES: { id: HeroMode; label: string }[] = [
   { id: "tinta", label: "Tinta" },
