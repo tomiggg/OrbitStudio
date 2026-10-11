@@ -33,7 +33,7 @@ export function V2(props: Props) {
 
   return (
     <MotionConfig reducedMotion="user">
-      <V2Provider openContact={openContact}>
+      <V2Provider openContact={openContact} persist={!!props.versionCHref}>
         <Shell {...props} contact={contact} closeContact={closeContact} />
       </V2Provider>
     </MotionConfig>

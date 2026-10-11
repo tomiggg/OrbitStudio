@@ -284,7 +284,7 @@ export function Hero() {
           <motion.span className="mono" {...metaIn(0)}>
             Identidad + sistemas
             <br />
-            para pymes
+            para negocios
           </motion.span>
           <motion.span className="mono hide-m" {...metaIn(1)}>
             Identidad

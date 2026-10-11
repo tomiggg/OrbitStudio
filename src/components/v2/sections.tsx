@@ -889,7 +889,7 @@ export function Marquee() {
       </VelocityRow>
       <VelocityRow base={2}>
         <span className="mq-set mq-small">
-          {["Identidad", "Operaciones", "Pymes", "Córdoba, AR", "LATAM", "Est. 2026"].map((w, i) => (
+          {["Identidad", "Operaciones", "Negocios", "Córdoba, AR", "LATAM", "Est. 2026"].map((w, i) => (
             <span key={w} className="mq-it">
               <span className="mono">({String(i + 1).padStart(2, "0")})</span>
               <span>{w}</span>
@@ -957,7 +957,7 @@ export function Cta() {
         <MaskText as="h2" className="cta-t" text={"¿Listo para\n*construir?*"} stagger={0.08} />
         <div className="cta-bot">
           <p>
-            Contanos cómo trabaja tu pyme hoy. En 30 minutos te decimos <b>qué ordenar primero</b>.
+            Contanos cómo trabaja tu negocio hoy. En 30 minutos te decimos <b>qué ordenar primero</b>.
           </p>
           <div className="cta-btns">
             <a className="btn o" href={`https://wa.me/${WHATSAPP}`} target="_blank" rel="noreferrer">
@@ -1015,7 +1015,7 @@ export function Footer({ versionCHref }: { versionCHref?: string }) {
         <div>
           <span className="mono">Estudio</span>
           <span>Shift Studio®</span>
-          <span className="mu">Sistemas de negocio para pymes</span>
+          <span className="mu">Sistemas para negocios</span>
         </div>
         <div>
           <span className="mono">Navegación</span>
