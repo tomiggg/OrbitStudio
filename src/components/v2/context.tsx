@@ -11,7 +11,7 @@ export type Settings = {
   grain: boolean;
 };
 
-const DEFAULTS: Settings = { hero: "tinta", set: "estudio", accent: true, grain: true };
+const DEFAULTS: Settings = { hero: "fluido", set: "estudio", accent: true, grain: true };
 const STORAGE_KEY = "ss_v2_settings";
 
 type Ctx = {

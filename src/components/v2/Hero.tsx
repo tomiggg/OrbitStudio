@@ -229,9 +229,13 @@ export function Hero() {
     addEventListener("pointermove", move, { passive: true });
     return () => removeEventListener("pointermove", move);
   }, [fine, reduceMotion, px, py]);
+  // Los rótulos se revelan desde una máscara (clip-path) en vez de un fundido:
+  // mismo gesto que las letras y, como nunca están en opacity 0, cuentan para
+  // el LCP desde el primer pintado (detrás de la intro) y no recién al final.
+  const HID = "inset(0% 0% 100% 0%)";
   const metaIn = (i: number) => ({
-    initial: { opacity: 0, y: 14 },
-    animate: ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 },
+    initial: { clipPath: HID, y: 14 },
+    animate: ready ? { clipPath: "inset(0% 0% 0% 0%)", y: 0 } : { clipPath: HID, y: 14 },
     transition: { duration: DUR.slow, ease: EASE, delay: 0.6 + i * 0.07 },
   });
 
