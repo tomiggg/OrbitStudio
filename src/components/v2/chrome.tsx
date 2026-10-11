@@ -9,7 +9,7 @@ import {
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics/track";
 import { useV2 } from "./context";
-import { HERO_MODES, IMAGE_SETS } from "./media";
+import { HERO_MODES, IMAGE_SETS, LIVE_MODES } from "./media";
 import { DUR, EASE, EASE_IN, EASE_IO, Roll, stagger } from "./primitives";
 import { useMedia } from "./useMedia";
 
@@ -478,9 +478,15 @@ export function SettingsPanel({ versionCHref }: { versionCHref: string }) {
               <span className="mono">Solo preview</span>
             </div>
             <Seg
-              label="Hero"
+              label="Hero · video"
               value={settings.hero}
               options={HERO_MODES}
+              onChange={(hero) => update({ hero })}
+            />
+            <Seg
+              label="Hero · en vivo"
+              value={settings.hero}
+              options={LIVE_MODES}
               onChange={(hero) => update({ hero })}
             />
             <Seg

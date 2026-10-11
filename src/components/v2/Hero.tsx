@@ -10,7 +10,8 @@ import {
 } from "framer-motion";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useV2 } from "./context";
-import { HERO_PHOTO, HERO_VIDEOS, SETS, type HeroMode } from "./media";
+import { HeroCanvas } from "./HeroCanvas";
+import { HERO_PHOTO, HERO_VIDEOS, SETS, isLive, type HeroMode } from "./media";
 import { DUR, EASE, Magnetic, MaskText, stagger } from "./primitives";
 import { useIsMobile, useMedia, useSectionProgress } from "./useMedia";
 
@@ -53,7 +54,7 @@ function Slides({ slides }: { slides: string[] }) {
   );
 }
 
-export function HeroMedia({ mode, slides }: { mode: HeroMode; slides: string[] }) {
+export function HeroMedia({ mode, slides, accent }: { mode: HeroMode; slides: string[]; accent: boolean }) {
   return (
     <AnimatePresence initial={false}>
       <motion.div
@@ -64,7 +65,9 @@ export function HeroMedia({ mode, slides }: { mode: HeroMode; slides: string[] }
         exit={{ opacity: 0 }}
         transition={{ duration: 0.9, ease: "easeInOut" }}
       >
-        {mode === "foto" ? (
+        {isLive(mode) ? (
+          <HeroCanvas mode={mode} accent={accent} />
+        ) : mode === "foto" ? (
           <div className="hm-img kb" style={{ backgroundImage: `url(${HERO_PHOTO})` }} />
         ) : mode === "slides" ? (
           <Slides slides={slides} />
@@ -267,7 +270,7 @@ export function Hero() {
         >
           <motion.div className="hero-frame" style={js ? { scaleX: fX, scaleY: fY } : undefined}>
             <motion.div className="hero-media" style={js ? { scaleX: mX, scaleY: mY } : undefined}>
-              <HeroMedia mode={settings.hero} slides={SETS[settings.set].slides} />
+              <HeroMedia mode={settings.hero} slides={SETS[settings.set].slides} accent={settings.accent} />
             </motion.div>
             <motion.div className="hero-veil" style={js ? { opacity: veilO } : undefined} />
           </motion.div>

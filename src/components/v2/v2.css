@@ -122,16 +122,21 @@ html.v2-cur .v2 input,html.v2-cur .v2 textarea{cursor:text}
    que el viewport por lado para que sus esquinas redondeadas queden afuera al
    llegar a pantalla completa; el media lleva la contra-escala. */
 .v2 .hero-frame-in{position:absolute;inset:0}
-.v2 .hero-frame{position:absolute;inset:calc(-1 * var(--hr,40px));border-radius:var(--hr,40px);overflow:hidden;background:#0A0A09;transform:scale(var(--sx,.34),var(--sy,.44));transform-origin:50% 50%;will-change:transform}
+.v2 .hero-frame{position:absolute;inset:calc(-1 * var(--hr,40px));border-radius:var(--hr,40px);overflow:hidden;background:var(--bg);transform:scale(var(--sx,.34),var(--sy,.44));transform-origin:50% 50%;will-change:transform}
 .v2 .hero-media{position:absolute;inset:0;transform:scale(calc(1.3 / var(--sx,.34)),calc(1.3 / var(--sy,.44)));transform-origin:50% 50%;will-change:transform}
 .v2 .hero-w,.v2 .hero-meta,.v2 .hero-stmt,.v2 .hero-veil{will-change:transform,opacity}
 .v2 .hm{position:absolute;inset:0}
-.v2 .hm video,.v2 .hm-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.v2 .hm video,.v2 .hm-img,.v2 .hm-cv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+/* Con el shift, el humo también se da vuelta: tinta sobre papel en vez de humo
+   sobre negro (los clips son en escala de grises, así que invertir no ensucia).
+   Los fondos en vivo hacen lo mismo dentro del shader (u_tone). */
+.v2 .hm video{transition:filter .7s var(--ease-io)}
+.v2[data-tone="light"] .hm video{filter:invert(.96) sepia(.06)}
 .v2 .hm-img{background:center/cover no-repeat;filter:grayscale(1) contrast(1.05)}
 .v2 .kb{animation:v2kb 16s ease-in-out infinite alternate}
 @keyframes v2kb{from{transform:scale(1.02)}to{transform:scale(1.14) translate(-1.5%,-1%)}}
 .v2 .hm-count{position:absolute;right:var(--pad);bottom:28px;color:rgba(236,234,229,.8);z-index:2}
-.v2 .hero-veil{position:absolute;inset:0;background:#0A0A09;pointer-events:none}
+.v2 .hero-veil{position:absolute;inset:0;background:var(--bg);pointer-events:none}
 .v2 .hero-meta{position:absolute;left:var(--pad);right:var(--pad);top:clamp(88px,12vh,124px);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;z-index:3}
 .v2 .hero-meta .mono{color:rgba(236,234,229,.72)}
 .v2 .hero-cue{display:inline-flex;align-items:center;gap:10px}
@@ -165,6 +170,8 @@ html.v2-cur .v2 input,html.v2-cur .v2 textarea{cursor:text}
 .v2 .mf-t .sf{letter-spacing:-.025em}
 .v2 .mf-pill{display:inline-block;height:.8em;vertical-align:-.06em;border-radius:999px;overflow:hidden;position:relative;margin-right:.25em;background:var(--bg3)}
 .v2 .mf-pill>span{position:absolute;inset:0;background:center/cover no-repeat;filter:grayscale(1)}
+/* Sobre hueso, las fotos se "imprimen" en el papel: los blancos toman el tono del fondo. */
+.v2[data-tone="light"] .mf-pill>span{mix-blend-mode:multiply;filter:grayscale(1) contrast(1.12)}
 .v2 .mf-prog{position:absolute;left:var(--pad);right:var(--pad);bottom:32px;height:1px;background:color-mix(in srgb,var(--fg) 45%,transparent);transform-origin:0 50%}
 
 /* ── facts ── */
